@@ -5,6 +5,10 @@ class Textos {
   static String btnCadastrar = "Cadastrar";
   static String btnAvancar = "Avançar";
   static String btnListarEscalas = "Ver lista de Escalas";
+  static String btnAdicionar = "Adicionar";
+  static String btnRecarregar = "Recarregar";
+  static String btnExcluir = "Excluir";
+  static String btnUsarEscala = "Utilizar está escala";
 
   // TELA CADASTRO E SELECAO DE LOCAIS DE TRABALHO
   static String tituloTelaCadastroSelecaoLocalTrabalho = "Locais de Trabalho";
@@ -38,6 +42,13 @@ class Textos {
 
   // TELA GERAR ESCALA
   static String descricaoGerarEscala = "Defina o nome que a escala irá receber";
+
+  // TELA SELECAO TABELAS
+  static String tituloTelaSelecaoTabelas = "Seleção de Escalas";
+  static String descricaoDropDownTabelas =
+      "Utilize o menu abaixo para selecionar uma "
+      "Escalas para estar sendo utilizada.";
+  static String descricaoTabelaSelecionada = "A Escalas selecionada foi : ";
 
   //MENSAGENS DE ERROS
   static String erroCampoVazio = "Preencha este campo";

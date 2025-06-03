@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
-import 'package:sscaleg/modelo/escala_modelo.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
@@ -35,90 +33,15 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   List<int> listaNumeroAuxiliarRepeticao = [];
 
   List<String> nomeVoluntarios = PassarPegarDados.recuperarNomesVoluntarios();
-
   List<Map> escalaSorteada = [];
-
-  // List<EscalaSonoplatasModelo> escalaSorteadaSom = [];
-  // List<String> locaisSorteioVoluntarios = [
-  //   Constantes.porta01,
-  //   Constantes.banheiroFeminino,
-  //   Constantes.primeiraHoraPulpito,
-  //   Constantes.segundaHoraPulpito,
-  //   Constantes.primeiraHoraEntrada,
-  //   Constantes.segundaHoraEntrada,
-  //   Constantes.mesaApoio,
-  //   Constantes.recolherOferta,
-  //   Constantes.irmaoReserva
-  // ];
-
+  int index = 0;
   String horarioSemana = "19:20";
   String horarioFinalSemana = "17:50";
 
-  // List<String> gravataCor = [
-  //   Constantes.gravataPreta,
-  //   Constantes.gravataAmarela,
-  //   Constantes.gravataAzul,
-  //   Constantes.gravataDourada,
-  //   Constantes.gravataMarsala,
-  //   Constantes.gravataVerde,
-  //   Constantes.gravataVermelha
-  // ];
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
-    // // removendo da lista de locais de trabalho os pontos
-    // // que nao irao receber voluntarios baseado no tipo de voluntario
-    // if (widget.tipoCadastroVoluntarios ==
-    //     Constantes.fireBaseDocumentoSonoplastas) {
-    //   locaisSorteioVoluntarios.clear();
-    //   locaisSorteioVoluntarios = [
-    //     Constantes.mesaSom,
-    //     Constantes.notebook,
-    //     Constantes.videos,
-    //     Constantes.irmaoReserva,
-    //   ];
-    // } else {
-    //   if (widget.tipoCadastroVoluntarios !=
-    //       Constantes.fireBaseDocumentoCooperadores) {
-    //     // caso o tipo de voluntario seja diferente do parametro
-    //     // passado entrar no if e remover os seguintes elementos
-    //     locaisSorteioVoluntarios.removeWhere(
-    //       (element) =>
-    //           element.contains(Constantes.primeiraHoraPulpito) ||
-    //           element.contains(Constantes.segundaHoraPulpito) ||
-    //           element.contains(Constantes.recolherOferta) ||
-    //           element.contains(Constantes.porta01),
-    //     );
-    //   } else {
-    //     locaisSorteioVoluntarios.removeWhere(
-    //       (element) =>
-    //           element.contains(Constantes.mesaApoio) ||
-    //           element.contains(Constantes.banheiroFeminino),
-    //     );
-    //   }
-    // }
-    // //adicionando o nome dos voluntarios a uma lista de String
-    // for (var element in widget.voluntariosSelecionados) {
-    //   // add somente o nome na lista
-    //   nomeVoluntarios.add(element.texto);
-    // }
-    // // chamando metodo para recuperar o horario de troca de turno
-    // chamarRecuperarHorarioTroca();
   }
-
-  // metodo para chamar recuperacao do horario de troca de turno
-  // chamarRecuperarHorarioTroca() async {
-  //   horarioSemana = await MetodosAuxiliares.recuperarValoresSharePreferences(
-  //     Constantes.diaSegunda,
-  //   );
-  //   horarioFinalSemana =
-  //       await MetodosAuxiliares.recuperarValoresSharePreferences(
-  //         Constantes.diaDomingo,
-  //       );
-  // }
 
   // metodo para realizar o sorteio dos nomes nos locais de trabalho
   fazerSorteio() {
@@ -128,12 +51,12 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     // limpando listas
     escalaSorteada.clear();
     listaNumeroAuxiliarRepeticao.clear();
-    Map linha = {};
     int numeroRandomico = 0;
     // chamando metodo para sortear posicoes na lista de numero
     // sem repeticao para ser utilizado no FOR abaixo
     sortearNomesSemRepeticao(numeroRandomico);
     for (var datas in intervaloTrabalho) {
+      Map linha = {};
       String horarioInicioTrabalho = "";
       //verificando se a data Contem algum dos parametros a abaixo para
       // definir qual sera o horario de troca de turno
@@ -152,22 +75,15 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
         // no index que esta e vai atribuir um NOME DE VOLUNTARIO a esse LOCAL da
         // LINHA baseado no valor que a LISTA de NUMEROS AUXILIAR recebeu para que
         // não haja repeticao de nomes na mesma LINHA
+        // linha[nome_local_trabalho] = "nome voluntario"
         linha[locaisSorteioVoluntarios.elementAt(index)] = nomeVoluntarios
             .elementAt(listaNumeroAuxiliarRepeticao.elementAt(index));
       }
-
-      // //chamando metodo para sortear
-      // // novas combinacoes de nome
+      escalaSorteada.add(linha);
       sortearNomesSemRepeticao(numeroRandomico);
     }
-    print("Linha:${linha}");
-    chamarCadastroItens(linha);
+    chamarCadastroItens();
   }
-
-  // sortearGravata() {
-  //   int numeroRandom = random.nextInt(gravataCor.length);
-  //   return gravataCor.elementAt(numeroRandom);
-  // }
 
   // metodo para chamar o sorteio de nomes sem repeticao
   sortearNomesSemRepeticao(int numeroRandomico) {
@@ -197,24 +113,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     }
   }
 
-  // metodo para chamar o cadastro de itens no banco de dados
-  chamarCadastroItens(Map linha) async {
-    int contador = 0;
-    var db = FirebaseFirestore.instance;
-    db
-        // definindo a COLECAO no Firebase
-        .collection(Constantes.fireBaseColecaoEscalas)
-        // definindo o nome do DOCUMENTO
-        .add({Constantes.fireBaseDocumentoDadosEscalas: nomeEscala.text});
-    String idDocumentoFirebase = await buscarIDDocumentoFirebase();
-
-    linha.forEach((key, value) {
-      print(key);
-      print(value);
-     cadastrarItens(key, value, idDocumentoFirebase);
-    });
-  }
-
+  //metodo para buscar o id na base de dados para poder adicionar os dados
+  // naquele id buscado
   buscarIDDocumentoFirebase() async {
     String idDocumentoFirebase = "";
     var db = FirebaseFirestore.instance;
@@ -222,10 +122,12 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
         // definindo a COLECAO no Firebase
         .collection(Constantes.fireBaseColecaoEscalas)
         // selecionar todos os itens que contem o parametro passado
-        .where(Constantes.fireBaseDocumentoDadosEscalas)
+        .where(Constantes.fireBaseDocumentoNomeEscalas)
         .get()
         .then((querySnapshot) {
           for (var docSnapshot in querySnapshot.docs) {
+            //verificando se o retorno do banco de dados contem
+            // o nome digitado no campo de texto
             if (docSnapshot.data().values.contains(nomeEscala.text)) {
               // caso seja definir que a variavel vai receber o valor
               idDocumentoFirebase = docSnapshot.id;
@@ -235,36 +137,78 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     return idDocumentoFirebase;
   }
 
-  cadastrarItens(
-    String chaveNomeCampo,
-    String valorDadosCampos,
-    String idDocumentoFirebase,
-  ) async {
+  // metodo para chamar o cadastro de itens no banco de dados
+  chamarCadastroItens() async {
+    try {
+      var db = FirebaseFirestore.instance;
+      db
+          // definindo a COLECAO no Firebase
+          .collection(Constantes.fireBaseColecaoEscalas)
+          // definindo o nome do DOCUMENTO
+          .add({Constantes.fireBaseDocumentoNomeEscalas: nomeEscala.text})
+          .then(
+            (value) async {
+              String idDocumentoFirebase = await buscarIDDocumentoFirebase();
+              //percorrento a lista
+              for (var element in escalaSorteada) {
+                // para cada iteracao chamar metodo
+                cadastrarItens(element.entries.toList(), idDocumentoFirebase);
+              }
+            },
+            onError: (e) {
+              chamarExibirMensagemErro("Erro Criar Nome Escala : ${e.toString()}");
+            },
+          );
+    } catch (e) {
+      chamarExibirMensagemErro(e.toString());
+    }
+  }
+
+  chamarExibirMensagemErro(String erro){
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoErro,
+      erro,
+      context,
+    );
+  }
+
+  cadastrarItens(List<MapEntry> escala, String idDocumentoFirebase) async {
     try {
       var db = FirebaseFirestore.instance;
       db
           .collection(Constantes.fireBaseColecaoEscalas)
           .doc(idDocumentoFirebase)
-          .collection(Constantes.fireBaseDocumentoDadosEscalas)
+          .collection(Constantes.fireBaseDadosCadastrados)
           .doc()
-          .set({chaveNomeCampo: valorDadosCampos.toString()});
+          .set(criarMapComTodosOsDados(escala))
+          .then((value) {
+            index++;
+            //ve
+            if (index == escalaSorteada.length) {
+              index = 0;
+              MetodosAuxiliares.exibirMensagens(
+                Constantes.tipoNotificacaoSucesso,
+                Textos.notificacaoSucesso,
+                context,
+              );
+            }
+          });
     } catch (e) {
-      MetodosAuxiliares.exibirMensagens(
-        Constantes.tipoNotificacaoErro,
-        Textos.erroListaVazia,
-        context,
-      );
-      if (kDebugMode) {
-        print(e.toString());
-      }
+      chamarExibirMensagemErro(e.toString());
     }
   }
 
-  chamarTelaCarregamento() {
-    setState(() {
-      exibirWidgetCarregamento = true;
-    });
+  criarMapComTodosOsDados(List<MapEntry> escala) {
+    Map<String, dynamic> itemFinal = {};
+    //percorrendo a escala para pegar cada item da escala
+    // e colocar num Map para ser retornado
+    for (var element in escala) {
+      itemFinal[element.key] = element.value;
+    }
+    return itemFinal;
   }
+
+  chamarTelaCarregamento() {}
 
   @override
   Widget build(BuildContext context) {
@@ -326,8 +270,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                     style: const TextStyle(fontSize: 20),
                                   ),
                                 ),
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                Column(
                                   children: [
                                     Form(
                                       key: validacaoFormulario,
@@ -354,6 +297,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                     Container(
                                       margin: const EdgeInsets.symmetric(
                                         horizontal: 10.0,
+                                        vertical: 10.0,
                                       ),
                                       width: 100,
                                       height: 50,
@@ -365,24 +309,13 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                             fazerSorteio();
                                           }
                                         },
-                                        child: Text(Textos.btnGerarEscala),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
-                                      ),
-                                      width: 100,
-                                      height: 50,
-                                      child: FloatingActionButton(
-                                        heroTag: Textos.btnGerarEscala,
-                                        onPressed: () {
-                                          escalaSorteada.forEach((element) {
-                                            print(element);
-                                          });
-                                          print(escalaSorteada.length);
-                                        },
-                                        child: Text("Textos.btnGerarEscala"),
+                                        child: Text(
+                                          Textos.btnGerarEscala,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],

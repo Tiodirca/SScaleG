@@ -27,6 +27,10 @@ class _TelaInicialState extends State<TelaInicial> {
           Navigator.pushReplacementNamed(
               context,
               Constantes.rotaTelaCadastroSelecaoLocalTrabalho);
+        }else if(nomeBtn == Textos.btnListarEscalas){
+          Navigator.pushReplacementNamed(
+              context,
+              Constantes.rotaTelaCadastroSelecaoLocalTrabalho);
         }
         //else if (nomeBtn == Textos.btnConfiguracoes) {
         //   // Navigator.pushReplacementNamed(

@@ -5,6 +5,7 @@ import 'package:sscaleg/telas/geracao_escalas/tela_gerar_escala.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_dias_semana.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_intervalo_trabalho.dart';
 import 'package:sscaleg/telas/tela_inicial.dart';
+import 'package:sscaleg/telas/tela_listagem_escala_banco_dados.dart';
 
 import '../telas/tela_splash.dart';
 import 'constantes.dart';
@@ -34,6 +35,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => const TelaSelecaoIntervaloTrabalho());
       case Constantes.rotaTelaGerarEscala:
         return MaterialPageRoute(builder: (_) => const TelaGerarEscala());
+        case Constantes.rotaTelaListagemEscalaBandoDados:
+      return MaterialPageRoute(builder: (_) => const TelaListagemTabelasBancoDados());
     }
     // Se o argumento não é do tipo correto, retorna erro
     return erroRota(settings);

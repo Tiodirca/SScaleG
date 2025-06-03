@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
+
 class Constantes {
   //ROTAS
   static const rotaTelaSplash = "telaSplash";
   static const rotaTelaInicial = "telaInicial";
+  //Rotas da GERACAO DE ESCALA
   static const rotaTelaCadastroSelecaoLocalTrabalho =
       "telaCadSelecaoLocalTrabalho";
   static const rotaTelaCadastroSelecaoVoluntarios = "telaCadSelecaoVoluntarios";
@@ -9,6 +12,9 @@ class Constantes {
   static const rotaTelaSelecaoIntervaloTrabalho =
       "telaSelecaoIntervaloTrabalho";
   static const rotaTelaGerarEscala = "telaGerarEscala";
+
+  static const rotaTelaListagemEscalaBandoDados = "telaListagemEscalaBancoDados";
+
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";
@@ -19,8 +25,24 @@ class Constantes {
   static const diaSabado = "Sábado";
   static const diaDomingo = "Domingo";
 
+  //Complementos da geracao de escala
   static const dataCulto = "Data";
   static const horarioTrabalho = "Horario de Trabalho";
+
+  // ICONES
+  static const iconeTelaInicial = Icons.home_filled;
+  static const iconeAdicionar = Icons.add;
+  static const iconeAtualizar = Icons.update;
+  static const iconeLista = Icons.list_alt_outlined;
+  static const iconeOpcoesData = Icons.settings;
+
+  static const iconeExclusao = Icons.close;
+  static const iconeRecarregar = Icons.refresh;
+  static const iconeBaixar = Icons.download_rounded;
+
+  static const iconeSalvar = Icons.save;
+  static const iconeSalvarOpcoes = Icons.save_as;
+  static const iconeDataCulto = Icons.date_range_outlined;
 
   //TIPO NOTIFICACAO
   static const tipoNotificacaoSucesso = "Sucesso";
@@ -38,5 +60,5 @@ class Constantes {
   //VOLUNTARIOS
   static const fireBaseColecaoEscalas = "Escalas";
   static const fireBaseDadosCadastrados = "dados_tabela";
-  static const fireBaseDocumentoDadosEscalas = "dados_escalas";
+  static const fireBaseDocumentoNomeEscalas = "nome_escalas";
 }
