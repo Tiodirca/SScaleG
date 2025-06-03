@@ -23,14 +23,14 @@ class _TelaInicialState extends State<TelaInicial> {
     child: FloatingActionButton(
       heroTag: nomeBtn,
       onPressed: () {
-        if (nomeBtn == Textos.btnGerarEscala) {
+        if (nomeBtn == Textos.btnCriarEscala) {
           Navigator.pushReplacementNamed(
               context,
               Constantes.rotaTelaCadastroSelecaoLocalTrabalho);
         }else if(nomeBtn == Textos.btnListarEscalas){
           Navigator.pushReplacementNamed(
               context,
-              Constantes.rotaTelaCadastroSelecaoLocalTrabalho);
+              Constantes.rotaTelaListagemEscalaBandoDados);
         }
         //else if (nomeBtn == Textos.btnConfiguracoes) {
         //   // Navigator.pushReplacementNamed(
@@ -97,7 +97,7 @@ class _TelaInicialState extends State<TelaInicial> {
                     // child: Text(Textos.descricaoTelaInicial,
                     //     style: const TextStyle(fontSize: 18),
                     //     textAlign: TextAlign.center)),
-                    botao(Textos.btnGerarEscala),
+                    botao(Textos.btnCriarEscala),
                     botao(Textos.btnListarEscalas),
                   ],
                 ),

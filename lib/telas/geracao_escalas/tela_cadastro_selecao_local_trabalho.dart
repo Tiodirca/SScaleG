@@ -120,27 +120,38 @@ class _TelaCadastroSelecaoLocalTrabalhoState
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
-          .collection(
-            nomeColecaoFireBase,
-          ) // passando a colecao
+          .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
-          .set({
-            nomeDocumentoFireBase: nomeControle.text,
-          });
-      chamarTelaCarregamento();
-      realizarBuscaDadosFireBase();
-      MetodosAuxiliares.exibirMensagens(
-        Constantes.tipoNotificacaoSucesso,
-        Textos.notificacaoSucesso,
-        context,
-      );
+          .set({nomeDocumentoFireBase: nomeControle.text})
+          .then(
+            (value) {
+              chamarTelaCarregamento();
+              realizarBuscaDadosFireBase();
+              chamarExibirMensagemSucesso();
+            },
+            onError: (e) {
+              chamarExibirMensagemErro("Erro Cadastrar Local: ${e.toString()}");
+            },
+          );
     } catch (e) {
-      MetodosAuxiliares.exibirMensagens(
-        Constantes.tipoNotificacaoErro,
-        Textos.notificacaoErro,
-        context,
-      );
+      chamarExibirMensagemErro(e.toString());
     }
+  }
+
+  chamarExibirMensagemErro(String erro) {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoErro,
+      erro,
+      context,
+    );
+  }
+
+  chamarExibirMensagemSucesso(){
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoSucesso,
+      Textos.notificacaoSucesso,
+      context,
+    );
   }
 
   chamarTelaCarregamento() {
@@ -153,24 +164,34 @@ class _TelaCadastroSelecaoLocalTrabalhoState
   }
 
   realizarBuscaDadosFireBase() async {
-    var db = FirebaseFirestore.instance;
-    //instanciano variavel
-    db.collection(nomeColecaoFireBase).get().then((
-      querySnapshot,
-    ) async {
-      // for para percorrer todos os dados que a variavel recebeu
-      if (querySnapshot.docs.isNotEmpty) {
-        for (var documentoFirebase in querySnapshot.docs) {
-          // chamando metodo para converter json
-          // recebido do firebase para objeto
-          converterJsonParaObjeto(documentoFirebase.id);
-        }
-      } else {
-        setState(() {
-          exibirWidgetCarregamento = false;
-        });
-      }
-    });
+    try {
+      var db = FirebaseFirestore.instance;
+      //instanciano variavel
+      db
+          .collection(nomeColecaoFireBase)
+          .get()
+          .then(
+            (querySnapshot) async {
+              // for para percorrer todos os dados que a variavel recebeu
+              if (querySnapshot.docs.isNotEmpty) {
+                for (var documentoFirebase in querySnapshot.docs) {
+                  // chamando metodo para converter json
+                  // recebido do firebase para objeto
+                  converterJsonParaObjeto(documentoFirebase.id);
+                }
+              } else {
+                setState(() {
+                  exibirWidgetCarregamento = false;
+                });
+              }
+            },
+            onError: (e) {
+              chamarExibirMensagemErro("Erro Buscar Locais: ${e.toString()}");
+            },
+          );
+    } catch (e) {
+      chamarExibirMensagemErro(e.toString());
+    }
   }
 
   converterJsonParaObjeto(String id) async {
@@ -209,19 +230,12 @@ class _TelaCadastroSelecaoLocalTrabalhoState
             setState(() {
               chamarTelaCarregamento();
               realizarBuscaDadosFireBase();
-              MetodosAuxiliares.exibirMensagens(
-                Constantes.tipoNotificacaoSucesso,
-                Textos.notificacaoSucesso,
-                context,
-              );
+             chamarExibirMensagemSucesso();
             });
           },
-          onError:
-              (e) => MetodosAuxiliares.exibirMensagens(
-                Constantes.tipoNotificacaoErro,
-                Textos.notificacaoErro,
-                context,
-              ),
+          onError: (e) {
+            chamarExibirMensagemErro("Erro Deletar: ${e.toString()}");
+          },
         );
   }
 
@@ -414,7 +428,8 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                           width: larguraTela,
                                           child: Text(
                                             textAlign: TextAlign.center,
-                                            Textos.descricaoSelecaoLocalTrabalho,
+                                            Textos
+                                                .descricaoSelecaoLocalTrabalho,
                                             style: const TextStyle(
                                               fontSize: 20,
                                             ),
@@ -481,16 +496,15 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                     child: FloatingActionButton(
                       heroTag: Textos.btnAvancar,
                       onPressed: () {
-                        if(listaNomesSelecionados.isEmpty){
+                        if (listaNomesSelecionados.isEmpty) {
                           MetodosAuxiliares.exibirMensagens(
                             Constantes.tipoNotificacaoErro,
                             Textos.erroListaVazia,
                             context,
                           );
-                        }else{
+                        } else {
                           redirecionarProximaTela();
                         }
-
                       },
                       child: Text(Textos.btnAvancar),
                     ),

@@ -19,7 +19,6 @@ class TelaGerarEscala extends StatefulWidget {
 }
 
 class _TelaGerarEscalaState extends State<TelaGerarEscala> {
-  String ordenarCadastroVoluntarios = "";
   bool exibirWidgetCarregamento = false;
   final validacaoFormulario = GlobalKey<FormState>();
   Estilo estilo = Estilo();
@@ -233,7 +232,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
             } else {
               return Scaffold(
                 appBar: AppBar(
-                  title: Text(Textos.btnGerarEscala),
+                  title: Text(Textos.btnCriarEscala),
                   leading: IconButton(
                     color: Colors.white,
                     onPressed: () {
@@ -302,7 +301,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                       width: 100,
                                       height: 50,
                                       child: FloatingActionButton(
-                                        heroTag: Textos.btnGerarEscala,
+                                        heroTag: Textos.btnCriarEscala,
                                         onPressed: () {
                                           if (validacaoFormulario.currentState!
                                               .validate()) {
@@ -310,7 +309,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                           }
                                         },
                                         child: Text(
-                                          Textos.btnGerarEscala,
+                                          Textos.btnCriarEscala,
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,

@@ -101,6 +101,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
       }
     }
   }
+
   // metodo para cadastrar item
   cadastrarNome(String nome) async {
     try {
@@ -109,21 +110,31 @@ class _TelaCadastroSelecaoNomesVoluntariosState
       db
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
-          .set({nomeDocumentoFireBase: nomeControle.text});
-      chamarTelaCarregamento();
-      realizarBuscaDadosFireBase();
-      MetodosAuxiliares.exibirMensagens(
-        Constantes.tipoNotificacaoSucesso,
-        Textos.notificacaoSucesso,
-        context,
-      );
+          .set({nomeDocumentoFireBase: nomeControle.text})
+          .then((value) {
+            chamarTelaCarregamento();
+            realizarBuscaDadosFireBase();
+            chamarExibirMensagemSucesso();
+          });
     } catch (e) {
-      MetodosAuxiliares.exibirMensagens(
-        Constantes.tipoNotificacaoErro,
-        Textos.notificacaoErro,
-        context,
-      );
+      chamarExibirMensagemErro(e.toString());
     }
+  }
+
+  chamarExibirMensagemErro(String erro) {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoErro,
+      erro,
+      context,
+    );
+  }
+
+  chamarExibirMensagemSucesso() {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoSucesso,
+      Textos.notificacaoSucesso,
+      context,
+    );
   }
 
   chamarTelaCarregamento() {
@@ -136,22 +147,36 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   }
 
   realizarBuscaDadosFireBase() async {
-    var db = FirebaseFirestore.instance;
-    //instanciano variavel
-    db.collection(nomeColecaoFireBase).get().then((querySnapshot) async {
-      // for para percorrer todos os dados que a variavel recebeu
-      if (querySnapshot.docs.isNotEmpty) {
-        for (var documentoFirebase in querySnapshot.docs) {
-          // chamando metodo para converter json
-          // recebido do firebase para objeto
-          converterJsonParaObjeto(documentoFirebase.id);
-        }
-      } else {
-        setState(() {
-          exibirWidgetCarregamento = false;
-        });
-      }
-    });
+    try {
+      var db = FirebaseFirestore.instance;
+      //instanciano variavel
+      db
+          .collection(nomeColecaoFireBase)
+          .get()
+          .then(
+            (querySnapshot) async {
+              // for para percorrer todos os dados que a variavel recebeu
+              if (querySnapshot.docs.isNotEmpty) {
+                for (var documentoFirebase in querySnapshot.docs) {
+                  // chamando metodo para converter json
+                  // recebido do firebase para objeto
+                  converterJsonParaObjeto(documentoFirebase.id);
+                }
+              } else {
+                setState(() {
+                  exibirWidgetCarregamento = false;
+                });
+              }
+            },
+            onError: (e) {
+              chamarExibirMensagemErro(
+                "Erro Buscar Voluntarios: ${e.toString()}",
+              );
+            },
+          );
+    } catch (e) {
+      chamarExibirMensagemErro(e.toString());
+    }
   }
 
   converterJsonParaObjeto(String id) async {
@@ -181,25 +206,22 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   // Metodo para chamar deletar tabela
   chamarDeletar(CheckBoxModelo checkbox) async {
     var db = FirebaseFirestore.instance;
-    await db.collection(nomeColecaoFireBase).doc(checkbox.id).delete().then(
-      (doc) {
-        setState(() {
-          chamarTelaCarregamento();
-          realizarBuscaDadosFireBase();
-          MetodosAuxiliares.exibirMensagens(
-            Constantes.tipoNotificacaoSucesso,
-            Textos.notificacaoSucesso,
-            context,
-          );
-        });
-      },
-      onError:
-          (e) => MetodosAuxiliares.exibirMensagens(
-            Constantes.tipoNotificacaoErro,
-            Textos.notificacaoErro,
-            context,
-          ),
-    );
+    await db
+        .collection(nomeColecaoFireBase)
+        .doc(checkbox.id)
+        .delete()
+        .then(
+          (doc) {
+            setState(() {
+              chamarTelaCarregamento();
+              realizarBuscaDadosFireBase();
+              chamarExibirMensagemSucesso();
+            });
+          },
+          onError: (e) {
+            chamarExibirMensagemErro("Erro Deletar: ${e.toString()}");
+          },
+        );
   }
 
   Future<void> alertaExclusao(
@@ -256,7 +278,10 @@ class _TelaCadastroSelecaoNomesVoluntariosState
 
   redirecionarProximaTela() {
     PassarPegarDados.passarNomesVoluntarios(listaNomesSelecionados);
-    Navigator.pushReplacementNamed(context, Constantes.rotaTelaSelecaoDiasSemana);
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaSelecaoDiasSemana,
+    );
   }
 
   validarCampoEChamarCadastrar() {

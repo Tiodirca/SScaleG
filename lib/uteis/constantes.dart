@@ -13,8 +13,13 @@ class Constantes {
       "telaSelecaoIntervaloTrabalho";
   static const rotaTelaGerarEscala = "telaGerarEscala";
 
+  //ROTAS LISTAGEM ESCALAS
   static const rotaTelaListagemEscalaBandoDados = "telaListagemEscalaBancoDados";
+  static const rotaTelaEscalaDetalhada = "telaEscalaDetalhada";
 
+  //ARGUMENTOS
+  static const rotaArgumentEscalaDetalhadaNomeEscala = "nomeEscala";
+  static const rotaArgumentoEscalaDetalhadaIDEscalaSelecionada = "IDEscalaSelecionada";
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";
@@ -26,13 +31,17 @@ class Constantes {
   static const diaDomingo = "Domingo";
 
   //Complementos da geracao de escala
-  static const dataCulto = "Data";
-  static const horarioTrabalho = "Horario de Trabalho";
+  static const dataCulto = "DData";
+  static const horarioTrabalho = "DHorario de Trabalho";
+  static const editar = "Editar";
+  static const excluir = "Excluir";
+  static const idDocumento = "idDocumento";
 
   // ICONES
   static const iconeTelaInicial = Icons.home_filled;
   static const iconeAdicionar = Icons.add;
   static const iconeAtualizar = Icons.update;
+  static const iconeEditar = Icons.edit;
   static const iconeLista = Icons.list_alt_outlined;
   static const iconeOpcoesData = Icons.settings;
 
@@ -40,7 +49,10 @@ class Constantes {
   static const iconeRecarregar = Icons.refresh;
   static const iconeBaixar = Icons.download_rounded;
 
+
   static const iconeSalvar = Icons.save;
+  static const iconeAbrirBarraPesquisa = Icons.search;
+  static const iconeBarraPesquisar = Icons.send;
   static const iconeSalvarOpcoes = Icons.save_as;
   static const iconeDataCulto = Icons.date_range_outlined;
 

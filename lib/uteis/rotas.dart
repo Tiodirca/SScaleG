@@ -4,6 +4,7 @@ import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_nomes_volunt
 import 'package:sscaleg/telas/geracao_escalas/tela_gerar_escala.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_dias_semana.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_intervalo_trabalho.dart';
+import 'package:sscaleg/telas/tela_escala_detalhada.dart';
 import 'package:sscaleg/telas/tela_inicial.dart';
 import 'package:sscaleg/telas/tela_listagem_escala_banco_dados.dart';
 
@@ -32,11 +33,30 @@ class Rotas {
       case Constantes.rotaTelaSelecaoDiasSemana:
         return MaterialPageRoute(builder: (_) => const TelaSelecaoDiasSemana());
       case Constantes.rotaTelaSelecaoIntervaloTrabalho:
-        return MaterialPageRoute(builder: (_) => const TelaSelecaoIntervaloTrabalho());
+        return MaterialPageRoute(
+          builder: (_) => const TelaSelecaoIntervaloTrabalho(),
+        );
       case Constantes.rotaTelaGerarEscala:
         return MaterialPageRoute(builder: (_) => const TelaGerarEscala());
-        case Constantes.rotaTelaListagemEscalaBandoDados:
-      return MaterialPageRoute(builder: (_) => const TelaListagemTabelasBancoDados());
+      case Constantes.rotaTelaListagemEscalaBandoDados:
+        return MaterialPageRoute(
+          builder: (_) => const TelaListagemTabelasBancoDados(),
+        );
+      case Constantes.rotaTelaEscalaDetalhada:
+        if (args is Map) {
+          return MaterialPageRoute(
+            builder:
+                (_) => TelaEscalaDetalhada(
+                  nomeTabela:
+                      args[Constantes.rotaArgumentEscalaDetalhadaNomeEscala],
+                  idTabelaSelecionada:
+                      args[Constantes
+                          .rotaArgumentoEscalaDetalhadaIDEscalaSelecionada],
+                ),
+          );
+        } else {
+          return erroRota(settings);
+        }
     }
     // Se o argumento não é do tipo correto, retorna erro
     return erroRota(settings);

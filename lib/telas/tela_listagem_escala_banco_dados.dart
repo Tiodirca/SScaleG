@@ -60,8 +60,9 @@ class _TelaListagemTabelasBancoDadosState
             .toString()
             .replaceAll("(", "")
             .replaceAll(")", "");
-        tabelasBancoDados
-            .add(TabelaModelo(nomeTabela: nomeTabela, idTabela: doc.id));
+        tabelasBancoDados.add(
+          TabelaModelo(nomeTabela: nomeTabela, idTabela: doc.id),
+        );
       }
     });
     return tabelasBancoDados;
@@ -84,9 +85,7 @@ class _TelaListagemTabelasBancoDadosState
                   Textos.descricaoAlertaExclusao,
                   style: const TextStyle(color: Colors.black),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Wrap(
                   children: [
                     Text(
@@ -100,19 +99,13 @@ class _TelaListagemTabelasBancoDadosState
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(
-                'Não',
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text('Não', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text(
-                'Sim',
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text('Sim', style: TextStyle(color: Colors.black)),
               onPressed: () {
                 chamarDeletar();
                 Navigator.of(context).pop();
@@ -137,21 +130,17 @@ class _TelaListagemTabelasBancoDadosState
         .collection(Constantes.fireBaseColecaoEscalas)
         .doc(retornoIdDocumentoFireBase)
         .delete()
-        .then(
-      (doc) {
-        setState(() {
-          tabelasBancoDados = [];
-          nomeItemDrop = "";
-          nomeTabelaSelecionada = "";
-          exibirConfirmacaoTabelaSelecionada = false;
-        });
-        // MetodosAuxiliares.exibirMensagens(Textos.sucessoMsgExcluirEscala,
-        //     Textos.tipoNotificacaoSucesso, context);
-        chamarConsultarTabelas();
-      },onError: (e){
-
-    }
-    );
+        .then((doc) {
+          setState(() {
+            tabelasBancoDados = [];
+            nomeItemDrop = "";
+            nomeTabelaSelecionada = "";
+            exibirConfirmacaoTabelaSelecionada = false;
+          });
+          // MetodosAuxiliares.exibirMensagens(Textos.sucessoMsgExcluirEscala,
+          //     Textos.tipoNotificacaoSucesso, context);
+          chamarConsultarTabelas();
+        }, onError: (e) {});
   }
 
   realizarConsultaDocumentoFirebase() async {
@@ -163,15 +152,13 @@ class _TelaListagemTabelasBancoDadosState
         .collection(Constantes.fireBaseColecaoEscalas)
         .where(Constantes.fireBaseDocumentoNomeEscalas)
         .get()
-        .then(
-      (querySnapshot) {
-        for (var docSnapshot in querySnapshot.docs) {
-          if (docSnapshot.data().values.contains(nomeTabelaSelecionada)) {
-            idDocumentoFirebase = docSnapshot.id;
+        .then((querySnapshot) {
+          for (var docSnapshot in querySnapshot.docs) {
+            if (docSnapshot.data().values.contains(nomeTabelaSelecionada)) {
+              idDocumentoFirebase = docSnapshot.id;
+            }
           }
-        }
-      },
-    );
+        });
     return idDocumentoFirebase;
   }
 
@@ -185,281 +172,294 @@ class _TelaListagemTabelasBancoDadosState
         .doc(idDocumentoFirebase)
         .collection(Constantes.fireBaseDadosCadastrados)
         .get()
-        .then(
-      (querySnapshot) {
-        // para cada iteracao do FOR excluir o
-        // item corresponde ao ID da iteracao
-        for (var docSnapshot in querySnapshot.docs) {
-          db
-              .collection(Constantes.fireBaseColecaoEscalas)
-              .doc(idDocumentoFirebase)
-              .collection(Constantes.fireBaseDadosCadastrados)
-              .doc(docSnapshot.id)
-              .delete();
-        }
-      },
-    );
+        .then((querySnapshot) {
+          // para cada iteracao do FOR excluir o
+          // item corresponde ao ID da iteracao
+          for (var docSnapshot in querySnapshot.docs) {
+            db
+                .collection(Constantes.fireBaseColecaoEscalas)
+                .doc(idDocumentoFirebase)
+                .collection(Constantes.fireBaseDadosCadastrados)
+                .doc(docSnapshot.id)
+                .delete();
+          }
+        });
   }
 
-  Widget botoesAcoes(String nomeBotao, IconData icone, Color corBotao,
-          double largura, double altura) =>
-      SizedBox(
-          height: altura,
-          width: largura,
-          child: FloatingActionButton(
-              heroTag: nomeBotao,
-              elevation: 0,
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(color: corBotao),
-                  borderRadius: const BorderRadius.all(Radius.circular(10))),
-              onPressed: () async {
-                if (nomeBotao == Textos.btnAdicionar) {
-                  Navigator.pushReplacementNamed(
-                      context, Constantes.rotaTelaInicial);
-                } else if (nomeBotao == Textos.btnRecarregar) {
-                  setState(() {
-                    exibirWidgetCarregamento = true;
-                  });
-                  chamarConsultarTabelas();
-                } else {
-                  alertaExclusao(context);
-                }
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (nomeBotao == Textos.btnExcluir) {
-                        return Container();
-                      } else {
-                        return Text(
-                          nomeBotao,
-                          style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: PaletaCores.corAzulMagenta),
-                        );
-                      }
-                    },
+  Widget botoesAcoes(
+    String nomeBotao,
+    IconData icone,
+    Color corBotao,
+    double largura,
+    double altura,
+  ) => SizedBox(
+    height: altura,
+    width: largura,
+    child: FloatingActionButton(
+      heroTag: nomeBotao,
+      elevation: 0,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: corBotao),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
+      onPressed: () async {
+        if (nomeBotao == Textos.btnCriarEscala) {
+          Navigator.pushReplacementNamed(
+            context,
+            Constantes.rotaTelaCadastroSelecaoLocalTrabalho,
+          );
+        } else if (nomeBotao == Textos.btnRecarregar) {
+          setState(() {
+            exibirWidgetCarregamento = true;
+          });
+          chamarConsultarTabelas();
+        } else {
+          alertaExclusao(context);
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (nomeBotao == Textos.btnExcluir) {
+                return Container();
+              } else {
+                return Text(
+                  nomeBotao,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: PaletaCores.corAzulMagenta,
                   ),
-                ],
-              )));
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     double larguraTela = MediaQuery.of(context).size.width;
     double alturaTela = MediaQuery.of(context).size.height;
     Timer(Duration(seconds: 2), () {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
-          overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.immersiveSticky,
+        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+      );
     });
     return Theme(
-        data: estilo.estiloGeral,
-        child: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-          },
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (exibirWidgetCarregamento) {
-                return const TelaCarregamento();
-              } else {
-                return Scaffold(
-                  appBar: AppBar(
-                      title: Text(Textos.btnListarEscalas),
-                      leading: IconButton(
-                        color: Colors.white,
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                              context, Constantes.rotaTelaInicial);
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                        ),
-                      )),
-                  body: LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (tabelasBancoDados.isEmpty) {
-                        return Container(
-                          margin: const EdgeInsets.all(30),
-                          width: larguraTela,
-                          height: alturaTela,
-                          child: Column(
-                            children: [
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 20),
-                                width: larguraTela * 0.5,
-                                child: Text(
-                                    "Textos.descricaoErroConsultasBancoDados",
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center),
-                              ),
-                              Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    botoesAcoes(
-                                        Textos.btnAdicionar,
-                                        Constantes.iconeAdicionar,
-                                        PaletaCores.corCastanho,
-                                        80,
-                                        60),
-                                    botoesAcoes(
-                                        Textos.btnRecarregar,
-                                        Constantes.iconeRecarregar,
-                                        PaletaCores.corCastanho,
-                                        80,
-                                        60)
-                                  ]),
-                            ],
-                          ),
-                        );
-                      } else {
-                        return Container(
-                            color: Colors.white,
-                            width: larguraTela,
-                            height: alturaTela,
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  width: larguraTela,
-                                  child: Text(
-                                    textAlign: TextAlign.center,
-                                    Textos.descricaoDropDownTabelas,
-                                    style: const TextStyle(fontSize: 20),
-                                  ),
-                                ),
-                                DropdownButton(
-                                  value: nomeItemDrop,
-                                  icon: const Icon(
-                                    Icons.keyboard_arrow_down,
-                                    size: 40,
-                                    color: Colors.black,
-                                  ),
-                                  items: tabelasBancoDados
-                                      .map((item) => DropdownMenuItem<String>(
-                                            value: item.nomeTabela,
-                                            child: Text(
-                                              item.nomeTabela.toString(),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 20),
-                                            ),
-                                          ))
-                                      .toList(),
-                                  onChanged: (String? value) {
-                                    setState(() {
-                                      nomeItemDrop = value!;
-                                      nomeTabelaSelecionada = nomeItemDrop;
-                                      for (var element in tabelasBancoDados) {
-                                        if (element.nomeTabela
-                                            .contains(nomeTabelaSelecionada)) {
-                                          idTabelaSelecionada =
-                                              element.idTabela;
-                                        }
-                                      }
-                                      exibirConfirmacaoTabelaSelecionada = true;
-                                    });
-                                  },
-                                ),
-                                Visibility(
-                                    visible: exibirConfirmacaoTabelaSelecionada,
-                                    child: Container(
-                                        margin: const EdgeInsets.all(10),
-                                        width: larguraTela,
-                                        child: Column(
-                                          children: [
-                                            Wrap(
-                                              crossAxisAlignment:
-                                                  WrapCrossAlignment.center,
-                                              alignment: WrapAlignment.center,
-                                              children: [
-                                                Text(
-                                                  textAlign: TextAlign.center,
-                                                  "Textos.descricaoTabelaSelecionada",
-                                                  style: const TextStyle(
-                                                      fontSize: 20),
-                                                ),
-                                                Text(
-                                                  textAlign: TextAlign.center,
-                                                  nomeTabelaSelecionada,
-                                                  style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Container(
-                                                  margin: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 20),
-                                                  child: botoesAcoes(
-                                                      Textos.btnExcluir,
-                                                      Constantes.iconeExclusao,
-                                                      PaletaCores
-                                                          .corRosaAvermelhado,
-                                                      40,
-                                                      40),
-                                                )
-                                              ],
-                                            ),
-                                            Container(
-                                              margin: const EdgeInsets.all(20),
-                                              width: 200,
-                                              height: 50,
-                                              child: ElevatedButton(
-                                                child: Text(
-                                                  Textos.btnUsarEscala,
-                                                  textAlign: TextAlign.center,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: PaletaCores
-                                                          .corAzulMagenta,
-                                                      fontSize: 18),
-                                                ),
-                                                onPressed: () {
-                                                  // var dados = {};
-                                                  // dados[Constantes
-                                                  //         .rotaArgumentoNomeEscala] =
-                                                  //     nomeTabelaSelecionada;
-                                                  // dados[Constantes
-                                                  //         .rotaArgumentoIDEscalaSelecionada] =
-                                                  //     idTabelaSelecionada;
-                                                  // if (nomeTabelaSelecionada
-                                                  //     .contains(Constantes
-                                                  //         .argumentoDiferenciarEscalaSom)) {
-                                                  //   Navigator.pushReplacementNamed(
-                                                  //       context,
-                                                  //       Constantes
-                                                  //           .rotaEscalaDetalhadaSom,
-                                                  //       arguments: dados);
-                                                  // } else {
-                                                  //   Navigator.pushReplacementNamed(
-                                                  //       context,
-                                                  //       Constantes
-                                                  //           .rotaEscalaDetalhada,
-                                                  //       arguments: dados);
-                                                  //}
-                                                },
-                                              ),
-                                            )
-                                          ],
-                                        )))
-                              ],
-                            ));
-                      }
+      data: estilo.estiloGeral,
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (exibirWidgetCarregamento) {
+              return const TelaCarregamento();
+            } else {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text(Textos.btnListarEscalas),
+                  leading: IconButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        Constantes.rotaTelaInicial,
+                      );
                     },
+                    icon: const Icon(Icons.arrow_back_ios),
                   ),
-                );
-              }
-            },
-          ),
-        ));
+                ),
+                body: LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (tabelasBancoDados.isEmpty) {
+                      return Container(
+                        color: Colors.white,
+                        width: larguraTela,
+                        height: alturaTela,
+                        child: Column(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 20,
+                                horizontal: 20,
+                              ),
+                              width: larguraTela * 0.5,
+                              child: Text(
+                                Textos.erroBaseDadosVazia,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                botoesAcoes(
+                                  Textos.btnCriarEscala,
+                                  Constantes.iconeAdicionar,
+                                  PaletaCores.corCastanho,
+                                  100,
+                                  60,
+                                ),
+                                botoesAcoes(
+                                  Textos.btnRecarregar,
+                                  Constantes.iconeRecarregar,
+                                  PaletaCores.corCastanho,
+                                  100,
+                                  60,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Container(
+                        color: Colors.white,
+                        width: larguraTela,
+                        height: alturaTela,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              width: larguraTela,
+                              child: Text(
+                                textAlign: TextAlign.center,
+                                Textos.descricaoDropDownTabelas,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ),
+                            DropdownButton(
+                              value: nomeItemDrop,
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 40,
+                                color: Colors.black,
+                              ),
+                              items:
+                                  tabelasBancoDados
+                                      .map(
+                                        (item) => DropdownMenuItem<String>(
+                                          value: item.nomeTabela,
+                                          child: Text(
+                                            item.nomeTabela.toString(),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  nomeItemDrop = value!;
+                                  nomeTabelaSelecionada = nomeItemDrop;
+                                  for (var element in tabelasBancoDados) {
+                                    if (element.nomeTabela.contains(
+                                      nomeTabelaSelecionada,
+                                    )) {
+                                      idTabelaSelecionada = element.idTabela;
+                                    }
+                                  }
+                                  exibirConfirmacaoTabelaSelecionada = true;
+                                });
+                              },
+                            ),
+                            Visibility(
+                              visible: exibirConfirmacaoTabelaSelecionada,
+                              child: Container(
+                                margin: const EdgeInsets.all(10),
+                                width: larguraTela,
+                                child: Column(
+                                  children: [
+                                    Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      alignment: WrapAlignment.center,
+                                      children: [
+                                        Text(
+                                          textAlign: TextAlign.center,
+                                          Textos.descricaoTabelaSelecionada,
+                                          style: const TextStyle(fontSize: 20),
+                                        ),
+                                        Text(
+                                          textAlign: TextAlign.center,
+                                          nomeTabelaSelecionada,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                          ),
+                                          child: botoesAcoes(
+                                            Textos.btnExcluir,
+                                            Constantes.iconeExclusao,
+                                            PaletaCores.corRosaAvermelhado,
+                                            40,
+                                            40,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.all(20),
+                                      width: 200,
+                                      height: 50,
+                                      child: ElevatedButton(
+                                        child: Text(
+                                          Textos.btnUsarEscala,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: PaletaCores.corAzulMagenta,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          var dados = {};
+                                          dados[Constantes
+                                                  .rotaArgumentEscalaDetalhadaNomeEscala] =
+                                              nomeTabelaSelecionada;
+                                          dados[Constantes
+                                                  .rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
+                                              idTabelaSelecionada;
+                                          Navigator.pushReplacementNamed(
+                                            context,
+                                            Constantes.rotaTelaEscalaDetalhada,
+                                            arguments: dados,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                ),
+              );
+            }
+          },
+        ),
+      ),
+    );
   }
 }

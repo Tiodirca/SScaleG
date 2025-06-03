@@ -1,6 +1,6 @@
 class Textos {
   static String nomeApp = "SScaleG";
-  static String btnGerarEscala = "Gerar Escala";
+  static String btnCriarEscala = "Criar Escala";
 
   static String btnCadastrar = "Cadastrar";
   static String btnAvancar = "Avançar";
@@ -8,6 +8,9 @@ class Textos {
   static String btnAdicionar = "Adicionar";
   static String btnRecarregar = "Recarregar";
   static String btnExcluir = "Excluir";
+  static String btnTelaInicial = "Tela Inicial";
+  static String btnBaixar = "Baixar";
+  static String btnEditar = "Editar";
   static String btnUsarEscala = "Utilizar está escala";
 
   // TELA CADASTRO E SELECAO DE LOCAIS DE TRABALHO
@@ -49,6 +52,16 @@ class Textos {
       "Utilize o menu abaixo para selecionar uma "
       "Escalas para estar sendo utilizada.";
   static String descricaoTabelaSelecionada = "A Escalas selecionada foi : ";
+
+  // LISTAGEM
+  static String tituloTelaEscalaDetalhada = "Escalas Detalhada";
+  static String descricaoTelaListagemItens =
+      "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
+
+  static String telaFiltragemDescricao = "Aqui você pode ver os nomes "
+      "e a quantidade de vezes que eles se repetem, "
+      "aperte encima do nome para visualizar na escala onde eles estão";
+
 
   //MENSAGENS DE ERROS
   static String erroCampoVazio = "Preencha este campo";
