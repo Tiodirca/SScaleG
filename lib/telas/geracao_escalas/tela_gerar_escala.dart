@@ -35,6 +35,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   List<Map> escalaSorteada = [];
   int index = 0;
   String horarioSemana = "19:20";
+  String nomeEscalaFormatada = "";
   String horarioFinalSemana = "17:50";
 
   @override
@@ -127,7 +128,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
           for (var docSnapshot in querySnapshot.docs) {
             //verificando se o retorno do banco de dados contem
             // o nome digitado no campo de texto
-            if (docSnapshot.data().values.contains(nomeEscala.text)) {
+            if (docSnapshot.data().values.contains(nomeEscalaFormatada)) {
               // caso seja definir que a variavel vai receber o valor
               idDocumentoFirebase = docSnapshot.id;
             }
@@ -144,26 +145,35 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
           // definindo a COLECAO no Firebase
           .collection(Constantes.fireBaseColecaoEscalas)
           // definindo o nome do DOCUMENTO
-          .add({Constantes.fireBaseDocumentoNomeEscalas: nomeEscala.text})
+          .add({Constantes.fireBaseDocumentoNomeEscalas: nomeEscalaFormatada})
           .then(
             (value) async {
               String idDocumentoFirebase = await buscarIDDocumentoFirebase();
               //percorrento a lista
+              idDocumento = idDocumentoFirebase;
               for (var element in escalaSorteada) {
                 // para cada iteracao chamar metodo
                 cadastrarItens(element.entries.toList(), idDocumentoFirebase);
               }
             },
             onError: (e) {
-              chamarExibirMensagemErro("Erro Criar Nome Escala : ${e.toString()}");
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
+              chamarExibirMensagemErro(
+                "Erro Criar Nome Escala : ${e.toString()}",
+              );
             },
           );
     } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
       chamarExibirMensagemErro(e.toString());
     }
   }
 
-  chamarExibirMensagemErro(String erro){
+  chamarExibirMensagemErro(String erro) {
     MetodosAuxiliares.exibirMensagens(
       Constantes.tipoNotificacaoErro,
       erro,
@@ -190,11 +200,30 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                 Textos.notificacaoSucesso,
                 context,
               );
+              redirecionarProximaTela();
             }
           });
     } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
       chamarExibirMensagemErro(e.toString());
     }
+  }
+
+  redirecionarProximaTela() {
+    var dados = {};
+    dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] =
+        nomeEscalaFormatada;
+    dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
+        idDocumento;
+    Timer(const Duration(seconds: 3), () {
+      Navigator.pushReplacementNamed(
+        context,
+        Constantes.rotaTelaEscalaDetalhada,
+        arguments: dados,
+      );
+    });
   }
 
   criarMapComTodosOsDados(List<MapEntry> escala) {
@@ -207,7 +236,15 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     return itemFinal;
   }
 
-  chamarTelaCarregamento() {}
+  chamarFazerSorteio() {
+    setState(() {
+      nomeEscalaFormatada = nomeEscala.text.replaceAll(" ", "_");
+      exibirWidgetCarregamento = true;
+    });
+    if (validacaoFormulario.currentState!.validate()) {
+      fazerSorteio();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -278,11 +315,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                         child: TextFormField(
                                           controller: nomeEscala,
                                           onFieldSubmitted: (value) {
-                                            if (validacaoFormulario
-                                                .currentState!
-                                                .validate()) {
-                                              fazerSorteio();
-                                            }
+                                            chamarFazerSorteio();
                                           },
                                           validator: (value) {
                                             if (value!.isEmpty) {
@@ -303,10 +336,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                       child: FloatingActionButton(
                                         heroTag: Textos.btnCriarEscala,
                                         onPressed: () {
-                                          if (validacaoFormulario.currentState!
-                                              .validate()) {
-                                            fazerSorteio();
-                                          }
+                                          chamarFazerSorteio();
                                         },
                                         child: Text(
                                           Textos.btnCriarEscala,

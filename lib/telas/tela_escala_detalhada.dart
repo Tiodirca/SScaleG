@@ -8,6 +8,7 @@ import 'package:sscaleg/Uteis/paleta_cores.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
+import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
@@ -27,23 +28,17 @@ class TelaEscalaDetalhada extends StatefulWidget {
 
 class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   Estilo estilo = Estilo();
-  bool exibirTelaPesquisa = false;
   bool exibirBarraPesquisa = false;
-  late List<Map> escala;
-  List<String> cabecalhoEscala = [];
   bool exibirWidgetCarregamento = true;
   bool exibirOcultarBtnAcao = true;
-  int contadorItensEscala = 0;
-  int quantRepeticaoNome = 0;
-  int contadorQuantiItemEscala = 0;
+  late List<Map> escala;
+  List<String> cabecalhoEscala = [];
   List<Map> listaIDDocumento = [];
-  List<String> nomesFiltrados = [];
   List<DataColumn> cabecalho = [];
   List<DataRow> linhas = [];
-  Set<String> nomes = Set();
   String nomeReacar = "";
   final validacaoFormulario = GlobalKey<FormState>();
-  TextEditingController nomePesquisa = TextEditingController(text: "");
+  TextEditingController textoPesquisa = TextEditingController(text: "");
   Map<String, int> quantidadeRepeticaoNome = {};
 
   @override
@@ -53,16 +48,21 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
   }
 
+  limparVariaveis() {
+    setState(() {
+      escala.clear();
+      linhas.clear();
+      cabecalhoEscala.clear();
+      cabecalho.clear();
+      listaIDDocumento.clear();
+    });
+  }
+
   realizarBuscaDadosFireBase(String idDocumento) async {
     setState(() {
-      nomes.clear();
-      escala.clear();
-      quantidadeRepeticaoNome.clear();
-      nomesFiltrados.clear();
-      nomeReacar = "";
-      contadorItensEscala = 0;
-      quantRepeticaoNome = 0;
+      exibirWidgetCarregamento = true;
     });
+    limparVariaveis();
     var db = FirebaseFirestore.instance;
     //instanciano variavel
     db
@@ -70,63 +70,65 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         .doc(idDocumento)
         .collection(Constantes.fireBaseDadosCadastrados)
         .get()
-        .then((querySnapshot) async {
-          //Veficando se nao e vazio
-          if (querySnapshot.docs.isNotEmpty) {
-            // for para percorrer todos os dados que a variavel recebeu
-            for (var documentoFirebase in querySnapshot.docs) {
-              //mudando estado da lista adicionando os itens nela
-              setState(() {
-                Map idDocumentoData = {};
-                idDocumentoData[documentoFirebase.id] =
-                    documentoFirebase.data().values.first;
-                listaIDDocumento.addAll([idDocumentoData]);
-                escala.addAll([documentoFirebase.data()]);
-                //escala.add(documentoFirebase.data());
-                //ordandando lista pela data
-                ordenarListaPelaData();
-              });
-            }
-            if (escala.isEmpty) {
+        .then(
+          (querySnapshot) async {
+            //Veficando se nao e vazio
+            if (querySnapshot.docs.isNotEmpty) {
+              // for para percorrer todos os dados que a variavel recebeu
+              for (var documentoFirebase in querySnapshot.docs) {
+                //mudando estado da lista adicionando os itens nela
+                setState(() {
+                  Map idDocumentoData = {};
+                  idDocumentoData[documentoFirebase.id] =
+                      documentoFirebase.data().values.first;
+                  listaIDDocumento.addAll([idDocumentoData]);
+                  escala.addAll([documentoFirebase.data()]);
+                  //ordandando lista pela data
+                  ordenarListaPelaData();
+                });
+              }
+
+              if (escala.isEmpty) {
+                setState(() {
+                  exibirOcultarBtnAcao = false;
+                  exibirWidgetCarregamento = false;
+                });
+              } else {
+                carregarLinhas();
+                setState(() {
+                  cabecalhoEscala =
+                      querySnapshot.docs.first.data().keys.toList();
+                  //adicionando no cabecalho colunas de editar e excluir
+                  cabecalhoEscala.addAll([
+                    Constantes.editar,
+                    Constantes.excluir,
+                  ]);
+                  carregarCabecalho();
+                  exibirOcultarBtnAcao = true;
+                  exibirWidgetCarregamento = false;
+                });
+              }
+            } else {
               setState(() {
                 exibirOcultarBtnAcao = false;
                 exibirWidgetCarregamento = false;
               });
-            } else {
-              for (var element in escala) {
-                List<dynamic> elementos = [];
-                //adicionando somente os VALORES na lista
-                elementos = element.values.toList();
-                elementos.addAll([Constantes.editar, Constantes.excluir]);
-                //chamando metodo para adicionar cada item em uma linha e coluna
-                adicionarLinhasNaEscala(elementos);
-              }
-              setState(() {
-                cabecalhoEscala = querySnapshot.docs.first.data().keys.toList();
-                cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
-                carregarCabecalho();
-                exibirOcultarBtnAcao = true;
-                exibirWidgetCarregamento = false;
-              });
             }
-          } else {
-            setState(() {
-              exibirOcultarBtnAcao = false;
-              exibirWidgetCarregamento = false;
-            });
-          }
-        });
+          },
+          onError: (e) {
+            chamarExibirMensagemErro("Erro ao buscar escala : ${e.toString()}");
+          },
+        );
   }
 
-  carregarCabecalho() {
-    for (var element in cabecalhoEscala) {
-      cabecalho.add(
-        DataColumn(
-          label: Text(
-            element.toString().replaceAll("DD", "D").replaceAll("DH", "H"),
-          ),
-        ),
-      );
+  carregarLinhas() {
+    for (var element in escala) {
+      List<dynamic> elementos = [];
+      //adicionando somente os VALORES na lista
+      elementos = element.values.toList();
+      elementos.addAll([Constantes.editar, Constantes.excluir]);
+      //chamando metodo para adicionar cada item em uma linha e coluna
+      adicionarLinhasNaEscala(elementos);
     }
   }
 
@@ -153,11 +155,30 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
               );
             } else if (e.toString() == Constantes.excluir) {
               return DataCell(
-                botoesAreaPesquisa(
-                  Constantes.iconeExclusao,
-                  PaletaCores.corAzulMagenta,
-                  40,
-                  40,
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: FloatingActionButton(
+                    heroTag: Constantes.excluir,
+                    onPressed: () {
+                      for (var elemento in listaIDDocumento) {
+                        for (var element in listaItem) {
+                          if (elemento.values.contains(element)) {
+                            alertaExclusao(
+                              context,
+                              elemento.values.toString(),
+                              elemento.keys.toString(),
+                            );
+                          }
+                        }
+                      }
+                    },
+                    child: Icon(
+                      Constantes.iconeExclusao,
+                      color: PaletaCores.corAzulMagenta,
+                      size: 25,
+                    ),
+                  ),
                 ),
               );
             } else {
@@ -178,13 +199,15 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     ]);
   }
 
-  pegarIDDocumentoLinha(List<dynamic> listaItem) {
-    for (var elemento in listaIDDocumento) {
-      for (var element in listaItem) {
-        if (elemento.values.contains(element)) {
-          return {elemento.keys};
-        }
-      }
+  carregarCabecalho() {
+    for (var element in cabecalhoEscala) {
+      cabecalho.add(
+        DataColumn(
+          label: Text(
+            element.toString().replaceAll("DD", "D").replaceAll("DH", "H"),
+          ),
+        ),
+      );
     }
   }
 
@@ -211,7 +234,9 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   }
 
   validarNomeFoco(String nome) {
-    if (nome.toLowerCase().contains("jhonatan")) {
+    //colocando tudo em minuscolo pois se tiver maiusculo nao localiza
+    if (nome.toLowerCase().contains(nomeReacar.toLowerCase()) &&
+        nomeReacar.isNotEmpty) {
       return BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border(
@@ -226,225 +251,106 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     }
   }
 
-  // converterJsonParaObjeto(
-  //     String idDocumento, String id, int tamanhoEscala) async {
-  //   // instanciando variavel
-  //   var db = FirebaseFirestore.instance;
-  //   //fazendo busca no banco de dados
-  //   final ref = db
-  //       .collection(Constantes.fireBaseColecaoEscala)
-  //       .doc(idDocumento)
-  //       .collection(Constantes.fireBaseDadosCadastrados)
-  //       .doc(id)
-  //       // chamando conversao
-  //       .withConverter(
-  //         fromFirestore: EscalaModelo.fromFirestore,
-  //         toFirestore: (EscalaModelo escalaModelo, _) =>
-  //             escalaModelo.toFirestore(),
-  //       );
-  //
-  //   final docSnap = await ref.get();
-  //   final dados = docSnap.data(); // convertendo
-  //   if (dados != null) {
-  //     dados.id = docSnap.id;
-  //     //adicionando os dados convertidos na lista
-  //     escala.add(dados);
-  //     contadorItensEscala++;
-  //     setState(() {
-  //       ordenarLista();
-  //       chamarVerificarColunaVazia();
-  //       exibirWidgetCarregamento = false;
-  //     });
-  //     if (contadorItensEscala == tamanhoEscala) {
-  //       setState(() {
-  //         pegarNomesEscala();
-  //       });
-  //     }
-  //   }
-  // }
-
-  // pegarNomesEscala() {
-  //   List<String> nomesFiltradosAuxiliar = [];
-  //   if (exibirOcultarCampoMesaApoio) {
-  //     for (EscalaModelo voluntarios in escala) {
-  //       if (!nomes.contains(voluntarios.primeiraHoraEntrada) ||
-  //           !nomes.contains(voluntarios.irmaoReserva) ||
-  //           !nomes.contains(voluntarios.mesaApoio)) {
-  //         nomes.add(voluntarios.primeiraHoraEntrada.toLowerCase());
-  //         nomes.add(voluntarios.irmaoReserva.toLowerCase());
-  //         nomes.add(voluntarios.mesaApoio.toLowerCase());
-  //         nomesFiltradosAuxiliar.add(voluntarios.mesaApoio.toLowerCase());
-  //         nomesFiltradosAuxiliar
-  //             .add(voluntarios.primeiraHoraEntrada.toLowerCase());
-  //         nomesFiltradosAuxiliar.add(voluntarios.irmaoReserva.toLowerCase());
-  //       }
-  //     }
-  //   } else {
-  //     for (EscalaModelo voluntarios in escala) {
-  //       if (!nomes.contains(voluntarios.recolherOferta) ||
-  //           !nomes.contains(voluntarios.primeiraHoraPulpito) ||
-  //           !nomes.contains(voluntarios.primeiraHoraEntrada) ||
-  //           !nomes.contains(voluntarios.irmaoReserva)) {
-  //         nomesFiltradosAuxiliar.add(voluntarios.recolherOferta.toLowerCase());
-  //         nomesFiltradosAuxiliar.add(voluntarios.primeiraHoraPulpito.toLowerCase());
-  //         nomesFiltradosAuxiliar.add(voluntarios.primeiraHoraEntrada.toLowerCase());
-  //         nomesFiltradosAuxiliar.add(voluntarios.irmaoReserva.toLowerCase());
-  //       }
-  //     }
-  //   }
-  //   nomesFiltradosAuxiliar.forEach(
-  //     (element) {
-  //       if (element.isNotEmpty) {
-  //         if (element.contains(" e ") || element.contains("/")) {
-  //           element = element.replaceAll(" e ", "/");
-  //           nomesFiltrados.addAll(element.split("/"));
-  //         } else {
-  //           nomesFiltrados.add(element);
-  //         }
-  //       }
-  //     },
-  //   );
-  //   chamarPercorrerEscalaCompleta();
-  //   print(quantidadeRepeticaoNome.toString());
-  // }
-
-  chamarPercorrerEscalaCompleta() {
-    for (int i = 0; i < nomesFiltrados.length; i++) {
-      //percorrerEscalaCompleta(i);
-      quantRepeticaoNome = 0;
+  // // Metodo para chamar deletar tabela
+  chamarDeletar(String idDocumento) async {
+    try {
+      var db = FirebaseFirestore.instance;
+      await db
+          .collection(Constantes.fireBaseColecaoEscalas)
+          .doc(widget.idTabelaSelecionada)
+          .collection(Constantes.fireBaseDadosCadastrados)
+          .doc(idDocumento.replaceAll("(", "").replaceAll(")", ""))
+          .delete()
+          .then(
+            (doc) {
+              setState(() {
+                realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
+              });
+              chamarExibirMensagemSucesso();
+            },
+            onError: (e) {
+              chamarExibirMensagemErro("Erro ao Deletar : ${e.toString()}");
+            },
+          );
+    } catch (e) {
+      chamarExibirMensagemErro(e.toString());
     }
   }
 
-  // //metodo para percorrer a escala completa
-  // percorrerEscalaCompleta(int index) {
-  //   escala.forEach(
-  //     (element) {
-  //       verificarQuantRepeticaoNome(
-  //           element.primeiraHoraEntrada.toLowerCase(), index);
-  //       //validando se a escala e de cooperadoras
-  //       //caso o campo mesa apoio estiver ativo fazer os seguintes passos
-  //       if (exibirOcultarCampoMesaApoio) {
-  //         verificarQuantRepeticaoNome(element.mesaApoio.toLowerCase(), index);
-  //       } else {
-  //         verificarQuantRepeticaoNome(
-  //             element.recolherOferta.toLowerCase(), index);
-  //         verificarQuantRepeticaoNome(
-  //             element.primeiraHoraPulpito.toLowerCase(), index);
-  //       }
-  //       verificarQuantRepeticaoNome(element.irmaoReserva.toLowerCase(), index);
-  //     },
-  //   );
-  // }
+  chamarExibirMensagemErro(String erro) {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoErro,
+      erro,
+      context,
+    );
+  }
 
-  // //metodo para verificar q quantidade de repeticoes que a escala tem
-  // verificarQuantRepeticaoNome(String nome, int index) {
-  //   //verificando se a string JA contem na LISTA nome filtrados
-  //   if (nome.contains(nomesFiltrados.elementAt(index))) {
-  //     //caso JA tenha aumentar a quantidade
-  //     quantRepeticaoNome++;
-  //     //passando MAP para colocar o nome e a quantidade
-  //     quantidadeRepeticaoNome[nomesFiltrados.elementAt(index)] =
-  //         quantRepeticaoNome;
-  //   }
-  // }
-  //
-  // ordenarLista() {
-  //   // ordenando a lista pela data colocando
-  //   // a data mais antiga no topo da listagem
-  //   escala.sort(
-  //     (a, b) {
-  //       //convertendo data para o formato correto
-  //       int data = DateFormat("dd/MM/yyyy EEEE", "pt_BR")
-  //           .parse(a.dataCulto)
-  //           .compareTo(
-  //               DateFormat("dd/MM/yyyy EEEE", "pt_BR").parse(b.dataCulto));
-  //
-  //       // caso a variavel seja diferente de 0 quer dizer que as datas nao sao iguais
-  //       // logo sera colocado em ordem baseado na ordem acima
-  //       if (data != 0) {
-  //         return data;
-  //       }
-  //       // caso a condicao acima retorne 0 quer dizer que as datas sao iguais
-  //       // logo sera colocado em ordem baseado na ordem a baixo
-  //       return a.horarioTroca.compareTo(b.horarioTroca);
-  //     },
-  //   );
-  // }
-  //
-  // formatarHorario(String horarioTrocaRecuperado) {
-  //   String horaSeparada = horarioTrocaRecuperado.split(" : ")[1];
-  //   DateTime conversaoHorarioPData = new DateFormat("hh").parse(horaSeparada);
-  //   print(conversaoHorarioPData.hour.toString());
-  //   return conversaoHorarioPData;
-  // }
-  //
-  // // metodo para chamar metodo para verificar
-  // // se a coluna esta vazia
-  // chamarVerificarColunaVazia() {
-  //   for (var element in escala) {
-  //     if (element.mesaApoio.isNotEmpty) {
-  //       exibirOcultarCampoMesaApoio = true;
-  //       break;
-  //     } else {
-  //       exibirOcultarCampoMesaApoio = false;
-  //     }
-  //   }
-  //   for (var element in escala) {
-  //     if (element.irmaoReserva.isNotEmpty) {
-  //       exibirOcultarCampoIrmaoReserva = true;
-  //       break;
-  //     } else {
-  //       exibirOcultarCampoIrmaoReserva = false;
-  //     }
-  //   }
-  //   for (var element in escala) {
-  //     if (element.recolherOferta.isNotEmpty) {
-  //       exibirOcultarCampoRecolherOferta = true;
-  //       break;
-  //     } else {
-  //       exibirOcultarCampoRecolherOferta = false;
-  //     }
-  //   }
-  //   for (var element in escala) {
-  //     if (element.servirSantaCeia.isNotEmpty) {
-  //       exibirOcultarServirSantaCeia = true;
-  //       break;
-  //     } else {
-  //       exibirOcultarServirSantaCeia = false;
-  //     }
-  //   }
-  //   for (var element in escala) {
-  //     if (element.banheiroFeminino.isNotEmpty) {
-  //       //exibirPortaBanheiroFeminino = true;
-  //       break;
-  //     } else {
-  //       //exibirPortaBanheiroFeminino = false;
-  //     }
-  //   }
-  // }
-  //
-  // // Metodo para chamar deletar tabela
-  // chamarDeletar(EscalaModelo escalaModelo) async {
-  //   var db = FirebaseFirestore.instance;
-  //   await db
-  //       .collection(Constantes.fireBaseColecaoEscala)
-  //       .doc(widget.idTabelaSelecionada)
-  //       .collection(Constantes.fireBaseDadosCadastrados)
-  //       .doc(escalaModelo.id)
-  //       .delete()
-  //       .then(
-  //     (doc) {
-  //       setState(() {
-  //         escala.clear();
-  //         realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
-  //       });
-  //       MetodosAuxiliares.exibirMensagens(
-  //           Textos.sucessoExcluirItem, Textos.tipoNotificacaoSucesso, context);
-  //     },
-  //     onError: (e) => MetodosAuxiliares.exibirMensagens(
-  //         Textos.erroMsgExcluirItemEscala, Textos.tipoNotificacaoErro, context),
-  //   );
-  // }
+  chamarExibirMensagemSucesso() {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoSucesso,
+      Textos.notificacaoSucesso,
+      context,
+    );
+  }
+
+  Future<void> alertaExclusao(
+    BuildContext context,
+    String data,
+    String idDocumento,
+  ) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            Textos.tituloAlertaExclusao,
+            style: const TextStyle(color: Colors.black),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  Textos.descricaoAlertaExclusao,
+                  style: const TextStyle(color: Colors.black),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  children: [
+                    Text(
+                      data,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Não', style: TextStyle(color: Colors.black)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Sim', style: TextStyle(color: Colors.black)),
+              onPressed: () {
+                setState(() {
+                  nomeReacar = "";
+                  textoPesquisa.clear();
+                  exibirBarraPesquisa = false;
+                  exibirWidgetCarregamento = true;
+                });
+                chamarDeletar(idDocumento);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Widget botoesAcoes(
     String nomeBotao,
@@ -476,7 +382,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         } else if (nomeBotao == Textos.btnAdicionar) {
         } else if (nomeBotao == Textos.btnRecarregar) {
           setState(() {
-            //exibirWidgetCarregamento = true;
+            exibirWidgetCarregamento = true;
             realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
           });
         }
@@ -518,81 +424,13 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     ),
   );
 
-  // metodo para mudar status dos switch
-  // mudarSwitch(String label, bool valor) {
-  //   if (label == Textos.labelSwitchUniforme) {
-  //     setState(() {
-  //       exibirOcultarCampoUniforme = !exibirOcultarCampoUniforme;
-  //     });
-  //   }
-  // }
-
-  // Future<void> alertaExclusao(EscalaModelo escala, BuildContext context) async {
-  //   return showDialog<void>(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text(
-  //           Textos.tituloAlertaExclusao,
-  //           style: const TextStyle(color: Colors.black),
-  //         ),
-  //         content: SingleChildScrollView(
-  //           child: ListBody(
-  //             children: <Widget>[
-  //               Text(
-  //                 Textos.descricaoAlerta,
-  //                 style: const TextStyle(color: Colors.black),
-  //               ),
-  //               const SizedBox(
-  //                 height: 10,
-  //               ),
-  //               Wrap(
-  //                 children: [
-  //                   Text(
-  //                     escala.dataCulto,
-  //                     style: const TextStyle(fontWeight: FontWeight.bold),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             child: const Text(
-  //               'Não',
-  //               style: TextStyle(color: Colors.black),
-  //             ),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //           TextButton(
-  //             child: const Text(
-  //               'Sim',
-  //               style: TextStyle(color: Colors.black),
-  //             ),
-  //             onPressed: () {
-  //               setState(() {
-  //                 exibirWidgetCarregamento = true;
-  //               });
-  //               chamarDeletar(escala);
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   Widget botoesAreaPesquisa(
     IconData icone,
     Color corBotao,
     double largura,
     double altura,
-  ) => SizedBox(
+  ) => Container(
+    margin: EdgeInsets.symmetric(horizontal: 10.0),
     width: largura,
     height: altura,
     child: FloatingActionButton(
@@ -605,13 +443,18 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         } else if (icone == Constantes.iconeBarraPesquisar) {
           if (validacaoFormulario.currentState!.validate()) {
             setState(() {
-              nomeReacar = nomePesquisa.text;
+              nomeReacar = textoPesquisa.text;
+              linhas.clear();
+              carregarLinhas();
             });
           }
         } else {
           setState(() {
             exibirBarraPesquisa = false;
             nomeReacar = "";
+            textoPesquisa.clear();
+            linhas.clear();
+            carregarLinhas();
           });
         }
       },
@@ -745,7 +588,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                     ),
                                     height:
                                         Platform.isWindows
-                                            ? alturaTela * 0.55
+                                            ? alturaTela * 0.6
                                             : alturaTela * 0.5,
                                     width: larguraTela,
                                     child: Card(
@@ -790,118 +633,26 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                         elevation: 0,
                                         child: Column(
                                           children: [
-                                            // Padding(
-                                            //   padding: EdgeInsets.all(10),
-                                            //   child: Text(
-                                            //     Textos.telaFiltragemDescricao,
-                                            //     textAlign: TextAlign.center,
-                                            //   ),
-                                            // ),
                                             Row(
                                               children: [
                                                 Container(
                                                   width: 300,
                                                   height: 50,
                                                   color: Colors.white,
-                                                  child: TextFormField(
-                                                    validator: (value) {
-                                                      if (value!.isEmpty) {
-                                                        return Textos.erroCampoVazio;
-                                                      }
-                                                      return null;
-                                                    },
+                                                  child: Form(
+                                                    key: validacaoFormulario,
+                                                    child: TextFormField(
+                                                      controller: textoPesquisa,
+                                                      validator: (value) {
+                                                        if (value!.isEmpty) {
+                                                          return Textos
+                                                              .erroCampoVazio;
+                                                        }
+                                                        return null;
+                                                      },
+                                                    ),
                                                   ),
                                                 ),
-                                                // Container(
-                                                //   height: 200,
-                                                //   width: larguraTela,
-                                                //   child: Center(
-                                                //     child: GridView.builder(
-                                                //       itemCount:
-                                                //           quantidadeRepeticaoNome
-                                                //               .length,
-                                                //       gridDelegate:
-                                                //           SliverGridDelegateWithFixedCrossAxisCount(
-                                                //             crossAxisCount:
-                                                //                 Platform.isAndroid ||
-                                                //                         Platform
-                                                //                             .isIOS
-                                                //                     ? 3
-                                                //                     : 4,
-                                                //           ),
-                                                //       itemBuilder: (
-                                                //         context,
-                                                //         index,
-                                                //       ) {
-                                                //         return Container(
-                                                //           height: 100,
-                                                //           margin:
-                                                //               EdgeInsets.symmetric(
-                                                //                 vertical: 5,
-                                                //                 horizontal: 5,
-                                                //               ),
-                                                //           child: FloatingActionButton(
-                                                //             heroTag:
-                                                //                 quantidadeRepeticaoNome
-                                                //                     .keys
-                                                //                     .elementAt(
-                                                //                       index,
-                                                //                     )
-                                                //                     .toString(),
-                                                //             onPressed: () {
-                                                //               setState(() {
-                                                //                 exibirOcultarTelaQuantiRepeticaoNomes =
-                                                //                     false;
-                                                //                 nomeReacar = "";
-                                                //                 nomeReacar =
-                                                //                     quantidadeRepeticaoNome
-                                                //                         .keys
-                                                //                         .elementAt(
-                                                //                           index,
-                                                //                         );
-                                                //                 print(
-                                                //                   nomeReacar,
-                                                //                 );
-                                                //               });
-                                                //             },
-                                                //             child: Wrap(
-                                                //               alignment:
-                                                //                   WrapAlignment
-                                                //                       .center,
-                                                //               children: [
-                                                //                 Text(
-                                                //                   textAlign:
-                                                //                       TextAlign
-                                                //                           .center,
-                                                //                   " ${quantidadeRepeticaoNome.keys.elementAt(index)}",
-                                                //                   style: TextStyle(
-                                                //                     color:
-                                                //                         Colors
-                                                //                             .black,
-                                                //                   ),
-                                                //                 ),
-                                                //                 Text(
-                                                //                   textAlign:
-                                                //                       TextAlign
-                                                //                           .center,
-                                                //                   ": ${quantidadeRepeticaoNome.values.elementAt(index).toString()}",
-                                                //                   style: TextStyle(
-                                                //                     fontWeight:
-                                                //                         FontWeight
-                                                //                             .bold,
-                                                //                     color:
-                                                //                         Colors
-                                                //                             .black,
-                                                //                   ),
-                                                //                 ),
-                                                //               ],
-                                                //             ),
-                                                //           ),
-                                                //         );
-                                                //       },
-                                                //     ),
-                                                //   ),
-                                                // ),
                                                 botoesAreaPesquisa(
                                                   Constantes
                                                       .iconeBarraPesquisar,

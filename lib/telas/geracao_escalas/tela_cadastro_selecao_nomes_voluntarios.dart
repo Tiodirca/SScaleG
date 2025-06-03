@@ -111,12 +111,23 @@ class _TelaCadastroSelecaoNomesVoluntariosState
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
           .set({nomeDocumentoFireBase: nomeControle.text})
-          .then((value) {
-            chamarTelaCarregamento();
-            realizarBuscaDadosFireBase();
-            chamarExibirMensagemSucesso();
-          });
+          .then(
+            (value) {
+              chamarTelaCarregamento();
+              realizarBuscaDadosFireBase();
+              chamarExibirMensagemSucesso();
+            },
+            onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
+              chamarExibirMensagemErro("Erro ao cadastrar : ${e.toString()}");
+            },
+          );
     } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
       chamarExibirMensagemErro(e.toString());
     }
   }
@@ -169,12 +180,18 @@ class _TelaCadastroSelecaoNomesVoluntariosState
               }
             },
             onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
               chamarExibirMensagemErro(
                 "Erro Buscar Voluntarios: ${e.toString()}",
               );
             },
           );
     } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
       chamarExibirMensagemErro(e.toString());
     }
   }
@@ -219,6 +236,9 @@ class _TelaCadastroSelecaoNomesVoluntariosState
             });
           },
           onError: (e) {
+            setState(() {
+              exibirWidgetCarregamento = false;
+            });
             chamarExibirMensagemErro("Erro Deletar: ${e.toString()}");
           },
         );

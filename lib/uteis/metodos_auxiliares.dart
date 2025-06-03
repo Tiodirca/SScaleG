@@ -10,7 +10,7 @@ class MetodosAuxiliares {
         title: Text(tipoAlerta),
         showProgressIndicator: false,
         animationDuration: const Duration(seconds: 1),
-        toastDuration: const Duration(seconds: 3),
+        toastDuration: const Duration(seconds: 2),
         description: Text(msg),
       ).show(context);
     } else {
@@ -19,7 +19,7 @@ class MetodosAuxiliares {
         title: Text(tipoAlerta),
         showProgressIndicator: false,
         animationDuration: const Duration(seconds: 1),
-        toastDuration: const Duration(seconds: 3),
+        toastDuration: const Duration(seconds: 2),
         description: Text(msg),
       ).show(context);
     }

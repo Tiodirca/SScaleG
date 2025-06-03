@@ -130,10 +130,16 @@ class _TelaCadastroSelecaoLocalTrabalhoState
               chamarExibirMensagemSucesso();
             },
             onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
               chamarExibirMensagemErro("Erro Cadastrar Local: ${e.toString()}");
             },
           );
     } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
       chamarExibirMensagemErro(e.toString());
     }
   }
@@ -146,7 +152,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     );
   }
 
-  chamarExibirMensagemSucesso(){
+  chamarExibirMensagemSucesso() {
     MetodosAuxiliares.exibirMensagens(
       Constantes.tipoNotificacaoSucesso,
       Textos.notificacaoSucesso,
@@ -186,10 +192,16 @@ class _TelaCadastroSelecaoLocalTrabalhoState
               }
             },
             onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
               chamarExibirMensagemErro("Erro Buscar Locais: ${e.toString()}");
             },
           );
     } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
       chamarExibirMensagemErro(e.toString());
     }
   }
@@ -230,10 +242,13 @@ class _TelaCadastroSelecaoLocalTrabalhoState
             setState(() {
               chamarTelaCarregamento();
               realizarBuscaDadosFireBase();
-             chamarExibirMensagemSucesso();
+              chamarExibirMensagemSucesso();
             });
           },
           onError: (e) {
+            setState(() {
+              exibirWidgetCarregamento = false;
+            });
             chamarExibirMensagemErro("Erro Deletar: ${e.toString()}");
           },
         );
