@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:elegant_notification/elegant_notification.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sscaleg/uteis/constantes.dart';
+import 'package:sscaleg/uteis/textos.dart';
 
 class MetodosAuxiliares {
   static exibirMensagens(String tipoAlerta, String msg, BuildContext context) {
@@ -23,5 +25,39 @@ class MetodosAuxiliares {
         description: Text(msg),
       ).show(context);
     }
+  }
+
+  static formatarHorarioAjuste(TimeOfDay horarioDefinido) {
+    String horarioFormatado =
+        "${Textos.widgetAjustarHorarioInicio}${horarioDefinido.hour.toString().padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(2, "0")}";
+    return horarioFormatado;
+  }
+
+  static gravarHorarioInicioTrabalhoDefinido(
+    String parametroSharePreferences,
+    String horarioDefinido,
+  ) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(parametroSharePreferences, horarioDefinido);
+  }
+
+  static recuperarValoresSharePreferences(
+    String parametroSharePreferences,
+  ) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String valorRecuperado = prefs.getString(parametroSharePreferences) ?? '';
+    return valorRecuperado;
+  }
+
+  //metodo para ajustar o tamanho do textField com base no tamanho da tela
+  static ajustarTamanhoTextField(double larguraTela) {
+    double tamanho = 150;
+    //verificando qual o tamanho da tela
+    if (larguraTela <= 600) {
+      tamanho = 190;
+    } else {
+      tamanho = 500;
+    }
+    return tamanho;
   }
 }

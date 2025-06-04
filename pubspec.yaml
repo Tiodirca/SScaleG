@@ -25,6 +25,8 @@ dependencies:
   universal_html: ^2.2.1
   # necessario para notificacao elegante
   elegant_notification: ^2.2.2
+  # necessario para gravar chaves valores
+  shared_preferences: ^2.5.3
   # necessario para rodar firebase
   firebase_database: ^11.1.0
   cloud_firestore: ^5.3.0

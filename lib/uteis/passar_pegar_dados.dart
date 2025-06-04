@@ -3,6 +3,8 @@ class PassarPegarDados {
   static List<String> nomesVoluntarios = [];
   static List<String> diasSemana = [];
   static List<String> intervaloTrabalho = [];
+  static String horarioFinalSemanaDefinido = "";
+  static String horarioSemanaDefinido = "";
 
   static List<String> passarNomesLocaisTrabalho(List<String> locaisTrabalho) {
     nomesLocaisTrabalho = locaisTrabalho;
@@ -38,5 +40,23 @@ class PassarPegarDados {
 
   static List<String> recuperarIntervaloTrabalho() {
     return intervaloTrabalho;
+  }
+
+  static String passarHorarioSemanaDefinido(String horarioSemana) {
+    horarioSemanaDefinido = horarioSemana;
+    return horarioSemanaDefinido;
+  }
+
+  static String recuperarHorarioSemanaDefinido() {
+    return horarioSemanaDefinido;
+  }
+
+  static String passarHorarioFinalSemanaDefinido(String horarioSemana) {
+    horarioFinalSemanaDefinido = horarioSemana;
+    return horarioFinalSemanaDefinido;
+  }
+
+  static String recuperarHorarioFinalSemanaDefinido() {
+    return horarioFinalSemanaDefinido;
   }
 }

@@ -10,6 +10,8 @@ import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
+import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
+import 'package:sscaleg/widgets/widget_ajustar_horario.dart';
 
 class TelaGerarEscala extends StatefulWidget {
   const TelaGerarEscala({super.key});
@@ -34,20 +36,25 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   List<String> nomeVoluntarios = PassarPegarDados.recuperarNomesVoluntarios();
   List<Map> escalaSorteada = [];
   int index = 0;
-  String horarioSemana = "19:20";
+  String horarioSemana = "";
   String nomeEscalaFormatada = "";
-  String horarioFinalSemana = "17:50";
+  String horarioFinalSemana = "";
 
   @override
   void initState() {
     super.initState();
   }
 
+  recuperarHorarioDefinidoInicioTrabalho() {
+    setState(() {
+      horarioSemana = PassarPegarDados.recuperarHorarioSemanaDefinido();
+      horarioFinalSemana =
+          PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
+    });
+  }
+
   // metodo para realizar o sorteio dos nomes nos locais de trabalho
   fazerSorteio() {
-    setState(() {
-      //exibirWidgetCarregamento = true;
-    });
     // limpando listas
     escalaSorteada.clear();
     listaNumeroAuxiliarRepeticao.clear();
@@ -200,6 +207,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                 Textos.notificacaoSucesso,
                 context,
               );
+              limparListaDados();
               redirecionarProximaTela();
             }
           });
@@ -209,6 +217,15 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       });
       chamarExibirMensagemErro(e.toString());
     }
+  }
+
+  limparListaDados() {
+    PassarPegarDados.passarNomesLocaisTrabalho([]);
+    PassarPegarDados.passarNomesVoluntarios([]);
+    PassarPegarDados.passarIntervaloTrabalho([]);
+    PassarPegarDados.passarDiasSemana([]);
+    PassarPegarDados.passarHorarioSemanaDefinido("");
+    PassarPegarDados.passarHorarioFinalSemanaDefinido("");
   }
 
   redirecionarProximaTela() {
@@ -242,6 +259,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       exibirWidgetCarregamento = true;
     });
     if (validacaoFormulario.currentState!.validate()) {
+      recuperarHorarioDefinidoInicioTrabalho();
       fazerSorteio();
     }
   }
@@ -290,72 +308,64 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                     child: Column(
                       children: [
                         Container(
-                          height: alturaTela * 0.3,
-                          padding: const EdgeInsets.only(bottom: 20.0),
-                          width: larguraTela,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                  ),
-                                  child: Text(
-                                    Textos.descricaoGerarEscala,
-                                    textAlign: TextAlign.justify,
-                                    style: const TextStyle(fontSize: 20),
-                                  ),
-                                ),
-                                Column(
-                                  children: [
-                                    Form(
-                                      key: validacaoFormulario,
-                                      child: SizedBox(
-                                        width: Platform.isWindows ? 300 : 200,
-                                        child: TextFormField(
-                                          controller: nomeEscala,
-                                          onFieldSubmitted: (value) {
-                                            chamarFazerSorteio();
-                                          },
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return Textos.erroCampoVazio;
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
-                                        vertical: 10.0,
-                                      ),
-                                      width: 100,
-                                      height: 50,
-                                      child: FloatingActionButton(
-                                        heroTag: Textos.btnCriarEscala,
-                                        onPressed: () {
-                                          chamarFazerSorteio();
-                                        },
-                                        child: Text(
-                                          Textos.btnCriarEscala,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text(
+                            Textos.descricaoGerarEscala,
+                            textAlign: TextAlign.justify,
+                            style: const TextStyle(fontSize: 20),
                           ),
+                        ),
+                        Column(
+                          children: [
+                            Form(
+                              key: validacaoFormulario,
+                              child: SizedBox(
+                                width: Platform.isWindows ? 300 : 200,
+                                child: TextFormField(
+                                  controller: nomeEscala,
+                                  onFieldSubmitted: (value) {
+                                    chamarFazerSorteio();
+                                  },
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return Textos.erroCampoVazio;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                            WidgetAjustarHorario(),
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 10.0,
+                                vertical: 10.0,
+                              ),
+                              width: 100,
+                              height: 50,
+                              child: FloatingActionButton(
+                                heroTag: Textos.btnCriarEscala,
+                                onPressed: () {
+                                  chamarFazerSorteio();
+                                },
+                                child: Text(
+                                  Textos.btnCriarEscala,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
+                ),
+                bottomNavigationBar: Container(
+                  color: Colors.white,
+                  child: BarraNavegacao(),
                 ),
               );
             }

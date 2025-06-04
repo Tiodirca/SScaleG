@@ -4,6 +4,7 @@ class Constantes {
   //ROTAS
   static const rotaTelaSplash = "telaSplash";
   static const rotaTelaInicial = "telaInicial";
+
   //Rotas da GERACAO DE ESCALA
   static const rotaTelaCadastroSelecaoLocalTrabalho =
       "telaCadSelecaoLocalTrabalho";
@@ -14,12 +15,14 @@ class Constantes {
   static const rotaTelaGerarEscala = "telaGerarEscala";
 
   //ROTAS LISTAGEM ESCALAS
-  static const rotaTelaListagemEscalaBandoDados = "telaListagemEscalaBancoDados";
+  static const rotaTelaListagemEscalaBandoDados =
+      "telaListagemEscalaBancoDados";
   static const rotaTelaEscalaDetalhada = "telaEscalaDetalhada";
 
   //ARGUMENTOS
   static const rotaArgumentEscalaDetalhadaNomeEscala = "nomeEscala";
-  static const rotaArgumentoEscalaDetalhadaIDEscalaSelecionada = "IDEscalaSelecionada";
+  static const rotaArgumentoEscalaDetalhadaIDEscalaSelecionada =
+      "IDEscalaSelecionada";
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";
@@ -44,17 +47,25 @@ class Constantes {
   static const iconeEditar = Icons.edit;
   static const iconeLista = Icons.list_alt_outlined;
   static const iconeOpcoesData = Icons.settings;
-
   static const iconeExclusao = Icons.close;
   static const iconeRecarregar = Icons.refresh;
   static const iconeBaixar = Icons.download_rounded;
-
-
   static const iconeSalvar = Icons.save;
   static const iconeAbrirBarraPesquisa = Icons.search;
   static const iconeBarraPesquisar = Icons.send;
   static const iconeSalvarOpcoes = Icons.save_as;
   static const iconeDataCulto = Icons.date_range_outlined;
+
+  static const sharePreferencesAjustarHorarioSemana = "ajustarHorarioSemana";
+  static const sharePreferencesAjustarHorarioFinalSemana =
+      "ajustarHorarioFinalSemana";
+
+  //Horarios padrao
+  static const TimeOfDay horarioPadraoSemana = TimeOfDay(hour: 19, minute: 20);
+  static const TimeOfDay horarioPadraoFinalSemana = TimeOfDay(
+    hour: 17,
+    minute: 50,
+  );
 
   //TIPO NOTIFICACAO
   static const tipoNotificacaoSucesso = "Sucesso";

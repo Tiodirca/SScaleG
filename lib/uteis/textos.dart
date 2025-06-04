@@ -53,15 +53,30 @@ class Textos {
       "Escalas para estar sendo utilizada.";
   static String descricaoTabelaSelecionada = "A Escalas selecionada foi : ";
 
-  // LISTAGEM
+  // TELA ESCALA DETALHADA
   static String tituloTelaEscalaDetalhada = "Escalas Detalhada";
   static String descricaoTelaListagemItens =
       "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
 
-  static String telaFiltragemDescricao = "Aqui você pode ver os nomes "
+  static String telaFiltragemDescricao =
+      "Aqui você pode ver os nomes "
       "e a quantidade de vezes que eles se repetem, "
       "aperte encima do nome para visualizar na escala onde eles estão";
 
+  //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
+  static String widgetAjustarHorarioDescricao =
+      "Selecione qual o horario"
+      " do inicio da jornada de trabalho";
+  static String widgetAjustarHorarioSemana = "Horario durante semana";
+  static String widgetAjustarHorarioFinalSemana =
+      "Horario durante final de semana";
+  static String widgetAjustarHorarioInicio = "Iniciar às : ";
+
+  // TELA DE CADASTRO DE ITEM
+  static String tituloTelaCadastro = "Cadastro de item na Escalas";
+  static String descricaoTelaCadastro =
+      "Preencha os campos abaixo para adicionar "
+      "um item a lista que ira compor a escala";
 
   //MENSAGENS DE ERROS
   static String erroCampoVazio = "Preencha este campo";
