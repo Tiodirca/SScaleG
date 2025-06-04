@@ -23,10 +23,6 @@ class BarraNavegacao extends StatelessWidget {
                 Navigator.pushReplacementNamed(
                     context, Constantes.rotaTelaListagemEscalaBandoDados);
               }
-              // else if (nomeBtn == Textos.btnConfiguracoes) {
-              //   Navigator.pushReplacementNamed(
-              //       context, Constantes.rotaTelaConfiguracoes);
-              // }
             },
             child: Center(
               child: Icon(
@@ -52,7 +48,6 @@ class BarraNavegacao extends StatelessWidget {
         children: [
           botoesIcones(context, Constantes.iconeTelaInicial),
           botoesIcones(context, Constantes.iconeLista),
-          //botoesIcones(Textos.btnConfiguracoes, context, Icons.settings),
         ],
       ),
     );

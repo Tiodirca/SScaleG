@@ -10,7 +10,12 @@ class Textos {
   static String btnExcluir = "Excluir";
   static String btnTelaInicial = "Tela Inicial";
   static String btnBaixar = "Baixar";
+  static String btnOpcaoData = "Opção de datas";
+  static String btnData = "Data";
+  static String btnSalvar = "Salvar";
+  static String btnAdicionarCampo = "Adicionar Campo";
   static String btnEditar = "Editar";
+  static String btnVerEscalaAtual = "Escala Atual";
   static String btnUsarEscala = "Utilizar está escala";
 
   // TELA CADASTRO E SELECAO DE LOCAIS DE TRABALHO
@@ -58,10 +63,13 @@ class Textos {
   static String descricaoTelaListagemItens =
       "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
 
-  static String telaFiltragemDescricao =
-      "Aqui você pode ver os nomes "
-      "e a quantidade de vezes que eles se repetem, "
-      "aperte encima do nome para visualizar na escala onde eles estão";
+  // TELA DE CADASTRO DE ITEM
+  static String tituloTelaCadastro = "Cadastro de item na Escalas";
+  static String descricaoTelaCadastro =
+      "Preencha os campos abaixo para adicionar "
+      "um item a lista que ira compor a escala";
+
+  static String descricaoDataSelecionada = "A data Selecionada foi : ";
 
   //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
   static String widgetAjustarHorarioDescricao =
@@ -71,12 +79,6 @@ class Textos {
   static String widgetAjustarHorarioFinalSemana =
       "Horario durante final de semana";
   static String widgetAjustarHorarioInicio = "Iniciar às : ";
-
-  // TELA DE CADASTRO DE ITEM
-  static String tituloTelaCadastro = "Cadastro de item na Escalas";
-  static String descricaoTelaCadastro =
-      "Preencha os campos abaixo para adicionar "
-      "um item a lista que ira compor a escala";
 
   //MENSAGENS DE ERROS
   static String erroCampoVazio = "Preencha este campo";

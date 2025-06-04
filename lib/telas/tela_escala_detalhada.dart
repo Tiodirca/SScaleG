@@ -9,6 +9,7 @@ import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
+import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
@@ -34,9 +35,10 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   late List<Map> escala;
   List<String> cabecalhoEscala = [];
   List<Map> listaIDDocumento = [];
-  List<DataColumn> cabecalho = [];
-  List<DataRow> linhas = [];
+  List<DataColumn> cabecalhoDataColumn = [];
+  List<DataRow> linhasDataRow = [];
   String nomeReacar = "";
+  int contadorBtnFloat = 0;
   final validacaoFormulario = GlobalKey<FormState>();
   TextEditingController textoPesquisa = TextEditingController(text: "");
   Map<String, int> quantidadeRepeticaoNome = {};
@@ -51,9 +53,9 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   limparVariaveis() {
     setState(() {
       escala.clear();
-      linhas.clear();
+      linhasDataRow.clear();
       cabecalhoEscala.clear();
-      cabecalho.clear();
+      cabecalhoDataColumn.clear();
       listaIDDocumento.clear();
     });
   }
@@ -123,6 +125,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   carregarLinhas() {
     for (var element in escala) {
+      contadorBtnFloat++;
       List<dynamic> elementos = [];
       //adicionando somente os VALORES na lista
       elementos = element.values.toList();
@@ -133,7 +136,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   }
 
   adicionarLinhasNaEscala(List<dynamic> listaItem) {
-    linhas.addAll([
+    linhasDataRow.addAll([
       DataRow(
         cells: [
           ...listaItem.map((e) {
@@ -143,7 +146,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   width: 40,
                   height: 40,
                   child: FloatingActionButton(
-                    heroTag: Constantes.editar,
+                    heroTag: "${Constantes.editar}$contadorBtnFloat",
                     onPressed: () {},
                     child: Icon(
                       Constantes.iconeEditar,
@@ -159,7 +162,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   width: 40,
                   height: 40,
                   child: FloatingActionButton(
-                    heroTag: Constantes.excluir,
+                    heroTag:  "${Constantes.excluir}$contadorBtnFloat",
                     onPressed: () {
                       for (var elemento in listaIDDocumento) {
                         for (var element in listaItem) {
@@ -201,7 +204,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   carregarCabecalho() {
     for (var element in cabecalhoEscala) {
-      cabecalho.add(
+      cabecalhoDataColumn.add(
         DataColumn(
           label: Text(
             element.toString().replaceAll("DD", "D").replaceAll("DH", "H"),
@@ -293,6 +296,19 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     );
   }
 
+  redirecionarTelaCadastroItem() {
+    PassarPegarDados.passarCamposCadastroItem(cabecalhoEscala);
+    var dados = {};
+    dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaCadastroItem,
+      arguments: dados,
+    );
+  }
+
   Future<void> alertaExclusao(
     BuildContext context,
     String data,
@@ -380,6 +396,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           //     exibirUniformes: exibirOcultarCampoUniforme);
           // gerarPDF.pegarDados();
         } else if (nomeBotao == Textos.btnAdicionar) {
+          redirecionarTelaCadastroItem();
         } else if (nomeBotao == Textos.btnRecarregar) {
           setState(() {
             exibirWidgetCarregamento = true;
@@ -444,7 +461,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           if (validacaoFormulario.currentState!.validate()) {
             setState(() {
               nomeReacar = textoPesquisa.text;
-              linhas.clear();
+              linhasDataRow.clear();
               carregarLinhas();
             });
           }
@@ -453,7 +470,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             exibirBarraPesquisa = false;
             nomeReacar = "";
             textoPesquisa.clear();
-            linhas.clear();
+            linhasDataRow.clear();
             carregarLinhas();
           });
         }
@@ -607,8 +624,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                           children: [
                                             DataTable(
                                               columnSpacing: 10,
-                                              columns: cabecalho,
-                                              rows: linhas,
+                                              columns: cabecalhoDataColumn,
+                                              rows: linhasDataRow,
                                             ),
                                           ],
                                         ),

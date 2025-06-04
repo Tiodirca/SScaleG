@@ -19,6 +19,9 @@ class Constantes {
       "telaListagemEscalaBancoDados";
   static const rotaTelaEscalaDetalhada = "telaEscalaDetalhada";
 
+  //Cadastro item
+  static const rotaTelaCadastroItem = "telaCadastroItem";
+
   //ARGUMENTOS
   static const rotaArgumentEscalaDetalhadaNomeEscala = "nomeEscala";
   static const rotaArgumentoEscalaDetalhadaIDEscalaSelecionada =

@@ -4,6 +4,7 @@ import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_nomes_volunt
 import 'package:sscaleg/telas/geracao_escalas/tela_gerar_escala.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_dias_semana.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_intervalo_trabalho.dart';
+import 'package:sscaleg/telas/tela_cadastro_item.dart';
 import 'package:sscaleg/telas/tela_escala_detalhada.dart';
 import 'package:sscaleg/telas/tela_inicial.dart';
 import 'package:sscaleg/telas/tela_listagem_escala_banco_dados.dart';
@@ -47,6 +48,21 @@ class Rotas {
           return MaterialPageRoute(
             builder:
                 (_) => TelaEscalaDetalhada(
+                  nomeTabela:
+                      args[Constantes.rotaArgumentEscalaDetalhadaNomeEscala],
+                  idTabelaSelecionada:
+                      args[Constantes
+                          .rotaArgumentoEscalaDetalhadaIDEscalaSelecionada],
+                ),
+          );
+        } else {
+          return erroRota(settings);
+        }
+      case Constantes.rotaTelaCadastroItem:
+        if (args is Map) {
+          return MaterialPageRoute(
+            builder:
+                (_) => TelaCadastroItem(
                   nomeTabela:
                       args[Constantes.rotaArgumentEscalaDetalhadaNomeEscala],
                   idTabelaSelecionada:

@@ -1,45 +1,46 @@
 class PassarPegarDados {
-  static List<String> nomesLocaisTrabalho = [];
-  static List<String> nomesVoluntarios = [];
-  static List<String> diasSemana = [];
-  static List<String> intervaloTrabalho = [];
+  static List<String> listaNomesLocaisTrabalho = [];
+  static List<String> listaNomesVoluntarios = [];
+  static List<String> listaDiasSemana = [];
+  static List<String> listaIntervaloTrabalho = [];
+  static List<String> listaCamposCadastroItens = [];
   static String horarioFinalSemanaDefinido = "";
   static String horarioSemanaDefinido = "";
 
   static List<String> passarNomesLocaisTrabalho(List<String> locaisTrabalho) {
-    nomesLocaisTrabalho = locaisTrabalho;
-    return nomesLocaisTrabalho;
+    listaNomesLocaisTrabalho = locaisTrabalho;
+    return listaNomesLocaisTrabalho;
   }
 
   static List<String> recuperarNomesLocaisTrabalho() {
-    return nomesLocaisTrabalho;
+    return listaNomesLocaisTrabalho;
   }
 
   static List<String> passarNomesVoluntarios(List<String> voluntarios) {
-    nomesVoluntarios = voluntarios;
-    return nomesVoluntarios;
+    listaNomesVoluntarios = voluntarios;
+    return listaNomesVoluntarios;
   }
 
   static List<String> recuperarNomesVoluntarios() {
-    return nomesVoluntarios;
+    return listaNomesVoluntarios;
   }
 
   static List<String> passarDiasSemana(List<String> diaSemana) {
-    diasSemana = diaSemana;
-    return diasSemana;
+    listaDiasSemana = diaSemana;
+    return listaDiasSemana;
   }
 
   static List<String> recuperarDiasSemana() {
-    return diasSemana;
+    return listaDiasSemana;
   }
 
   static List<String> passarIntervaloTrabalho(List<String> intervalo) {
-    intervaloTrabalho = intervalo;
-    return intervaloTrabalho;
+    listaIntervaloTrabalho = intervalo;
+    return listaIntervaloTrabalho;
   }
 
   static List<String> recuperarIntervaloTrabalho() {
-    return intervaloTrabalho;
+    return listaIntervaloTrabalho;
   }
 
   static String passarHorarioSemanaDefinido(String horarioSemana) {
@@ -58,5 +59,14 @@ class PassarPegarDados {
 
   static String recuperarHorarioFinalSemanaDefinido() {
     return horarioFinalSemanaDefinido;
+  }
+
+  static List<String> passarCamposCadastroItem(List<String> camposCadastro) {
+    listaCamposCadastroItens = camposCadastro;
+    return listaCamposCadastroItens;
+  }
+
+  static List<String> recuperarCamposCadastroItem() {
+    return listaCamposCadastroItens;
   }
 }
