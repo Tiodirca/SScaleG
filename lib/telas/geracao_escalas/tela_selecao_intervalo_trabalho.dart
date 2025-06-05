@@ -150,7 +150,7 @@ class _TelaSelecaoIntervaloTrabalhoState
     Timer(Duration(seconds: 2), () {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
-        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+        overlays: [SystemUiOverlay.bottom],
       );
     });
     return Theme(

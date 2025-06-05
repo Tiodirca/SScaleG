@@ -10,13 +10,26 @@ class Textos {
   static String btnExcluir = "Excluir";
   static String btnTelaInicial = "Tela Inicial";
   static String btnBaixar = "Baixar";
-  static String btnOpcaoData = "Opção de datas";
+  static String btnOpcaoData = "Opções Adicional da data";
   static String btnData = "Data";
   static String btnSalvar = "Salvar";
   static String btnAdicionarCampo = "Adicionar Campo";
   static String btnEditar = "Editar";
+  static String btnSalvarOpcaoData = "Salvar Data";
   static String btnVerEscalaAtual = "Escala Atual";
   static String btnUsarEscala = "Utilizar está escala";
+
+  static String labelCampoNovo = "Nome do campo novo";
+  static String descricaoDataPicker = "Selecione uma data";
+
+  //WIDGET OPCOES DATA
+  static String descricaoSelecaoDepartamentos =
+      "Selecione qual será o departamento responsável pelo culto da data: ";
+  static String descricaoSelecaoDepartamentosCadastro =
+      "Cadastre o nome de um departamento caso ainda não esteja cadastrado";
+  static String descricaoSelecaoDepartamentosSelecao =
+      "Selecione uma opção que ira complementar a data, "
+      "não é possivel selecionar mais de uma opção";
 
   // TELA CADASTRO E SELECAO DE LOCAIS DE TRABALHO
   static String tituloTelaCadastroSelecaoLocalTrabalho = "Locais de Trabalho";

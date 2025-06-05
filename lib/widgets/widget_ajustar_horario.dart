@@ -91,7 +91,7 @@ class _WidgetAjustarHorarioState extends State<WidgetAjustarHorario> {
               exibirTimePicker(label);
             },
             child: const Icon(
-              Icons.access_time_filled_outlined,
+              Constantes.iconeMudarHorario,
               color: PaletaCores.corAzulEscuro,
             ),
           ),

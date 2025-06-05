@@ -83,6 +83,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   Map idDocumentoData = {};
                   idDocumentoData[documentoFirebase.id] =
                       documentoFirebase.data().values.first;
+                  //idDocumentoData["dados"] = documentoFirebase.data();
                   listaIDDocumento.addAll([idDocumentoData]);
                   escala.addAll([documentoFirebase.data()]);
                   //ordandando lista pela data
@@ -162,7 +163,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   width: 40,
                   height: 40,
                   child: FloatingActionButton(
-                    heroTag:  "${Constantes.excluir}$contadorBtnFloat",
+                    heroTag: "${Constantes.excluir}$contadorBtnFloat",
                     onPressed: () {
                       for (var elemento in listaIDDocumento) {
                         for (var element in listaItem) {
@@ -447,7 +448,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     double largura,
     double altura,
   ) => Container(
-    margin: EdgeInsets.symmetric(horizontal: 10.0),
+    margin: EdgeInsets.symmetric(horizontal: 5.0),
     width: largura,
     height: altura,
     child: FloatingActionButton(
@@ -486,7 +487,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     Timer(Duration(seconds: 2), () {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
-        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+        overlays: [SystemUiOverlay.bottom],
       );
     });
     return Theme(
@@ -621,12 +622,16 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                       ),
                                       child: Center(
                                         child: ListView(
+                                          scrollDirection:  Axis.vertical,
                                           children: [
-                                            DataTable(
-                                              columnSpacing: 10,
-                                              columns: cabecalhoDataColumn,
-                                              rows: linhasDataRow,
-                                            ),
+                                            SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: DataTable(
+                                                columnSpacing: 10,
+                                                columns: cabecalhoDataColumn,
+                                                rows: linhasDataRow,
+                                              ),
+                                            )
                                           ],
                                         ),
                                       ),
@@ -643,17 +648,21 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                       padding: EdgeInsets.all(10),
                                       width:
                                           Platform.isAndroid || Platform.isIOS
-                                              ? larguraTela * 0.9
+                                              ? larguraTela
                                               : larguraTela * 0.3,
                                       child: Card(
                                         color: Colors.transparent,
                                         elevation: 0,
                                         child: Column(
                                           children: [
-                                            Row(
+                                            Wrap(
                                               children: [
                                                 Container(
-                                                  width: 300,
+                                                  width:
+                                                      Platform.isAndroid ||
+                                                              Platform.isIOS
+                                                          ? 200
+                                                          : 300,
                                                   height: 50,
                                                   color: Colors.white,
                                                   child: Form(
@@ -722,8 +731,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                 100,
                                 60,
                               ),
-                              // botoesSwitch(Textos.labelSwitchUniforme,
-                              //     exibirOcultarCampoUniforme),
                               botoesAcoes(
                                 Textos.btnAdicionar,
                                 Constantes.iconeAdicionar,

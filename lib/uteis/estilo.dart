@@ -46,6 +46,11 @@ class Estilo {
             borderSide: const BorderSide(width: 1, color: Colors.red),
             borderRadius: BorderRadius.circular(10),
           ),
+          disabledBorder: OutlineInputBorder(
+            borderSide:
+            const BorderSide(width: 1, color: PaletaCores.corAzulEscuro),
+            borderRadius: BorderRadius.circular(10),
+          ),
           labelStyle: const TextStyle(
             color: PaletaCores.corAzulEscuro,
             fontWeight: FontWeight.bold,

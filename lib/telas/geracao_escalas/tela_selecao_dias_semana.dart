@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -136,7 +137,10 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
                     ),
                     child: SizedBox(
                       height: alturaTela * 0.6,
-                      width: larguraTela * 0.7,
+                      width:    Platform.isAndroid ||
+                          Platform.isIOS
+                          ? larguraTela
+                          : larguraTela * 0.7,
                       child: ListView(
                         children: [
                           ...listaDiasSemana.map(

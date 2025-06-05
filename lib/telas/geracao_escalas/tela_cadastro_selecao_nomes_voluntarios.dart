@@ -319,7 +319,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     Timer(Duration(seconds: 2), () {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
-        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+        overlays: [SystemUiOverlay.bottom],
       );
     });
     return Theme(
@@ -356,7 +356,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                     child: Column(
                       children: [
                         Container(
-                          height: alturaTela * 0.3,
+                          height: alturaTela * 0.2,
                           padding: const EdgeInsets.only(bottom: 20.0),
                           width: larguraTela,
                           child: SingleChildScrollView(
@@ -454,7 +454,10 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                           ),
                                           child: SizedBox(
                                             height: alturaTela * 0.45,
-                                            width: larguraTela * 0.8,
+                                            width:    Platform.isAndroid ||
+                                                Platform.isIOS
+                                                ? larguraTela
+                                                : larguraTela * 0.8,
                                             child: ListView(
                                               children: [
                                                 ...listaNomesCadastrados.map(

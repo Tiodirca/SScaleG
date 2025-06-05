@@ -58,6 +58,7 @@ class Constantes {
   static const iconeBarraPesquisar = Icons.send;
   static const iconeSalvarOpcoes = Icons.save_as;
   static const iconeDataCulto = Icons.date_range_outlined;
+  static const iconeMudarHorario = Icons.access_time_filled_outlined;
 
   static const sharePreferencesAjustarHorarioSemana = "ajustarHorarioSemana";
   static const sharePreferencesAjustarHorarioFinalSemana =
@@ -78,6 +79,10 @@ class Constantes {
   //LOCAIS TRABALHO
   static const fireBaseColecaoNomeLocaisTrabalho = "locais_trabalho";
   static const fireBaseDocumentoNomeLocaisTrabalho = "nome";
+
+  //LOCAIS TRABALHO
+  static const fireBaseColecaoNomeDepartamentosData = "departamentos_data";
+  static const fireBaseDocumentoNomeDepartamentosData = "nome";
 
   //VOLUNTARIOS
   static const fireBaseColecaoNomeVoluntarios = "nome_voluntarios";

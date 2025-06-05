@@ -43,33 +43,19 @@ class _TelaCadastroSelecaoLocalTrabalhoState
         activeColor: PaletaCores.corAzulEscuro,
         checkColor: PaletaCores.corRosaClaro,
         secondary: SizedBox(
-          width: 400,
-          height: 40,
-          child: Row(
-            children: [
-              Column(
-                children: [
-                  Text("Posição Inicial"),
-                  Text(exibirOrdemSlides(checkBoxModel)),
-                ],
-              ),
-              SizedBox(
-                width: 30,
-                height: 30,
-                child: FloatingActionButton(
-                  heroTag: "btnExcluir${checkBoxModel.id}",
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: const BorderSide(color: Colors.red, width: 1),
-                  ),
-                  child: const Icon(Icons.close, size: 20),
-                  onPressed: () {
-                    // chamando alerta para confirmar exclusao do item
-                    alertaExclusao(context, checkBoxModel);
-                  },
-                ),
-              ),
-            ],
+          width: 30,
+          height: 30,
+          child: FloatingActionButton(
+            heroTag: "btnExcluir${checkBoxModel.id}",
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: const BorderSide(color: Colors.red, width: 1),
+            ),
+            child: const Icon(Icons.close, size: 20),
+            onPressed: () {
+              // chamando alerta para confirmar exclusao do item
+              alertaExclusao(context, checkBoxModel);
+            },
           ),
         ),
         title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 20)),
@@ -116,6 +102,9 @@ class _TelaCadastroSelecaoLocalTrabalhoState
 
   // metodo para cadastrar item
   cadastrarNome(String nome) async {
+    setState(() {
+      exibirWidgetCarregamento = true;
+    });
     try {
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
@@ -125,7 +114,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
           .set({nomeDocumentoFireBase: nomeControle.text})
           .then(
             (value) {
-              chamarTelaCarregamento();
+              limparDados();
               realizarBuscaDadosFireBase();
               chamarExibirMensagemSucesso();
             },
@@ -160,13 +149,11 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     );
   }
 
-  chamarTelaCarregamento() {
+  limparDados() {
     listaNomesCadastrados.clear();
     nomeControle.clear();
     listaNomesSelecionados.clear();
-    setState(() {
-      exibirWidgetCarregamento = true;
-    });
+
   }
 
   realizarBuscaDadosFireBase() async {
@@ -232,6 +219,9 @@ class _TelaCadastroSelecaoLocalTrabalhoState
 
   // Metodo para chamar deletar tabela
   chamarDeletar(CheckBoxModelo checkbox) async {
+    setState(() {
+      exibirWidgetCarregamento = true;
+    });
     var db = FirebaseFirestore.instance;
     await db
         .collection(nomeColecaoFireBase)
@@ -240,7 +230,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
         .then(
           (doc) {
             setState(() {
-              chamarTelaCarregamento();
+              limparDados();
               realizarBuscaDadosFireBase();
               chamarExibirMensagemSucesso();
             });
@@ -329,7 +319,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     Timer(Duration(seconds: 2), () {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
-        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+        overlays: [SystemUiOverlay.bottom],
       );
     });
     return Theme(
@@ -365,7 +355,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                     child: Column(
                       children: [
                         Container(
-                          height: alturaTela * 0.3,
+                          height: alturaTela * 0.2,
                           padding: const EdgeInsets.only(bottom: 20.0),
                           width: larguraTela,
                           child: SingleChildScrollView(
@@ -431,52 +421,49 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                             builder: (context, constraints) {
                               if (listaNomesCadastrados.isNotEmpty) {
                                 // area de exibicao de descricao e listagem de nomes
-                                return SizedBox(
-                                  width: larguraTela,
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.symmetric(
-                                            horizontal: 10.0,
+                                return SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        width: larguraTela,
+                                        child: Text(
+                                          textAlign: TextAlign.center,
+                                          Textos.descricaoSelecaoLocalTrabalho,
+                                          style: const TextStyle(fontSize: 20),
+                                        ),
+                                      ),
+                                      // Area de Exibicao da lista com os nomes dos voluntarios
+                                      Card(
+                                        color: Colors.white,
+                                        shape: const OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(20),
                                           ),
-                                          width: larguraTela,
-                                          child: Text(
-                                            textAlign: TextAlign.center,
-                                            Textos
-                                                .descricaoSelecaoLocalTrabalho,
-                                            style: const TextStyle(
-                                              fontSize: 20,
-                                            ),
+                                          borderSide: BorderSide(
+                                            width: 1,
+                                            color: PaletaCores.corCastanho,
                                           ),
                                         ),
-                                        // Area de Exibicao da lista com os nomes dos voluntarios
-                                        Card(
-                                          color: Colors.white,
-                                          shape: const OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(20),
-                                            ),
-                                            borderSide: BorderSide(
-                                              width: 1,
-                                              color: PaletaCores.corCastanho,
-                                            ),
-                                          ),
-                                          child: SizedBox(
-                                            height: alturaTela * 0.45,
-                                            width: larguraTela * 0.8,
-                                            child: ListView(
-                                              children: [
-                                                ...listaNomesCadastrados.map(
-                                                  (e) =>
-                                                      checkBoxPersonalizado(e),
-                                                ),
-                                              ],
-                                            ),
+                                        child: SizedBox(
+                                          height: alturaTela * 0.45,
+                                          width:
+                                              Platform.isAndroid ||
+                                                      Platform.isIOS
+                                                  ? larguraTela
+                                                  : larguraTela * 0.8,
+                                          child: ListView(
+                                            children: [
+                                              ...listaNomesCadastrados.map(
+                                                (e) => checkBoxPersonalizado(e),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               } else {
