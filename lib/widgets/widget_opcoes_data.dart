@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sscaleg/Modelo/check_box_modelo.dart';
@@ -49,7 +49,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     );
   }
 
-
   chamarExibirMensagemSucesso() {
     MetodosAuxiliares.exibirMensagens(
       Constantes.tipoNotificacaoSucesso,
@@ -61,6 +60,13 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   limparDados() {
     listaNomesCadastrados.clear();
     nomeControle.clear();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
   }
 
   realizarBuscaDadosFireBase() async {
@@ -95,7 +101,9 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
               setState(() {
                 exibirWidgetTelaCarregamento = false;
               });
-              chamarExibirMensagemErro("Erro Buscar Departamento: ${e.toString()}");
+              chamarExibirMensagemErro(
+                "Erro Buscar Departamento: ${e.toString()}",
+              );
             },
           );
     } catch (e) {
@@ -126,7 +134,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
       listaNomesCadastrados.add(dados);
       setState(() {
         recuperarCheckBoxMarcado(dataSelecionadaComDepartamento, quantidade);
-        exibirWidgetTelaCarregamento = false;
       });
     }
   }
@@ -154,7 +161,9 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
             setState(() {
               exibirWidgetTelaCarregamento = false;
             });
-            chamarExibirMensagemErro("Erro Deletar Departamento: ${e.toString()}");
+            chamarExibirMensagemErro(
+              "Erro Deletar Departamento: ${e.toString()}",
+            );
           },
         );
   }
@@ -187,7 +196,9 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
               setState(() {
                 exibirWidgetTelaCarregamento = false;
               });
-              chamarExibirMensagemErro("Erro Cadastrar Departamento: ${e.toString()}");
+              chamarExibirMensagemErro(
+                "Erro Cadastrar Departamento: ${e.toString()}",
+              );
             },
           );
     } catch (e) {
@@ -218,6 +229,14 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
           element.checked = false;
         }
       }
+      PassarPegarDados.passarConfirmacaoCarregamentoConcluido(
+        Constantes.confirmacaoCarregamentoConcluidoData,
+      );
+      Timer(const Duration(milliseconds: 500), () {
+        setState(() {
+          exibirWidgetTelaCarregamento = false;
+        });
+      });
     }
   }
 
@@ -231,7 +250,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   }
 
   //metodo para verificar
-  verificarSelecoes() {
+  alterarDataComDepartamento() {
     String opcoesAdicionaisSelecionada = "";
     for (var element in listaNomesCadastrados) {
       if (element.checked) {
@@ -245,6 +264,26 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
           "$dataSelecionadaComDepartamento$opcoesAdicionaisSelecionada";
       PassarPegarDados.passarDataComComplemento(dataSelecionadaComDepartamento);
     });
+  }
+
+  validarSelecoes(CheckBoxModelo checkBoxModel) {
+    //verificando se o checkbox selecionado
+    if (checkBoxModel.checked == true) {
+      // caso tenha sido definir que a variavel receber o valor
+      checkBoxSelecionado = checkBoxModel.texto;
+    } else {
+      // caso seja desmarcado vai receber o seguinte valor
+      checkBoxSelecionado = "";
+    }
+    //percorrendo a lista
+    for (var element in listaNomesCadastrados) {
+      //caso a variavel seja DIFERENTE do elemento passado
+      if (checkBoxSelecionado != element.texto) {
+        // definir que o valor do elemento sera
+        // false para poder desmarcar na lista de checkbox
+        element.checked = false;
+      }
+    }
   }
 
   Future<void> alertaExclusao(
@@ -325,28 +364,14 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
         onChanged: (value) {
           setState(() {
             checkBoxModel.checked = value!;
-            //verificando se o checkbox selecionado
-            if (checkBoxModel.checked == true) {
-              // caso tenha sido definir que a variavel receber o valor
-              checkBoxSelecionado = checkBoxModel.texto;
-            } else {
-              // caso seja desmarcado vai receber o seguinte valor
-              checkBoxSelecionado = "";
-            }
-            //percorrendo a lista
-            for (var element in listaNomesCadastrados) {
-              //caso a variavel seja DIFERENTE do elemento passado
-              if (checkBoxSelecionado != element.texto) {
-                // definir que o valor do elemento sera
-                // false para poder desmarcar na lista de checkbox
-                element.checked = false;
-              }
-            }
+            validarSelecoes(checkBoxModel);
           });
           // //chamando metodo
-          verificarSelecoes();
+          alterarDataComDepartamento();
         },
       );
+
+
 
   Widget botoesAcoes(
     String nomeBotao,
@@ -394,12 +419,19 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   Widget build(BuildContext context) {
     double larguraTela = MediaQuery.of(context).size.width;
     double alturaTela = MediaQuery.of(context).size.height;
+    double alturaBarraStatus = MediaQuery.of(context).padding.top;
+    double alturaAppBar = AppBar().preferredSize.height;
     return Theme(
       data: estilo.estiloGeral,
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (exibirWidgetTelaCarregamento) {
-           return TelaCarregamento();
+            //Dentro de um SizezBox para ajustar a Exibicao da tela para nao aparecer barra rolagem
+            return SizedBox(
+              width: larguraTela,
+              height: alturaTela - alturaBarraStatus - alturaAppBar,
+              child: TelaCarregamento(),
+            );
           } else {
             return Column(
               children: [

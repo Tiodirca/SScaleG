@@ -11,8 +11,8 @@ class BarraNavegacao extends StatelessWidget {
 
   Widget botoesIcones(BuildContext context, IconData icon) =>
       SizedBox(
-          height: 60,
-          width: 60,
+          height: 50,
+          width: 50,
           child: FloatingActionButton(
             heroTag: icon.toString(),
             onPressed: () {

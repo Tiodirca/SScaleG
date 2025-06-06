@@ -508,7 +508,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                           redirecionarProximaTela();
                         }
                       },
-                      child: Text(Textos.btnAvancar),
+                      child: Text(Textos.btnAvancar,style: TextStyle(color: Colors.black),),
                     ),
                   ),
                 ),

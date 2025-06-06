@@ -32,28 +32,11 @@ class _TelaInicialState extends State<TelaInicial> {
               context,
               Constantes.rotaTelaListagemEscalaBandoDados);
         }
-        //else if (nomeBtn == Textos.btnConfiguracoes) {
-        //   // Navigator.pushReplacementNamed(
-        //   //     context, Constantes.rotaTelaConfiguracoes);
-        // } else if (nomeBtn == Textos.btnListarEscalas) {
-        //   // Navigator.pushReplacementNamed(
-        //   //     context, Constantes.rotaListarEscalas);
-        // } else if (nomeBtn == Textos.btnSonoplastas) {
-        //   // Navigator.pushReplacementNamed(
-        //   //     arguments: Constantes.fireBaseDocumentoSonoplastas,
-        //   //     context,
-        //   //     Constantes.rotaTelaCadastroVoluntarios);
-        // } else {
-        //   // Navigator.pushReplacementNamed(
-        //   //     arguments: Constantes.fireBaseDocumentoCooperadores,
-        //   //     context,
-        //   //     Constantes.rotaTelaCadastroVoluntarios);
-        // }
       },
       child: Text(
         nomeBtn,
         textAlign: TextAlign.center,
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,color: Colors.black),
       ),
     ),
   );

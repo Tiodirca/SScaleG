@@ -175,7 +175,7 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
                     );
                   }
                 },
-                child: Text(Textos.btnAvancar),
+                child: Text(Textos.btnAvancar,style: TextStyle(color: Colors.black),),
               ),
             ),
           ),

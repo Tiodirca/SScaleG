@@ -19,8 +19,9 @@ class Constantes {
       "telaListagemEscalaBancoDados";
   static const rotaTelaEscalaDetalhada = "telaEscalaDetalhada";
 
-  //Cadastro item
+  //CADASTRO ITEM
   static const rotaTelaCadastroItem = "telaCadastroItem";
+  static const rotaTelaCadastroCampoNovo = "telaCadastroCampoNovo";
 
   //ARGUMENTOS
   static const rotaArgumentEscalaDetalhadaNomeEscala = "nomeEscala";
@@ -60,6 +61,7 @@ class Constantes {
   static const iconeDataCulto = Icons.date_range_outlined;
   static const iconeMudarHorario = Icons.access_time_filled_outlined;
 
+  // SHARE PREFERENCES
   static const sharePreferencesAjustarHorarioSemana = "ajustarHorarioSemana";
   static const sharePreferencesAjustarHorarioFinalSemana =
       "ajustarHorarioFinalSemana";
@@ -71,6 +73,13 @@ class Constantes {
     minute: 50,
   );
 
+  static const confirmacaoCarregamentoConcluidoData =
+      "carregamentoConcluidoData";
+  static const confirmacaoCarregamentoConcluidoCampo =
+      "carregamentoConcluidoAdicionarCampo";
+
+  static const tipoBuscaAdicionarCampo = "buscaAdicionarCampo";
+
   //TIPO NOTIFICACAO
   static const tipoNotificacaoSucesso = "Sucesso";
   static const tipoNotificacaoErro = "Erro";
@@ -80,7 +89,7 @@ class Constantes {
   static const fireBaseColecaoNomeLocaisTrabalho = "locais_trabalho";
   static const fireBaseDocumentoNomeLocaisTrabalho = "nome";
 
-  //LOCAIS TRABALHO
+  //COMPLEMENTO DATA DEPARTAMENTO
   static const fireBaseColecaoNomeDepartamentosData = "departamentos_data";
   static const fireBaseDocumentoNomeDepartamentosData = "nome";
 

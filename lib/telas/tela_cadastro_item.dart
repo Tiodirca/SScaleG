@@ -12,7 +12,6 @@ import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
-import 'package:sscaleg/widgets/widget_adicionar_novo_campo.dart';
 import 'package:sscaleg/widgets/widget_opcoes_data.dart';
 
 @immutable
@@ -33,8 +32,8 @@ class TelaCadastroItem extends StatefulWidget {
 class _TelaCadastroItemState extends State<TelaCadastroItem> {
   Estilo estilo = Estilo();
   bool exibirTelaCarregamento = false;
-  bool exibirTelaAdicionarCampo = false;
-  bool exibirOpcoesData = false;
+  bool exibirTelaOpcoesData = false;
+  bool exibirAcoesOpcaoData = false;
   String horarioTroca = "";
   bool exibirWidgetCarregamento = false;
   List<String> listaCamposOriginal = [];
@@ -84,6 +83,19 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     super.dispose();
     PassarPegarDados.passarDataComComplemento("");
     PassarPegarDados.passarCamposCadastroItem([]);
+  }
+
+  redirecionarTelaCadastroNovoCampo() {
+    var dados = {};
+    PassarPegarDados.passarCamposCadastroItem(listaCamposOriginal);
+    dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaCadastroCampoNovo,
+      arguments: dados,
+    );
   }
 
   // // metodo para recuperar os horarios definidos
@@ -144,95 +156,20 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     );
   }
 
-  Widget camposFormulario(double larguraTela, String label) => Container(
-    padding: const EdgeInsets.only(
-      left: 5.0,
-      top: 5.0,
-      right: 5.0,
-      bottom: 5.0,
-    ),
-    width: MetodosAuxiliares.ajustarTamanhoTextField(larguraTela),
-    child: TextFormField(
-      onChanged: (value) {
-        itemDigitado[label] = value;
-      },
-      enabled: !exibirTelaAdicionarCampo,
-      keyboardType: TextInputType.text,
-      decoration: InputDecoration(labelText: label),
-    ),
-  );
-
-  Widget botoesAcoes(
-    String nomeBotao,
-    IconData icone,
-    double largura,
-    double altura,
-  ) => Container(
-    margin: const EdgeInsets.only(bottom: 10.0),
-    height: altura,
-    width: largura,
-    child: FloatingActionButton(
-      heroTag: nomeBotao,
-      elevation: 0,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(color: PaletaCores.corCastanho),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      onPressed: () async {
-        // verificando o tipo do botao
-        // para fazer acoes diferentes
-        if (!exibirTelaAdicionarCampo) {
-          if (nomeBotao == Textos.btnSalvar) {
-            if (_formKeyFormulario.currentState!.validate()) {
-              chamarAdicionarItens();
-            }
-          } else if (nomeBotao == Textos.btnAdicionarCampo) {
-            setState(() {
-              exibirTelaAdicionarCampo = true;
-            });
-          } else if (nomeBotao == Textos.btnData) {
-            exibirDataPicker();
-          } else if (nomeBotao == Textos.btnOpcaoData) {
-            PassarPegarDados.passarDataComComplemento("");
-            setState(() {
-              exibirOpcoesData = true;
-            });
-          } else if (nomeBotao == Textos.btnSalvarOpcaoData) {
-            setState(() {
-              if (PassarPegarDados.recuperarDataComComplemento().isNotEmpty) {
-                dataFormatada = PassarPegarDados.recuperarDataComComplemento();
-              }
-              exibirOpcoesData = false;
-            });
-          }
-        }
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (nomeBotao == Textos.btnOpcaoData) {
-                return Container();
-              } else {
-                return Icon(icone, color: PaletaCores.corAzulMagenta, size: 30);
-              }
-            },
-          ),
-          Text(
-            nomeBotao,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: PaletaCores.corAzulMagenta,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+  verificarCarregamentoDadosConcluido() {
+    String dados = PassarPegarDados.recuperarConfirmacaoCarregamentoConcluido();
+    if (dados.isEmpty) {
+      Timer(const Duration(seconds: 1), () {
+        verificarCarregamentoDadosConcluido();
+      });
+    } else if (dados.contains(
+      Constantes.confirmacaoCarregamentoConcluidoData,
+    )) {
+      setState(() {
+        exibirAcoesOpcaoData = true;
+      });
+    }
+  }
 
   chamarAdicionarItens() {
     itemDigitado[Constantes.dataCulto] = dataFormatada;
@@ -308,8 +245,9 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           onPressed: () async {
             if (icone == Constantes.iconeExclusao) {
               setState(() {
-                exibirTelaAdicionarCampo = false;
-                exibirOpcoesData = false;
+                exibirTelaOpcoesData = false;
+                exibirAcoesOpcaoData = false;
+                PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
               });
             } else if (icone == Constantes.iconeMudarHorario) {
               exibirTimePicker();
@@ -318,6 +256,94 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           child: Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
         ),
       );
+
+  Widget camposFormulario(double larguraTela, String label) => Container(
+    padding: const EdgeInsets.only(
+      left: 5.0,
+      top: 5.0,
+      right: 5.0,
+      bottom: 5.0,
+    ),
+    width: MetodosAuxiliares.ajustarTamanhoTextField(larguraTela),
+    child: TextFormField(
+      onChanged: (value) {
+        itemDigitado[label] = value;
+      },
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(labelText: label),
+    ),
+  );
+
+  Widget botoesAcoes(
+    String nomeBotao,
+    IconData icone,
+    double largura,
+    double altura,
+  ) => Container(
+    margin: const EdgeInsets.only(bottom: 10.0),
+    height: altura,
+    width: largura,
+    child: FloatingActionButton(
+      heroTag: nomeBotao,
+      elevation: 0,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        side: BorderSide(color: PaletaCores.corCastanho),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      onPressed: () async {
+        // verificando o tipo do botao
+        // para fazer acoes diferentes
+        if (nomeBotao == Textos.btnSalvar) {
+          if (_formKeyFormulario.currentState!.validate()) {
+            chamarAdicionarItens();
+          }
+        } else if (nomeBotao == Textos.btnAdicionarCampo) {
+          redirecionarTelaCadastroNovoCampo();
+        } else if (nomeBotao == Textos.btnData) {
+          exibirDataPicker();
+        } else if (nomeBotao == Textos.btnOpcaoData) {
+          PassarPegarDados.passarDataComComplemento("");
+          setState(() {
+            exibirTelaOpcoesData = true;
+            verificarCarregamentoDadosConcluido();
+          });
+        } else if (nomeBotao == Textos.btnSalvarOpcaoData) {
+          setState(() {
+            if (PassarPegarDados.recuperarDataComComplemento().isNotEmpty) {
+              dataFormatada = PassarPegarDados.recuperarDataComComplemento();
+            }
+            PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
+            exibirAcoesOpcaoData = false;
+            exibirTelaOpcoesData = false;
+          });
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (nomeBotao == Textos.btnOpcaoData) {
+                return Container();
+              } else {
+                return Icon(icone, color: PaletaCores.corAzulMagenta, size: 30);
+              }
+            },
+          ),
+          Text(
+            nomeBotao,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: PaletaCores.corAzulMagenta,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 
   exibirTimePicker() async {
     TimeOfDay? novoHorario = await showTimePicker(
@@ -386,8 +412,6 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   Widget build(BuildContext context) {
     double alturaTela = MediaQuery.of(context).size.height;
     double larguraTela = MediaQuery.of(context).size.width;
-    double alturaBarraStatus = MediaQuery.of(context).padding.top;
-    double alturaAppBar = AppBar().preferredSize.height;
     Timer(Duration(seconds: 2), () {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
@@ -407,31 +431,30 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
             } else {
               return Scaffold(
                 appBar: AppBar(
-                  actions: [
-                    Visibility(
-                      visible: exibirTelaAdicionarCampo,
-                      child: Center(
-                        child: botoesIcones(
-                          Constantes.iconeExclusao,
-                          40,
-                          PaletaCores.corRosaAvermelhado,
-                        ),
-                      ),
+                  //Colocando Visible negando o valor da variavel ou quando a variavel for verdadeira
+                  // para que quando o usuario clicar para mostrar o widget de opcoes data
+                  // estes campos sejam ocultados enquanto a  tela de carregamento aparece
+                  title: Visibility(
+                    visible:
+                        !exibirTelaOpcoesData || exibirAcoesOpcaoData == true,
+                    child: Text(Textos.telaCadastroTitulo),
+                  ),
+                  leading: Visibility(
+                    visible:
+                        !exibirTelaOpcoesData || exibirAcoesOpcaoData == true,
+                    child: IconButton(
+                      color: Colors.white,
+                      onPressed: () {
+                        redirecionarTelaAnterior();
+                      },
+                      icon: const Icon(Icons.arrow_back_ios),
                     ),
-                  ],
-                  title: Text(Textos.tituloTelaCadastro),
-                  leading: IconButton(
-                    color: Colors.white,
-                    onPressed: () {
-                      redirecionarTelaAnterior();
-                    },
-                    icon: const Icon(Icons.arrow_back_ios),
                   ),
                 ),
                 body: Container(
                   color: Colors.white,
                   width: larguraTela,
-                  height: alturaTela - alturaAppBar - alturaBarraStatus,
+                  height: alturaTela,
                   child: SingleChildScrollView(
                     child: Container(
                       margin: const EdgeInsets.symmetric(
@@ -441,14 +464,14 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                       width: larguraTela,
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          if (exibirOpcoesData) {
+                          if (exibirTelaOpcoesData) {
                             return Column(
                               children: [
                                 WidgetOpcoesData(
                                   dataSelecionada: dataFormatada,
                                 ),
                                 Visibility(
-                                  visible: exibirOpcoesData,
+                                  visible: exibirAcoesOpcaoData,
                                   child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -475,15 +498,6 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                 ),
                               ],
                             );
-                          } else if (exibirTelaAdicionarCampo) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                WidgetAdicionarNovoCampo(
-                                  idDocumento: widget.idTabelaSelecionada,
-                                ),
-                              ],
-                            );
                           } else {
                             return Column(
                               children: [
@@ -501,7 +515,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                 SizedBox(
                                   width: larguraTela,
                                   child: Text(
-                                    Textos.descricaoTelaCadastro,
+                                    Textos.telaCadastroDescricao,
                                     style: const TextStyle(fontSize: 18),
                                     textAlign: TextAlign.center,
                                   ),
@@ -573,7 +587,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                   ),
                 ),
                 bottomNavigationBar: Visibility(
-                  visible: !exibirOpcoesData,
+                  visible: !exibirTelaOpcoesData,
                   child: Container(
                     alignment: Alignment.center,
                     color: Colors.white,
@@ -584,26 +598,23 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Visibility(
-                          visible: !exibirTelaAdicionarCampo,
-                          child: Visibility(
-                            visible: !exibirOpcoesData,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                botoesAcoes(
-                                  Textos.btnSalvar,
-                                  Constantes.iconeSalvar,
-                                  90,
-                                  60,
-                                ),
-                                botoesAcoes(
-                                  Textos.btnAdicionarCampo,
-                                  Constantes.iconeAdicionar,
-                                  140,
-                                  60,
-                                ),
-                              ],
-                            ),
+                          visible: !exibirTelaOpcoesData,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              botoesAcoes(
+                                Textos.btnSalvar,
+                                Constantes.iconeSalvar,
+                                90,
+                                60,
+                              ),
+                              botoesAcoes(
+                                Textos.btnAdicionarCampo,
+                                Constantes.iconeAdicionar,
+                                140,
+                                60,
+                              ),
+                            ],
                           ),
                         ),
                         BarraNavegacao(),

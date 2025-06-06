@@ -56,7 +56,7 @@ class MetodosAuxiliares {
     if (larguraTela <= 600) {
       tamanho = 190;
     } else {
-      tamanho = 500;
+      tamanho = 400;
     }
     return tamanho;
   }

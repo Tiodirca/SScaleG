@@ -78,17 +78,14 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             if (querySnapshot.docs.isNotEmpty) {
               // for para percorrer todos os dados que a variavel recebeu
               for (var documentoFirebase in querySnapshot.docs) {
-                //mudando estado da lista adicionando os itens nela
-                setState(() {
-                  Map idDocumentoData = {};
-                  idDocumentoData[documentoFirebase.id] =
-                      documentoFirebase.data().values.first;
-                  //idDocumentoData["dados"] = documentoFirebase.data();
-                  listaIDDocumento.addAll([idDocumentoData]);
-                  escala.addAll([documentoFirebase.data()]);
-                  //ordandando lista pela data
-                  ordenarListaPelaData();
-                });
+                Map idDocumentoData = {};
+                idDocumentoData[documentoFirebase.id] =
+                    documentoFirebase.data().values.first;
+                //idDocumentoData["dados"] = documentoFirebase.data();
+                listaIDDocumento.addAll([idDocumentoData]);
+                escala.addAll([documentoFirebase.data()]);
+                //ordandando lista pela data
+                ordenarListaPelaData();
               }
 
               if (escala.isEmpty) {
@@ -622,16 +619,16 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                       ),
                                       child: Center(
                                         child: ListView(
-                                          scrollDirection:  Axis.vertical,
+                                          scrollDirection: Axis.vertical,
                                           children: [
                                             SingleChildScrollView(
                                               scrollDirection: Axis.horizontal,
                                               child: DataTable(
-                                                columnSpacing: 10,
+                                                columnSpacing: 20,
                                                 columns: cabecalhoDataColumn,
                                                 rows: linhasDataRow,
                                               ),
-                                            )
+                                            ),
                                           ],
                                         ),
                                       ),

@@ -425,7 +425,7 @@ class _TelaListagemTabelasBancoDadosState
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: PaletaCores.corAzulMagenta,
+                                            color: Colors.black,
                                             fontSize: 18,
                                           ),
                                         ),

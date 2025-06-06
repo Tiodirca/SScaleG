@@ -19,9 +19,6 @@ class Textos {
   static String btnVerEscalaAtual = "Escala Atual";
   static String btnUsarEscala = "Utilizar está escala";
 
-  static String labelCampoNovo = "Nome do campo novo";
-  static String descricaoDataPicker = "Selecione uma data";
-
   //WIDGET OPCOES DATA
   static String descricaoSelecaoDepartamentos =
       "Selecione qual será o departamento responsável pelo culto da data: ";
@@ -77,12 +74,16 @@ class Textos {
       "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
 
   // TELA DE CADASTRO DE ITEM
-  static String tituloTelaCadastro = "Cadastro de item na Escalas";
-  static String descricaoTelaCadastro =
+  static String telaCadastroTitulo = "Cadastro de item na Escalas";
+  static String telaCadastroDescricao =
       "Preencha os campos abaixo para adicionar "
       "um item a lista que ira compor a escala";
 
-  static String descricaoDataSelecionada = "A data Selecionada foi : ";
+  // TELA ADIONAR NOVO CAMPO
+  static String telaCadastroNovoCampoTitulo = "Cadastrar nova coluna";
+  static String telaCadastroNovoCampoDescricao =
+      "Digite o nome que a nova coluna/campo irá receber";
+  static String telaCadastroCampoNovolabel = "Nome da coluna";
 
   //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
   static String widgetAjustarHorarioDescricao =
@@ -105,6 +106,8 @@ class Textos {
 
   //GERAIS
   static String telaCarregamentoAguarde = "Aguarde Carregando";
+  static String descricaoDataPicker = "Selecione uma data";
+  static String descricaoDataSelecionada = "A data Selecionada foi : ";
 
   //ALERTA EXCLUSAO
   static String tituloAlertaExclusao = "Excluir Item";

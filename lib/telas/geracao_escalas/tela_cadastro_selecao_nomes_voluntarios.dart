@@ -522,7 +522,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                           );
                         }
                       },
-                      child: Text(Textos.btnAvancar),
+                      child: Text(Textos.btnAvancar,style: TextStyle(color: Colors.black),),
                     ),
                   ),
                 ),

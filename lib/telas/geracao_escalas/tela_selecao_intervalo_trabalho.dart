@@ -58,11 +58,11 @@ class _TelaSelecaoIntervaloTrabalhoState
                 return Theme(
                   data: ThemeData.dark().copyWith(
                     colorScheme: const ColorScheme.light(
-                      primary: PaletaCores.corAzulEscuro,
-                      onPrimary: Colors.white,
-                      onSurface: Colors.black,
+                      primary: Colors.white,
+                      onPrimary: PaletaCores.corCastanho,
+                      surface: PaletaCores.corAzulEscuro,
+                      onSurface: Colors.white,
                     ),
-                    dialogBackgroundColor: Colors.white,
                   ),
                   child: child!,
                 );
@@ -283,7 +283,7 @@ class _TelaSelecaoIntervaloTrabalhoState
                     );
                   }
                 },
-                child: Text(Textos.btnAvancar),
+                child: Text(Textos.btnAvancar,style: TextStyle(color: Colors.black),),
               ),
             ),
           ),
