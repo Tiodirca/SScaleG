@@ -3,7 +3,7 @@ class PassarPegarDados {
   static List<String> listaNomesVoluntarios = [];
   static List<String> listaDiasSemana = [];
   static List<String> listaIntervaloTrabalho = [];
-  static List<String> listaCamposCadastroItens = [];
+  static List<String> listaCamposLinhaItem = [];
   static String horarioFinalSemanaDefinido = "";
   static String horarioSemanaDefinido = "";
   static String dataComComplemento = "";
@@ -72,7 +72,9 @@ class PassarPegarDados {
     return dataComComplemento;
   }
 
-  static String passarConfirmacaoCarregamentoConcluido(String carregamentoConcluido) {
+  static String passarConfirmacaoCarregamentoConcluido(
+    String carregamentoConcluido,
+  ) {
     confirmacaoCarregamentoConcluido = carregamentoConcluido;
     return confirmacaoCarregamentoConcluido;
   }
@@ -81,12 +83,12 @@ class PassarPegarDados {
     return confirmacaoCarregamentoConcluido;
   }
 
-  static List<String> passarCamposCadastroItem(List<String> camposCadastro) {
-    listaCamposCadastroItens = camposCadastro;
-    return listaCamposCadastroItens;
+  static List<String> passarCamposItem(List<String> campos) {
+    listaCamposLinhaItem = campos;
+    return listaCamposLinhaItem;
   }
 
-  static List<String> recuperarCamposCadastroItem() {
-    return listaCamposCadastroItens;
+  static List<String> recuperarCamposItem() {
+    return listaCamposLinhaItem;
   }
 }

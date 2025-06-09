@@ -49,7 +49,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   void initState() {
     super.initState();
     recuperarHorarioTroca();
-    listaCamposOriginal = PassarPegarDados.recuperarCamposCadastroItem();
+    listaCamposOriginal = PassarPegarDados.recuperarCamposItem();
     listaCamposOriginal.removeWhere((element) {
       return element.contains(Constantes.editar);
     });
@@ -82,15 +82,17 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   void dispose() {
     super.dispose();
     PassarPegarDados.passarDataComComplemento("");
-    PassarPegarDados.passarCamposCadastroItem([]);
+    PassarPegarDados.passarCamposItem([]);
   }
 
   redirecionarTelaCadastroNovoCampo() {
     var dados = {};
-    PassarPegarDados.passarCamposCadastroItem(listaCamposOriginal);
+    PassarPegarDados.passarCamposItem(listaCamposOriginal);
     dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] = widget.nomeTabela;
     dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
         widget.idTabelaSelecionada;
+    dados[Constantes.rotaArgumentoTipoTelaAnteriorCadastroCampoNovo] =
+        Constantes.tipoTelaAnteriorCadastroItem;
     Navigator.pushReplacementNamed(
       context,
       Constantes.rotaTelaCadastroCampoNovo,

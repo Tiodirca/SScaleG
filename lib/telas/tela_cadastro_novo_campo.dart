@@ -13,20 +13,21 @@ class TelaCadastroCampoNovo extends StatefulWidget {
     super.key,
     required this.idDocumento,
     required this.nomeEscala,
+    required this.tipoTelaAnterior,
   });
 
   final String idDocumento;
   final String nomeEscala;
+  final String tipoTelaAnterior;
 
   @override
   State<TelaCadastroCampoNovo> createState() => _TelaCadastroCampoNovoState();
 }
 
 class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
-  List<Map> escala = [];
+  List<Map> escalaQuantidadeItensCadastrados = [];
   int index = 0;
   Estilo estilo = Estilo();
-  bool ativarDesativarBtn = true;
   bool exibirWidgetTelaCarregamento = true;
   String nomeCampoFormatado = "";
   final validacaoFormulario = GlobalKey<FormState>();
@@ -37,84 +38,98 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   void initState() {
     super.initState();
     realizarBuscaDadosFireBase(widget.idDocumento, "");
-    cabecalhoEscala = PassarPegarDados.recuperarCamposCadastroItem();
+    cabecalhoEscala = PassarPegarDados.recuperarCamposItem();
   }
 
   @override
   void dispose() {
     super.dispose();
-    PassarPegarDados.passarCamposCadastroItem([]);
+    PassarPegarDados.passarCamposItem([]);
   }
 
   realizarBuscaDadosFireBase(String idDocumento, String tipoBusca) async {
     setState(() {
       //exibirWidgetCarregamento = true;
     });
-    var db = FirebaseFirestore.instance;
-    //instanciano variavel
-    db
-        .collection(Constantes.fireBaseColecaoEscalas)
-        .doc(idDocumento)
-        .collection(Constantes.fireBaseDadosCadastrados)
-        .get()
-        .then(
-          (querySnapshot) async {
-            //Veficando se nao e vazio
-            if (querySnapshot.docs.isNotEmpty) {
-              // for para percorrer todos os dados que a variavel recebeu
-              for (var documentoFirebase in querySnapshot.docs) {
-                if (!tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
-                  Map idDocumentoData = {};
-                  idDocumentoData[Constantes.idDocumento] =
-                      documentoFirebase.id;
-                  escala.addAll([idDocumentoData, documentoFirebase.data()]);
-                }
-              }
-
-              if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
-                setState(() {
-                  cabecalhoEscala =
-                      querySnapshot.docs.first.data().keys.toList();
-                  //adicionando no cabecalho colunas de editar e excluir
-                  cabecalhoEscala.addAll([
-                    Constantes.editar,
-                    Constantes.excluir,
-                  ]);
-                });
-                redirecionarTelaCadastroItem();
+    try {
+      var db = FirebaseFirestore.instance;
+      //instanciano variavel
+      db
+          .collection(Constantes.fireBaseColecaoEscalas)
+          .doc(idDocumento)
+          .collection(Constantes.fireBaseDadosCadastrados)
+          .get()
+          .then(
+            (querySnapshot) async {
+              //Veficando se nao e vazio
+              if (querySnapshot.docs.isNotEmpty) {
+                carregarDados(querySnapshot, tipoBusca);
+                validarTipoBusca(querySnapshot, tipoBusca);
               } else {
                 setState(() {
-                  exibirWidgetTelaCarregamento = false;
+                  if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+                    exibirWidgetTelaCarregamento = false;
+                  }
+                  chamarExibirMensagemErro(Textos.erroBaseDadosVazia);
                 });
               }
-            } else {
+            },
+            onError: (e) {
               setState(() {
-                if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
-                  exibirWidgetTelaCarregamento = false;
-                } else {
-                  ativarDesativarBtn = false;
-                }
-                chamarExibirMensagemErro(Textos.erroBaseDadosVazia);
+                exibirWidgetTelaCarregamento = false;
               });
-            }
-          },
-          onError: (e) {
-            setState(() {
-              ativarDesativarBtn = false;
-            });
-            chamarExibirMensagemErro("Erro ao buscar escala : ${e.toString()}");
-          },
-        );
+              chamarExibirMensagemErro(
+                "Erro ao buscar escala : ${e.toString()}",
+              );
+            },
+          );
+    } catch (e) {
+      setState(() {
+        exibirWidgetTelaCarregamento = false;
+      });
+      chamarExibirMensagemErro("Erro ao buscar escala : ${e.toString()}");
+    }
+  }
+
+  carregarDados(var querySnapshot, String tipoBusca) {
+    // for para percorrer todos os dados que a variavel recebeu
+    for (var documentoFirebase in querySnapshot.docs) {
+      if (!tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+        Map idDocumentoData = {};
+        idDocumentoData[Constantes.idDocumento] = documentoFirebase.id;
+        escalaQuantidadeItensCadastrados.addAll([
+          idDocumentoData,
+          documentoFirebase.data(),
+        ]);
+      }
+    }
+  }
+
+  validarTipoBusca(var querySnapshot, String tipoBusca) {
+    if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+      setState(() {
+        cabecalhoEscala = querySnapshot.docs.first.data().keys.toList();
+        //adicionando no cabecalho colunas de editar e excluir
+        cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
+      });
+      if (widget.tipoTelaAnterior == Constantes.tipoTelaAnteriorCadastroItem) {
+        redirecionarTelaCadastroItem();
+      } else {}
+    } else {
+      setState(() {
+        exibirWidgetTelaCarregamento = false;
+      });
+    }
   }
 
   chamarAtualizarCampoPercorrerEscala() {
+    int tamanhoEscala = 0;
     setState(() {
       exibirWidgetTelaCarregamento = true;
     });
     nomeCampoFormatado = nomeAdicionarCampo.text;
-    //
     String idDocumentoItem = "";
-    for (var element in escala) {
+    for (var element in escalaQuantidadeItensCadastrados) {
       if (element.keys.contains(Constantes.idDocumento)) {
         idDocumentoItem = element.values
             .toString()
@@ -122,10 +137,12 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
             .replaceAll(")", "");
       }
       if (!element.keys.contains(Constantes.idDocumento)) {
+        tamanhoEscala++;
         atualizarCampos(
           element.entries.toList(),
           widget.idDocumento,
           idDocumentoItem,
+          tamanhoEscala,
         );
       }
     }
@@ -154,7 +171,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   }
 
   redirecionarTelaCadastroItem() {
-    PassarPegarDados.passarCamposCadastroItem(cabecalhoEscala);
+    PassarPegarDados.passarCamposItem(cabecalhoEscala);
     var dados = {};
     dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] = widget.nomeEscala;
     dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
@@ -166,12 +183,11 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
     );
   }
 
-
-
   atualizarCampos(
     List<MapEntry> escala,
     String idDocumentoFirebase,
     String idItem,
+    int tamanhoEscala,
   ) async {
     try {
       var db = FirebaseFirestore.instance;
@@ -183,30 +199,38 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
           .set(criarMapComTodosOsDados(escala))
           .then(
             (value) {
+              //definindo que a cada iteracao o index ira aumentar
               index++;
-              if (index == escala.length) {
+              //caso o index seja igual ao tamanho da escala realizar acoes
+              if (index == tamanhoEscala) {
                 index = 0;
                 realizarBuscaDadosFireBase(
                   widget.idDocumento,
                   Constantes.tipoBuscaAdicionarCampo,
                 );
-                MetodosAuxiliares.exibirMensagens(
-                  Constantes.tipoNotificacaoSucesso,
-                  Textos.notificacaoSucesso,
-                  context,
-                );
+                chamarExibirMensagemSucesso();
               }
             },
             onError: (e) {
-              chamarExibirMensagemErro("Erro ao atualizar : ${e.toString()}");
+              chamarExibirMensagemErro(
+                "Erro ao adicionar campo : ${e.toString()}",
+              );
             },
           );
     } catch (e) {
       setState(() {
-        //exibirWidgetCarregamento = false;
+        exibirWidgetTelaCarregamento = false;
       });
-      chamarExibirMensagemErro(e.toString());
+      chamarExibirMensagemErro("Erro adicionar campo : ${e.toString()}");
     }
+  }
+
+  chamarExibirMensagemSucesso() {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoSucesso,
+      Textos.notificacaoSucesso,
+      context,
+    );
   }
 
   chamarExibirMensagemErro(String erro) {
@@ -216,16 +240,6 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
       context,
     );
   }
-
-  Widget botoesAcoes(
-    double larguraTela,
-    TextEditingController controleHorario,
-    String label,
-  ) => Container(
-    margin: const EdgeInsets.symmetric(vertical: 20.0),
-    width: larguraTela,
-    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: []),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -253,16 +267,13 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
                 color: Colors.white,
                 width: larguraTela,
                 height: alturaTela,
-                child:Column(
+                child: Column(
                   children: [
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                      ),
+                      margin: const EdgeInsets.symmetric(horizontal: 10.0),
                       width: larguraTela,
                       child: Text(
-                        Textos.descricaoTabelaSelecionada +
-                            widget.nomeEscala,
+                        Textos.descricaoTabelaSelecionada + widget.nomeEscala,
                         textAlign: TextAlign.end,
                       ),
                     ),

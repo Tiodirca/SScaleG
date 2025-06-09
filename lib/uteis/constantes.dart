@@ -23,10 +23,15 @@ class Constantes {
   static const rotaTelaCadastroItem = "telaCadastroItem";
   static const rotaTelaCadastroCampoNovo = "telaCadastroCampoNovo";
 
+  static const tipoTelaAnteriorCadastroItem = "telaAnteriorCadastroItem";
+  static const tipoTelaAnteriorAtualizarItem = "telaAnteriorAtualizarItem";
+
   //ARGUMENTOS
   static const rotaArgumentEscalaDetalhadaNomeEscala = "nomeEscala";
   static const rotaArgumentoEscalaDetalhadaIDEscalaSelecionada =
       "IDEscalaSelecionada";
+  static const rotaArgumentoTipoTelaAnteriorCadastroCampoNovo =
+      "cadastroCampoNovo";
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";

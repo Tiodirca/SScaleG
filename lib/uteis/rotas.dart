@@ -84,6 +84,9 @@ class Rotas {
                   idDocumento:
                       args[Constantes
                           .rotaArgumentoEscalaDetalhadaIDEscalaSelecionada],
+                  tipoTelaAnterior:
+                      args[Constantes
+                          .rotaArgumentoTipoTelaAnteriorCadastroCampoNovo],
                 ),
           );
         } else {

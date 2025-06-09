@@ -25,8 +25,8 @@ class Textos {
   static String descricaoSelecaoDepartamentosCadastro =
       "Cadastre o nome de um departamento caso ainda não esteja cadastrado";
   static String descricaoSelecaoDepartamentosSelecao =
-      "Selecione uma opção que ira complementar a data, "
-      "não é possivel selecionar mais de uma opção";
+      "Selecione uma opção que irá complementar a data, "
+      "não é possível selecionar mais de uma opção";
 
   // TELA CADASTRO E SELECAO DE LOCAIS DE TRABALHO
   static String tituloTelaCadastroSelecaoLocalTrabalho = "Locais de Trabalho";
@@ -35,16 +35,16 @@ class Textos {
       "cadastrar o nome do Local de trabalho que estará compondo a escala";
   static String descricaoSelecaoLocalTrabalho =
       "Selecione quais "
-      "Locais cadastrados que voce deseja que a escala tenha";
+      "Locais cadastrados que você deseja que a escala tenha";
 
   // TELA CADASTRO E SELECAO DE VOLUNTARIOS
-  static String tituloTelaCadastroSelecaoVoluntarios = "Voluntarios";
+  static String tituloTelaCadastroSelecaoVoluntarios = "Voluntários";
   static String descricaoCadastroVoluntario =
       "Use o campo abaixo para "
       "cadastrar o nome do voluntario que estará compondo a escala de trabalho";
   static String descricaoSelecaoVoluntarios =
       "Selecione quais "
-      "voluntarios que voce deseja que a escala tenha";
+      "voluntários que você deseja que a escala tenha";
 
   // TELA SELECAO DIAS SEMANA
   static String descricaoSelecaoDiasSemana =
@@ -77,7 +77,7 @@ class Textos {
   static String telaCadastroTitulo = "Cadastro de item na Escalas";
   static String telaCadastroDescricao =
       "Preencha os campos abaixo para adicionar "
-      "um item a lista que ira compor a escala";
+      "um item à lista que irá compor a escala";
 
   // TELA ADIONAR NOVO CAMPO
   static String telaCadastroNovoCampoTitulo = "Cadastrar nova coluna";
@@ -89,7 +89,7 @@ class Textos {
   static String widgetAjustarHorarioDescricao =
       "Selecione qual o horario"
       " do inicio da jornada de trabalho";
-  static String widgetAjustarHorarioSemana = "Horario durante semana";
+  static String widgetAjustarHorarioSemana = "Horário durante semana";
   static String widgetAjustarHorarioFinalSemana =
       "Horario durante final de semana";
   static String widgetAjustarHorarioInicio = "Iniciar às : ";
@@ -101,7 +101,7 @@ class Textos {
   static String erroQuantidadeSelecionadaInsuficiente =
       "Selecione uma quantidade de itens igual ou superior a : ";
   static String erroBaseDadosVazia =
-      "Não foi possivel encontrar nenhuma informação na base de dados,por favor "
+      "Não foi possível encontrar nenhuma informação na base de dados, por favor "
       "verifique a conexão com internet ou cadastre uma informação";
 
   //GERAIS

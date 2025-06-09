@@ -41,7 +41,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   int contadorBtnFloat = 0;
   final validacaoFormulario = GlobalKey<FormState>();
   TextEditingController textoPesquisa = TextEditingController(text: "");
-  Map<String, int> quantidadeRepeticaoNome = {};
 
   @override
   void initState() {
@@ -80,13 +79,13 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
               for (var documentoFirebase in querySnapshot.docs) {
                 Map idDocumentoData = {};
                 idDocumentoData[documentoFirebase.id] =
-                    documentoFirebase.data().values.first;
-                //idDocumentoData["dados"] = documentoFirebase.data();
+                    "${documentoFirebase.data().values.elementAt(0)} "
+                    "${documentoFirebase.data().values.elementAt(1)}";
                 listaIDDocumento.addAll([idDocumentoData]);
-                escala.addAll([documentoFirebase.data()]);
                 //ordandando lista pela data
-                ordenarListaPelaData();
+                escala.addAll([documentoFirebase.data()]);
               }
+              ordenarListaPelaData();
 
               if (escala.isEmpty) {
                 setState(() {
@@ -94,7 +93,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   exibirWidgetCarregamento = false;
                 });
               } else {
-                carregarLinhas();
+                chamarCarregarLinhas();
                 setState(() {
                   cabecalhoEscala =
                       querySnapshot.docs.first.data().keys.toList();
@@ -121,19 +120,29 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         );
   }
 
-  carregarLinhas() {
-    for (var element in escala) {
+  chamarCarregarLinhas() {
+    String idDocumentoItem = "";
+    for (var item in escala) {
       contadorBtnFloat++;
-      List<dynamic> elementos = [];
       //adicionando somente os VALORES na lista
-      elementos = element.values.toList();
-      elementos.addAll([Constantes.editar, Constantes.excluir]);
-      //chamando metodo para adicionar cada item em uma linha e coluna
-      adicionarLinhasNaEscala(elementos);
+      if (item.keys.contains(Constantes.idDocumento)) {
+        idDocumentoItem = item.values
+            .toString()
+            .replaceAll("(", "")
+            .replaceAll(")", "");
+      }
+
+      if (!item.keys.contains(Constantes.idDocumento)) {
+        List<dynamic> elementos = [];
+        //adicionando somente os VALORES na lista
+        elementos = item.values.toList();
+        elementos.addAll([Constantes.editar, Constantes.excluir]);
+        adicionarLinhasNaEscala(elementos, idDocumentoItem);
+      }
     }
   }
 
-  adicionarLinhasNaEscala(List<dynamic> listaItem) {
+  adicionarLinhasNaEscala(List<dynamic> listaItem, String idDocumento) {
     linhasDataRow.addAll([
       DataRow(
         cells: [
@@ -145,7 +154,21 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   height: 40,
                   child: FloatingActionButton(
                     heroTag: "${Constantes.editar}$contadorBtnFloat",
-                    onPressed: () {},
+                    onPressed: () {
+                      for (var elemento in listaIDDocumento) {
+                        String dataComHora = elemento.values.toString();
+                        String dataComHoraItem =
+                            "${listaItem[0]} ${listaItem[1]}";
+
+                        if (dataComHora.contains(dataComHoraItem)) {
+                          String idDocumento = elemento.keys
+                              .toString()
+                              .replaceAll("(", "")
+                              .replaceAll(")", "");
+                          print(listaItem.toString());
+                        }
+                      }
+                    },
                     child: Icon(
                       Constantes.iconeEditar,
                       color: PaletaCores.corAzulMagenta,
@@ -163,14 +186,20 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                     heroTag: "${Constantes.excluir}$contadorBtnFloat",
                     onPressed: () {
                       for (var elemento in listaIDDocumento) {
-                        for (var element in listaItem) {
-                          if (elemento.values.contains(element)) {
-                            alertaExclusao(
-                              context,
-                              elemento.values.toString(),
-                              elemento.keys.toString(),
-                            );
-                          }
+                        String dataComHora = elemento.values.toString();
+                        String dataComHoraItem =
+                            "${listaItem[0]} ${listaItem[1]}";
+
+                        if (dataComHora.contains(dataComHoraItem)) {
+                          String idDocumento = elemento.keys
+                              .toString()
+                              .replaceAll("(", "")
+                              .replaceAll(")", "");
+                          alertaExclusao(
+                            context,
+                            elemento.values.toString(),
+                            idDocumento,
+                          );
                         }
                       }
                     },
@@ -222,7 +251,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           .compareTo(
             DateFormat("dd/MM/yyyy EEEE", "pt_BR").parse(b.values.elementAt(0)),
           );
-
       // caso a variavel seja diferente de 0 quer dizer que as datas nao sao iguais
       // logo sera colocado em ordem baseado na ordem acima
       if (data != 0) {
@@ -260,7 +288,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           .collection(Constantes.fireBaseColecaoEscalas)
           .doc(widget.idTabelaSelecionada)
           .collection(Constantes.fireBaseDadosCadastrados)
-          .doc(idDocumento.replaceAll("(", "").replaceAll(")", ""))
+          .doc(idDocumento)
           .delete()
           .then(
             (doc) {
@@ -270,10 +298,16 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
               chamarExibirMensagemSucesso();
             },
             onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
               chamarExibirMensagemErro("Erro ao Deletar : ${e.toString()}");
             },
           );
     } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
       chamarExibirMensagemErro(e.toString());
     }
   }
@@ -295,7 +329,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   }
 
   redirecionarTelaCadastroItem() {
-    PassarPegarDados.passarCamposCadastroItem(cabecalhoEscala);
+    PassarPegarDados.passarCamposItem(cabecalhoEscala);
     var dados = {};
     dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] = widget.nomeTabela;
     dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
@@ -460,7 +494,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             setState(() {
               nomeReacar = textoPesquisa.text;
               linhasDataRow.clear();
-              carregarLinhas();
+              chamarCarregarLinhas();
             });
           }
         } else {
@@ -469,7 +503,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             nomeReacar = "";
             textoPesquisa.clear();
             linhasDataRow.clear();
-            carregarLinhas();
+            chamarCarregarLinhas();
           });
         }
       },
