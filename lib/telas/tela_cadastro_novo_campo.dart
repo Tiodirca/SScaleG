@@ -32,6 +32,8 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   String nomeCampoFormatado = "";
   final validacaoFormulario = GlobalKey<FormState>();
   List<String> cabecalhoEscala = [];
+  Map itensRecebidosCabecalhoLinha = {};
+  String idItemAtualizar = "";
   TextEditingController nomeAdicionarCampo = TextEditingController(text: "");
 
   @override
@@ -39,12 +41,17 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
     super.initState();
     realizarBuscaDadosFireBase(widget.idDocumento, "");
     cabecalhoEscala = PassarPegarDados.recuperarCamposItem();
+    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItensAtualizar();
+    idItemAtualizar = PassarPegarDados.recuperarIdAtualizarSelecionado();
   }
 
   @override
   void dispose() {
     super.dispose();
     PassarPegarDados.passarCamposItem([]);
+    PassarPegarDados.passarItensAtualizar({});
+    PassarPegarDados.passarIdAtualizarSelecionado("");
+    PassarPegarDados.passarDataComComplemento("");
   }
 
   realizarBuscaDadosFireBase(String idDocumento, String tipoBusca) async {
@@ -113,7 +120,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
         cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
       });
       if (widget.tipoTelaAnterior == Constantes.tipoTelaAnteriorCadastroItem) {
-        redirecionarTelaCadastroItem();
+        validarRedirecionamentoTela();
       } else {}
     } else {
       setState(() {
@@ -173,14 +180,35 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   redirecionarTelaCadastroItem() {
     PassarPegarDados.passarCamposItem(cabecalhoEscala);
     var dados = {};
-    dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] = widget.nomeEscala;
-    dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
-        widget.idDocumento;
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeEscala;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] = widget.idDocumento;
     Navigator.pushReplacementNamed(
       context,
       Constantes.rotaTelaCadastroItem,
       arguments: dados,
     );
+  }
+
+  redirecionarTelaAtualizarItem() {
+    PassarPegarDados.passarCamposItem(cabecalhoEscala);
+    //PassarPegarDados.passarItensAtualizar(listaDadosItem);
+    PassarPegarDados.passarIdAtualizarSelecionado(idItemAtualizar);
+    var dados = {};
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeEscala;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] = widget.idDocumento;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaAtualizarItem,
+      arguments: dados,
+    );
+  }
+
+  validarRedirecionamentoTela() {
+    if (idItemAtualizar.isEmpty && itensRecebidosCabecalhoLinha.isEmpty) {
+      redirecionarTelaCadastroItem();
+    } else {
+      redirecionarTelaAtualizarItem();
+    }
   }
 
   atualizarCampos(
@@ -258,7 +286,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
                 leading: IconButton(
                   color: Colors.white,
                   onPressed: () {
-                    redirecionarTelaCadastroItem();
+                    validarRedirecionamentoTela();
                   },
                   icon: const Icon(Icons.arrow_back_ios),
                 ),

@@ -60,4 +60,17 @@ class MetodosAuxiliares {
     }
     return tamanho;
   }
+
+  static quantidadeColunasGridView(double larguraTela) {
+    int tamanho = 5;
+    //verificando qual o tamanho da tela
+    if (larguraTela <= 600) {
+      tamanho = 2;
+    } else if (larguraTela >= 600 && larguraTela <= 1000) {
+      tamanho = 4;
+    } else {
+      tamanho = 5;
+    }
+    return tamanho;
+  }
 }

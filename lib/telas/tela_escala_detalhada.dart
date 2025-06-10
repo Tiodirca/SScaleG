@@ -73,51 +73,51 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         .get()
         .then(
           (querySnapshot) async {
-            //Veficando se nao e vazio
-            if (querySnapshot.docs.isNotEmpty) {
-              // for para percorrer todos os dados que a variavel recebeu
-              for (var documentoFirebase in querySnapshot.docs) {
-                Map idDocumentoData = {};
-                idDocumentoData[documentoFirebase.id] =
-                    "${documentoFirebase.data().values.elementAt(0)} "
-                    "${documentoFirebase.data().values.elementAt(1)}";
-                listaIDDocumento.addAll([idDocumentoData]);
-                //ordandando lista pela data
-                escala.addAll([documentoFirebase.data()]);
-              }
-              ordenarListaPelaData();
+        //Veficando se nao e vazio
+        if (querySnapshot.docs.isNotEmpty) {
+          // for para percorrer todos os dados que a variavel recebeu
+          for (var documentoFirebase in querySnapshot.docs) {
+            Map idDocumentoData = {};
+            idDocumentoData[documentoFirebase.id] =
+            "${documentoFirebase.data().values.elementAt(0)} "
+                "${documentoFirebase.data().values.elementAt(1)}";
+            listaIDDocumento.addAll([idDocumentoData]);
+            //ordandando lista pela data
+            escala.addAll([documentoFirebase.data()]);
+          }
+          ordenarListaPelaData();
 
-              if (escala.isEmpty) {
-                setState(() {
-                  exibirOcultarBtnAcao = false;
-                  exibirWidgetCarregamento = false;
-                });
-              } else {
-                chamarCarregarLinhas();
-                setState(() {
-                  cabecalhoEscala =
-                      querySnapshot.docs.first.data().keys.toList();
-                  //adicionando no cabecalho colunas de editar e excluir
-                  cabecalhoEscala.addAll([
-                    Constantes.editar,
-                    Constantes.excluir,
-                  ]);
-                  carregarCabecalho();
-                  exibirOcultarBtnAcao = true;
-                  exibirWidgetCarregamento = false;
-                });
-              }
-            } else {
-              setState(() {
-                exibirOcultarBtnAcao = false;
-                exibirWidgetCarregamento = false;
-              });
-            }
-          },
-          onError: (e) {
-            chamarExibirMensagemErro("Erro ao buscar escala : ${e.toString()}");
-          },
-        );
+          if (escala.isEmpty) {
+            setState(() {
+              exibirOcultarBtnAcao = false;
+              exibirWidgetCarregamento = false;
+            });
+          } else {
+            chamarCarregarLinhas();
+            setState(() {
+              cabecalhoEscala =
+                  querySnapshot.docs.first.data().keys.toList();
+              //adicionando no cabecalho colunas de editar e excluir
+              cabecalhoEscala.addAll([
+                Constantes.editar,
+                Constantes.excluir,
+              ]);
+              carregarCabecalho();
+              exibirOcultarBtnAcao = true;
+              exibirWidgetCarregamento = false;
+            });
+          }
+        } else {
+          setState(() {
+            exibirOcultarBtnAcao = false;
+            exibirWidgetCarregamento = false;
+          });
+        }
+      },
+      onError: (e) {
+        chamarExibirMensagemErro("Erro ao buscar escala : ${e.toString()}");
+      },
+    );
   }
 
   chamarCarregarLinhas() {
@@ -142,6 +142,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     }
   }
 
+
   adicionarLinhasNaEscala(List<dynamic> listaItem, String idDocumento) {
     linhasDataRow.addAll([
       DataRow(
@@ -165,7 +166,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                               .toString()
                               .replaceAll("(", "")
                               .replaceAll(")", "");
-                          print(listaItem.toString());
+                          redirecionarTelaAtualizar(listaItem, idDocumento);
                         }
                       }
                     },
@@ -229,12 +230,31 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     ]);
   }
 
+  redirecionarTelaAtualizar(List<dynamic> listaItens, String id) {
+    PassarPegarDados.passarCamposItem(cabecalhoEscala);
+    Map dadosCabecalhoLinha = {};
+    for (int i = 0; i < cabecalhoEscala.length; i++) {
+      dadosCabecalhoLinha[cabecalhoEscala[i]] = listaItens[i];
+    }
+    PassarPegarDados.passarItensAtualizar(dadosCabecalhoLinha);
+    PassarPegarDados.passarIdAtualizarSelecionado(id);
+    var dados = {};
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaAtualizarItem,
+      arguments: dados,
+    );
+  }
+
   carregarCabecalho() {
     for (var element in cabecalhoEscala) {
       cabecalhoDataColumn.add(
         DataColumn(
           label: Text(
-            element.toString().replaceAll("DD", "D").replaceAll("DH", "H"),
+            element.toString().replaceAll("1_", "").replaceAll("2_", "").replaceAll("_", " "),
           ),
         ),
       );
@@ -331,8 +351,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   redirecionarTelaCadastroItem() {
     PassarPegarDados.passarCamposItem(cabecalhoEscala);
     var dados = {};
-    dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] = widget.nomeTabela;
-    dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
         widget.idTabelaSelecionada;
     Navigator.pushReplacementNamed(
       context,
@@ -638,7 +658,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                     height:
                                         Platform.isWindows
                                             ? alturaTela * 0.6
-                                            : alturaTela * 0.5,
+                                            : alturaTela * 0.55,
                                     width: larguraTela,
                                     child: Card(
                                       color: Colors.white,

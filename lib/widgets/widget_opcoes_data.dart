@@ -35,7 +35,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     dataSelecionadaComDepartamento = widget.dataSelecionada;
     realizarBuscaDadosFireBase();
@@ -64,7 +63,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
   }
@@ -246,7 +244,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
         dataComDepartamento = dataComDepartamento.split(element.texto)[0];
       }
     }
-    return dataComDepartamento;
+    return dataComDepartamento.replaceAll("(", "").replaceAll(")", "");
   }
 
   //metodo para verificar
@@ -254,7 +252,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     String opcoesAdicionaisSelecionada = "";
     for (var element in listaNomesCadastrados) {
       if (element.checked) {
-        opcoesAdicionaisSelecionada = element.texto;
+        opcoesAdicionaisSelecionada = "(${element.texto})";
       }
     }
     setState(() {
@@ -371,8 +369,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
         },
       );
 
-
-
   Widget botoesAcoes(
     String nomeBotao,
     IconData icone,
@@ -441,9 +437,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                   style: TextStyle(fontSize: 18),
                 ),
                 Text(
-                  dataSelecionadaComDepartamento
-                      .replaceAll("(", "")
-                      .replaceAll(")", ""),
+                  dataSelecionadaComDepartamento,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),

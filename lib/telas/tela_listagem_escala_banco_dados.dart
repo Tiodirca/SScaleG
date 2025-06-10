@@ -432,10 +432,10 @@ class _TelaListagemTabelasBancoDadosState
                                         onPressed: () {
                                           var dados = {};
                                           dados[Constantes
-                                                  .rotaArgumentEscalaDetalhadaNomeEscala] =
+                                                  .rotaArgumentoNomeEscala] =
                                               nomeTabelaSelecionada;
                                           dados[Constantes
-                                                  .rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
+                                                  .rotaArgumentoIDEscalaSelecionada] =
                                               idTabelaSelecionada;
                                           Navigator.pushReplacementNamed(
                                             context,

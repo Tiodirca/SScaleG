@@ -15,8 +15,8 @@ import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 import 'package:sscaleg/widgets/widget_opcoes_data.dart';
 
 @immutable
-class TelaCadastroItem extends StatefulWidget {
-  const TelaCadastroItem({
+class TelaAtualizarItem extends StatefulWidget {
+  const TelaAtualizarItem({
     super.key,
     required this.nomeTabela,
     required this.idTabelaSelecionada,
@@ -26,20 +26,21 @@ class TelaCadastroItem extends StatefulWidget {
   final String idTabelaSelecionada;
 
   @override
-  State<TelaCadastroItem> createState() => _TelaCadastroItemState();
+  State<TelaAtualizarItem> createState() => _TelaAtualizarItemState();
 }
 
-class _TelaCadastroItemState extends State<TelaCadastroItem> {
+class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   Estilo estilo = Estilo();
   bool exibirTelaCarregamento = false;
   bool exibirTelaOpcoesData = false;
   bool exibirAcoesOpcaoData = false;
   String horarioTroca = "";
   bool exibirWidgetCarregamento = false;
-  List<String> listaCamposOriginal = [];
-  List<String> listaCamposExibicao = [];
+  Map itensRecebidosCabecalhoLinha = {};
   String nomeDigitado = "";
   String dataFormatada = "";
+  String idItem = "";
+  String departamentoData = "";
   Map<dynamic, dynamic> itemDigitado = {};
   TimeOfDay? horarioTimePicker = const TimeOfDay(hour: 19, minute: 00);
   DateTime dataSelecionada = DateTime.now();
@@ -48,46 +49,49 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   @override
   void initState() {
     super.initState();
+    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItensAtualizar();
+    idItem = PassarPegarDados.recuperarIdAtualizarSelecionado();
+    itensRecebidosCabecalhoLinha.removeWhere((key, value) {
+      return key.toString().contains(Constantes.editar);
+    });
+    itensRecebidosCabecalhoLinha.removeWhere((key, value) {
+      return key.toString().contains(Constantes.excluir);
+    });
+    String data = itensRecebidosCabecalhoLinha.values.elementAt(0);
+    dataSelecionada = DateFormat("dd/MM/yyyy EEEE", "pt_BR").parse(data);
+
     recuperarHorarioTroca();
-    listaCamposOriginal = PassarPegarDados.recuperarCamposItem();
-    listaCamposOriginal.removeWhere((element) {
-      return element.contains(Constantes.editar);
-    });
-    listaCamposOriginal.removeWhere((element) {
-      return element.contains(Constantes.excluir);
-    });
+    if (data.contains("(")) {
+      departamentoData = data.split("(")[1];
+      dataFormatada = "$dataFormatada($departamentoData";
+    }
     carregarCampos();
   }
 
   carregarCampos() {
     setState(() {
-      for (var element in listaCamposOriginal) {
-        listaCamposExibicao.add(element);
-      }
-      listaCamposExibicao.removeWhere((element) {
-        return element.contains(Constantes.dataCulto);
-      });
-      listaCamposExibicao.removeWhere((element) {
-        return element.contains(Constantes.horarioTrabalho);
+      itensRecebidosCabecalhoLinha.forEach((key, value) {
+        if (!(key.toString().contains(Constantes.dataCulto) ||
+            key.toString().contains(Constantes.horarioTrabalho))) {
+          itemDigitado[key.toString()] = value.toString();
+        }
       });
     });
-    if (itemDigitado.length != listaCamposOriginal.length) {
-      for (var element in listaCamposOriginal) {
-        itemDigitado[element] = "";
-      }
-    }
   }
 
   @override
   void dispose() {
     super.dispose();
+    PassarPegarDados.passarItensAtualizar({});
+    PassarPegarDados.passarIdAtualizarSelecionado("");
     PassarPegarDados.passarDataComComplemento("");
     PassarPegarDados.passarCamposItem([]);
   }
 
   redirecionarTelaCadastroNovoCampo() {
     var dados = {};
-    PassarPegarDados.passarCamposItem(listaCamposOriginal);
+    PassarPegarDados.passarItensAtualizar(itensRecebidosCabecalhoLinha);
+    PassarPegarDados.passarIdAtualizarSelecionado(idItem);
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
     dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
         widget.idTabelaSelecionada;
@@ -176,10 +180,10 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   chamarAdicionarItens() {
     itemDigitado[Constantes.dataCulto] = dataFormatada;
     itemDigitado[Constantes.horarioTrabalho] = horarioTroca;
-    cadastrarItens(widget.idTabelaSelecionada);
+    atualizarItem(widget.idTabelaSelecionada);
   }
 
-  cadastrarItens(String idDocumentoFirebase) async {
+  atualizarItem(String idDocumentoFirebase) async {
     setState(() {
       exibirWidgetCarregamento = true;
     });
@@ -189,12 +193,10 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           .collection(Constantes.fireBaseColecaoEscalas)
           .doc(idDocumentoFirebase)
           .collection(Constantes.fireBaseDadosCadastrados)
-          .doc()
+          .doc(idItem)
           .set(criarMapCompativel(itemDigitado))
           .then((value) {
-            setState(() {
-              exibirWidgetCarregamento = false;
-            });
+            redirecionarTelaAnterior();
             chamarExibirMensagemSucesso();
           });
     } catch (e) {
@@ -266,11 +268,13 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
       right: 5.0,
       bottom: 5.0,
     ),
+    height: 100,
     width: MetodosAuxiliares.ajustarTamanhoTextField(larguraTela),
     child: TextFormField(
       onChanged: (value) {
         itemDigitado[label] = value;
       },
+      initialValue: itemDigitado[label],
       keyboardType: TextInputType.text,
       decoration: InputDecoration(labelText: label),
     ),
@@ -439,7 +443,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                   title: Visibility(
                     visible:
                         !exibirTelaOpcoesData || exibirAcoesOpcaoData == true,
-                    child: Text(Textos.telaCadastroTitulo),
+                    child: Text(Textos.telaAtualizarItemTitulo),
                   ),
                   leading: Visibility(
                     visible:
@@ -517,7 +521,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                 SizedBox(
                                   width: larguraTela,
                                   child: Text(
-                                    Textos.telaCadastroDescricao,
+                                    Textos.telaAtualizarDescricao,
                                     style: const TextStyle(fontSize: 18),
                                     textAlign: TextAlign.center,
                                   ),
@@ -578,11 +582,11 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                                 ),
                                             mainAxisExtent: 70,
                                           ),
-                                      itemCount: listaCamposExibicao.length,
+                                      itemCount: itemDigitado.length,
                                       itemBuilder: (context, index) {
                                         return camposFormulario(
-                                          100,
-                                          listaCamposExibicao.elementAt(index),
+                                          larguraTela,
+                                          itemDigitado.keys.elementAt(index),
                                         );
                                       },
                                     ),

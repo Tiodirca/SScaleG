@@ -23,13 +23,15 @@ class Constantes {
   static const rotaTelaCadastroItem = "telaCadastroItem";
   static const rotaTelaCadastroCampoNovo = "telaCadastroCampoNovo";
 
+  static const rotaTelaAtualizarItem = "telaAtualizarItem";
+
   static const tipoTelaAnteriorCadastroItem = "telaAnteriorCadastroItem";
   static const tipoTelaAnteriorAtualizarItem = "telaAnteriorAtualizarItem";
 
   //ARGUMENTOS
-  static const rotaArgumentEscalaDetalhadaNomeEscala = "nomeEscala";
-  static const rotaArgumentoEscalaDetalhadaIDEscalaSelecionada =
-      "IDEscalaSelecionada";
+  static const rotaArgumentoNomeEscala = "nomeEscala";
+  static const rotaArgumentoIDEscalaSelecionada = "IDEscalaSelecionada";
+  static const rotaArgumentoIDItemSelecionado = "IDEscalaSelecionada";
   static const rotaArgumentoTipoTelaAnteriorCadastroCampoNovo =
       "cadastroCampoNovo";
 
@@ -43,8 +45,8 @@ class Constantes {
   static const diaDomingo = "Domingo";
 
   //Complementos da geracao de escala
-  static const dataCulto = "DData";
-  static const horarioTrabalho = "DHorario de Trabalho";
+  static const dataCulto = "1_Data";
+  static const horarioTrabalho = "2_Horario_de_Trabalho";
   static const editar = "Editar";
   static const excluir = "Excluir";
   static const idDocumento = "idDocumento";

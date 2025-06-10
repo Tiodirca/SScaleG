@@ -79,6 +79,11 @@ class Textos {
       "Preencha os campos abaixo para adicionar "
       "um item à lista que irá compor a escala";
 
+  // TELA DE ATUALIZAR DE ITEM
+  static String telaAtualizarItemTitulo = "Atualizar item na Escala";
+  static String telaAtualizarDescricao =
+      "Altere os valores que estão nos campos conforme necessario";
+
   // TELA ADIONAR NOVO CAMPO
   static String telaCadastroNovoCampoTitulo = "Cadastrar nova coluna";
   static String telaCadastroNovoCampoDescricao =

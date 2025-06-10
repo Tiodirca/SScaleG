@@ -4,6 +4,9 @@ class PassarPegarDados {
   static List<String> listaDiasSemana = [];
   static List<String> listaIntervaloTrabalho = [];
   static List<String> listaCamposLinhaItem = [];
+  static List<dynamic> listaItensAtualizar = [];
+  static Map itensAtualizar = {};
+  static String idItemAtualizarSelecionado = "";
   static String horarioFinalSemanaDefinido = "";
   static String horarioSemanaDefinido = "";
   static String dataComComplemento = "";
@@ -90,5 +93,23 @@ class PassarPegarDados {
 
   static List<String> recuperarCamposItem() {
     return listaCamposLinhaItem;
+  }
+
+  static String passarIdAtualizarSelecionado(String id) {
+    idItemAtualizarSelecionado = id;
+    return idItemAtualizarSelecionado;
+  }
+
+  static String recuperarIdAtualizarSelecionado() {
+    return idItemAtualizarSelecionado;
+  }
+
+  static Map passarItensAtualizar(Map itens) {
+    itensAtualizar = itens;
+    return itensAtualizar;
+  }
+
+  static Map recuperarItensAtualizar() {
+    return itensAtualizar;
   }
 }

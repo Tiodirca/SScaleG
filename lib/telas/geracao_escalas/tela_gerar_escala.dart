@@ -73,8 +73,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       } else {
         horarioInicioTrabalho = horarioSemana;
       }
-      linha[Constantes.dataCulto] = datas;
       linha[Constantes.horarioTrabalho] = horarioInicioTrabalho;
+      linha[Constantes.dataCulto] = datas;
       // fazendo a iteracao baseado na quantidade de dias selecionados no intervalo de trabalho
       for (int index = 0; index < locaisSorteioVoluntarios.length; index++) {
         // fazendo iteracao baseado na quantidade de locais de trabalho disponiveis
@@ -230,9 +230,9 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
   redirecionarProximaTela() {
     var dados = {};
-    dados[Constantes.rotaArgumentEscalaDetalhadaNomeEscala] =
+    dados[Constantes.rotaArgumentoNomeEscala] =
         nomeEscalaFormatada;
-    dados[Constantes.rotaArgumentoEscalaDetalhadaIDEscalaSelecionada] =
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
         idDocumento;
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacementNamed(
