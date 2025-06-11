@@ -33,7 +33,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   bool exibirWidgetCarregamento = true;
   bool exibirOcultarBtnAcao = true;
   late List<Map> escala;
-  List<String> cabecalhoEscala = [];
+  List<dynamic> cabecalhoEscala = [];
   List<Map> listaIDDocumento = [];
   List<DataColumn> cabecalhoDataColumn = [];
   List<DataRow> linhasDataRow = [];
@@ -73,77 +73,98 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         .get()
         .then(
           (querySnapshot) async {
-        //Veficando se nao e vazio
-        if (querySnapshot.docs.isNotEmpty) {
-          // for para percorrer todos os dados que a variavel recebeu
-          for (var documentoFirebase in querySnapshot.docs) {
-            Map idDocumentoData = {};
-            idDocumentoData[documentoFirebase.id] =
-            "${documentoFirebase.data().values.elementAt(0)} "
-                "${documentoFirebase.data().values.elementAt(1)}";
-            listaIDDocumento.addAll([idDocumentoData]);
-            //ordandando lista pela data
-            escala.addAll([documentoFirebase.data()]);
-          }
-          ordenarListaPelaData();
+            //Veficando se nao e vazio
+            if (querySnapshot.docs.isNotEmpty) {
+              // for para percorrer todos os dados que a variavel recebeu
+              for (var documentoFirebase in querySnapshot.docs) {
+                Map idDocumentoData = {};
+                idDocumentoData[documentoFirebase.id] =
+                    "${documentoFirebase.data().values.elementAt(0)} "
+                    "${documentoFirebase.data().values.elementAt(1)}";
+                listaIDDocumento.addAll([idDocumentoData]);
+                //ordandando lista pela data
+                escala.addAll([documentoFirebase.data()]);
+              }
+              //ordenarListaPelaData();
+              if (escala.isEmpty) {
+                setState(() {
+                  exibirOcultarBtnAcao = false;
+                  exibirWidgetCarregamento = false;
+                });
+              } else {
+                setState(() {
+                  print(querySnapshot.docs.first.data().keys.toList());
 
-          if (escala.isEmpty) {
-            setState(() {
-              exibirOcultarBtnAcao = false;
-              exibirWidgetCarregamento = false;
-            });
-          } else {
-            chamarCarregarLinhas();
-            setState(() {
-              cabecalhoEscala =
-                  querySnapshot.docs.first.data().keys.toList();
-              //adicionando no cabecalho colunas de editar e excluir
-              cabecalhoEscala.addAll([
-                Constantes.editar,
-                Constantes.excluir,
-              ]);
-              carregarCabecalho();
-              exibirOcultarBtnAcao = true;
-              exibirWidgetCarregamento = false;
-            });
-          }
-        } else {
-          setState(() {
-            exibirOcultarBtnAcao = false;
-            exibirWidgetCarregamento = false;
-          });
-        }
-      },
-      onError: (e) {
-        chamarExibirMensagemErro("Erro ao buscar escala : ${e.toString()}");
-      },
-    );
+                  chamarCarregarLinhas();
+                  exibirOcultarBtnAcao = true;
+                  exibirWidgetCarregamento = false;
+                });
+              }
+            } else {
+              setState(() {
+                exibirOcultarBtnAcao = false;
+                exibirWidgetCarregamento = false;
+              });
+            }
+          },
+          onError: (e) {
+            chamarExibirMensagemErro("Erro ao buscar escala : ${e.toString()}");
+          },
+        );
   }
 
   chamarCarregarLinhas() {
-    String idDocumentoItem = "";
+    List<MapEntry> escalaOrdenadaItemMap = [];
+    String dataComparacao = "";
+    Map escalaOrdenadaMap = {};
     for (var item in escala) {
       contadorBtnFloat++;
-      //adicionando somente os VALORES na lista
-      if (item.keys.contains(Constantes.idDocumento)) {
-        idDocumentoItem = item.values
-            .toString()
-            .replaceAll("(", "")
-            .replaceAll(")", "");
-      }
 
-      if (!item.keys.contains(Constantes.idDocumento)) {
-        List<dynamic> elementos = [];
-        //adicionando somente os VALORES na lista
-        elementos = item.values.toList();
-        elementos.addAll([Constantes.editar, Constantes.excluir]);
-        adicionarLinhasNaEscala(elementos, idDocumentoItem);
+      List<dynamic> elementos = [];
+      // adicinando na lista todos os itens transformados em entries item  a item
+      escalaOrdenadaItemMap.addAll(item.entries);
+      //ordenando a lista para que a data e o
+      escalaOrdenadaItemMap.sort((a, b) {
+        return a.key.toString().compareTo(b.key.toString());
+      });
+      //percorrendo cada item do map que esta na lista Escala
+      item.forEach((key, value) {
+        //verificando se a key corrende ao seguinte valor
+        if (key.contains(Constantes.dataCulto)) {
+          //definindo que variavel vai receber o seguinte valor
+          dataComparacao = value;
+          //percorrendo lista ja ordenada
+          for (var elemento in escalaOrdenadaItemMap) {
+            //verificando se o map NAO contem a data de comparadacao
+            // caso nao tenha entrar no IF
+            if (!(escalaOrdenadaMap.containsKey(dataComparacao))) {
+              //definindo que o map vai receber os valores
+              escalaOrdenadaMap[elemento.key] = elemento.value;
+            }
+          }
+        }
+      });
+      //print(t.toString());
+      if (cabecalhoEscala.isEmpty) {
+        cabecalhoEscala = escalaOrdenadaMap.keys.toList();
+        //adicionando no cabecalho colunas de editar e excluir
+        cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
+        carregarCabecalho();
       }
+      elementos = escalaOrdenadaMap.values.toList();
+      elementos.addAll([Constantes.editar, Constantes.excluir]);
+      adicionarLinhasNaEscala(elementos);
     }
   }
 
+  chamarCarregarCabecalho(Map item) {
+    cabecalhoEscala = item.keys.toList();
+    //adicionando no cabecalho colunas de editar e excluir
+    cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
+    carregarCabecalho();
+  }
 
-  adicionarLinhasNaEscala(List<dynamic> listaItem, String idDocumento) {
+  adicionarLinhasNaEscala(List<dynamic> listaItem) {
     linhasDataRow.addAll([
       DataRow(
         cells: [
@@ -230,31 +251,17 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     ]);
   }
 
-  redirecionarTelaAtualizar(List<dynamic> listaItens, String id) {
-    PassarPegarDados.passarCamposItem(cabecalhoEscala);
-    Map dadosCabecalhoLinha = {};
-    for (int i = 0; i < cabecalhoEscala.length; i++) {
-      dadosCabecalhoLinha[cabecalhoEscala[i]] = listaItens[i];
-    }
-    PassarPegarDados.passarItensAtualizar(dadosCabecalhoLinha);
-    PassarPegarDados.passarIdAtualizarSelecionado(id);
-    var dados = {};
-    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
-    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
-        widget.idTabelaSelecionada;
-    Navigator.pushReplacementNamed(
-      context,
-      Constantes.rotaTelaAtualizarItem,
-      arguments: dados,
-    );
-  }
-
   carregarCabecalho() {
     for (var element in cabecalhoEscala) {
       cabecalhoDataColumn.add(
         DataColumn(
           label: Text(
-            element.toString().replaceAll("1_", "").replaceAll("2_", "").replaceAll("_", " "),
+            element
+                .toString()
+                .replaceAll("01_", "")
+                .replaceAll("02_", "")
+                .replaceAll("_", " ")
+                .replaceAll(RegExp(r'[0-9]'), ''),
           ),
         ),
       );
@@ -349,7 +356,12 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   }
 
   redirecionarTelaCadastroItem() {
-    PassarPegarDados.passarCamposItem(cabecalhoEscala);
+    Map dadosCabecalhoLinha = {};
+    for (int i = 0; i < cabecalhoEscala.length; i++) {
+      dadosCabecalhoLinha[cabecalhoEscala[i]] = "";
+    }
+
+    PassarPegarDados.passarItens(dadosCabecalhoLinha);
     var dados = {};
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
     dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
@@ -357,6 +369,24 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     Navigator.pushReplacementNamed(
       context,
       Constantes.rotaTelaCadastroItem,
+      arguments: dados,
+    );
+  }
+
+  redirecionarTelaAtualizar(List<dynamic> listaItens, String id) {
+    Map dadosCabecalhoLinha = {};
+    for (int i = 0; i < cabecalhoEscala.length; i++) {
+      dadosCabecalhoLinha[cabecalhoEscala[i]] = listaItens[i];
+    }
+    PassarPegarDados.passarItens(dadosCabecalhoLinha);
+    PassarPegarDados.passarIdAtualizarSelecionado(id);
+    var dados = {};
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaAtualizarItem,
       arguments: dados,
     );
   }

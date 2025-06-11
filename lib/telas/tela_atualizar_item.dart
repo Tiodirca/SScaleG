@@ -49,7 +49,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   @override
   void initState() {
     super.initState();
-    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItensAtualizar();
+    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
     idItem = PassarPegarDados.recuperarIdAtualizarSelecionado();
     itensRecebidosCabecalhoLinha.removeWhere((key, value) {
       return key.toString().contains(Constantes.editar);
@@ -82,15 +82,14 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   @override
   void dispose() {
     super.dispose();
-    PassarPegarDados.passarItensAtualizar({});
+    PassarPegarDados.passarItens({});
     PassarPegarDados.passarIdAtualizarSelecionado("");
     PassarPegarDados.passarDataComComplemento("");
-    PassarPegarDados.passarCamposItem([]);
   }
 
   redirecionarTelaCadastroNovoCampo() {
     var dados = {};
-    PassarPegarDados.passarItensAtualizar(itensRecebidosCabecalhoLinha);
+    PassarPegarDados.passarItens(itensRecebidosCabecalhoLinha);
     PassarPegarDados.passarIdAtualizarSelecionado(idItem);
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
     dados[Constantes.rotaArgumentoIDEscalaSelecionada] =

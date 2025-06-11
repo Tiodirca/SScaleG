@@ -230,10 +230,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
   redirecionarProximaTela() {
     var dados = {};
-    dados[Constantes.rotaArgumentoNomeEscala] =
-        nomeEscalaFormatada;
-    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
-        idDocumento;
+    dados[Constantes.rotaArgumentoNomeEscala] = nomeEscalaFormatada;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] = idDocumento;
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacementNamed(
         context,
@@ -255,7 +253,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
   chamarFazerSorteio() {
     setState(() {
-      nomeEscalaFormatada = nomeEscala.text.replaceAll(" ", "_");
+      nomeEscalaFormatada =
+          nomeEscala.text.trim().replaceAll(" ", "_").toLowerCase();
       exibirWidgetCarregamento = true;
     });
     if (validacaoFormulario.currentState!.validate()) {

@@ -36,10 +36,9 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   bool exibirAcoesOpcaoData = false;
   String horarioTroca = "";
   bool exibirWidgetCarregamento = false;
-  List<String> listaCamposOriginal = [];
-  List<String> listaCamposExibicao = [];
   String nomeDigitado = "";
   String dataFormatada = "";
+  Map itensRecebidosCabecalhoLinha = {};
   Map<dynamic, dynamic> itemDigitado = {};
   TimeOfDay? horarioTimePicker = const TimeOfDay(hour: 19, minute: 00);
   DateTime dataSelecionada = DateTime.now();
@@ -49,33 +48,29 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   void initState() {
     super.initState();
     recuperarHorarioTroca();
-    listaCamposOriginal = PassarPegarDados.recuperarCamposItem();
-    listaCamposOriginal.removeWhere((element) {
-      return element.contains(Constantes.editar);
-    });
-    listaCamposOriginal.removeWhere((element) {
-      return element.contains(Constantes.excluir);
-    });
     carregarCampos();
   }
 
-  carregarCampos() {
+  carregarCampos(){
+    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
+    itensRecebidosCabecalhoLinha.removeWhere((key, value) {
+      return key.toString().contains(Constantes.editar);
+    });
+    itensRecebidosCabecalhoLinha.removeWhere((key, value) {
+      return key.toString().contains(Constantes.excluir);
+    });
+    carregarLabelCampos();
+  }
+
+  carregarLabelCampos() {
     setState(() {
-      for (var element in listaCamposOriginal) {
-        listaCamposExibicao.add(element);
-      }
-      listaCamposExibicao.removeWhere((element) {
-        return element.contains(Constantes.dataCulto);
-      });
-      listaCamposExibicao.removeWhere((element) {
-        return element.contains(Constantes.horarioTrabalho);
+      itensRecebidosCabecalhoLinha.forEach((key, value) {
+        if (!(key.toString().contains(Constantes.dataCulto) ||
+            key.toString().contains(Constantes.horarioTrabalho))) {
+          itemDigitado[key.toString()] = value.toString();
+        }
       });
     });
-    if (itemDigitado.length != listaCamposOriginal.length) {
-      for (var element in listaCamposOriginal) {
-        itemDigitado[element] = "";
-      }
-    }
   }
 
   @override
@@ -87,7 +82,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
 
   redirecionarTelaCadastroNovoCampo() {
     var dados = {};
-    PassarPegarDados.passarCamposItem(listaCamposOriginal);
+    PassarPegarDados.passarItens(itensRecebidosCabecalhoLinha);
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
     dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
         widget.idTabelaSelecionada;
@@ -193,6 +188,8 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           .set(criarMapCompativel(itemDigitado))
           .then((value) {
             setState(() {
+              itemDigitado.clear();
+              carregarCampos();
               exibirWidgetCarregamento = false;
             });
             chamarExibirMensagemSucesso();
@@ -578,11 +575,11 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                                 ),
                                             mainAxisExtent: 70,
                                           ),
-                                      itemCount: listaCamposExibicao.length,
+                                      itemCount: itemDigitado.length,
                                       itemBuilder: (context, index) {
                                         return camposFormulario(
                                           100,
-                                          listaCamposExibicao.elementAt(index),
+                                          itemDigitado.keys.elementAt(index),
                                         );
                                       },
                                     ),

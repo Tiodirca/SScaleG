@@ -29,8 +29,9 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   bool exibirWidgetCarregamento = true;
   final validacaoFormulario = GlobalKey<FormState>();
   Estilo estilo = Estilo();
+  String nomeCadastro = "";
   TextEditingController nomeControle = TextEditingController(text: "");
-
+  int indexTabela = 0;
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeVoluntarios;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeVoluntarios;
 
@@ -103,14 +104,14 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   }
 
   // metodo para cadastrar item
-  cadastrarNome(String nome) async {
+  cadastrarNome() async {
     try {
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
-          .set({nomeDocumentoFireBase: nomeControle.text})
+          .set({nomeDocumentoFireBase: nomeCadastro})
           .then(
             (value) {
               chamarTelaCarregamento();
@@ -171,7 +172,10 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                 for (var documentoFirebase in querySnapshot.docs) {
                   // chamando metodo para converter json
                   // recebido do firebase para objeto
-                  converterJsonParaObjeto(documentoFirebase.id);
+                  converterJsonParaObjeto(
+                    documentoFirebase.id,
+                    querySnapshot.size,
+                  );
                 }
               } else {
                 setState(() {
@@ -196,7 +200,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     }
   }
 
-  converterJsonParaObjeto(String id) async {
+  converterJsonParaObjeto(String id, int tamanhoEscala) async {
     var db = FirebaseFirestore.instance;
     final ref = db
         .collection(nomeColecaoFireBase)
@@ -212,12 +216,24 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     if (dados != null) {
       // pegando o id para posteriormente excluir o item caso seja necessario
       dados.id = docSnap.id;
+      indexTabela++;
       //adicionando os dados convertidos na lista
       listaNomesCadastrados.add(dados);
-      setState(() {
-        exibirWidgetCarregamento = false;
-      });
+      if (indexTabela == tamanhoEscala) {
+        setState(() {
+          indexTabela = 0;
+          ordenarListaOrdemAlfabetica();
+          exibirWidgetCarregamento = false;
+        });
+      }
     }
+  }
+
+  ordenarListaOrdemAlfabetica() {
+    // ordenando a lista por ondem alfabetica de A-Z
+    listaNomesCadastrados.sort((a, b) {
+      return a.texto.compareTo(b.texto);
+    });
   }
 
   // Metodo para chamar deletar tabela
@@ -307,7 +323,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   validarCampoEChamarCadastrar() {
     if (validacaoFormulario.currentState!.validate()) {
       setState(() {
-        cadastrarNome(nomeControle.text);
+        nomeCadastro = nomeControle.text.trim().replaceAll(" ", "_").toLowerCase();
+        cadastrarNome();
       });
     }
   }
@@ -454,10 +471,11 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                           ),
                                           child: SizedBox(
                                             height: alturaTela * 0.45,
-                                            width:    Platform.isAndroid ||
-                                                Platform.isIOS
-                                                ? larguraTela
-                                                : larguraTela * 0.8,
+                                            width:
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? larguraTela
+                                                    : larguraTela * 0.8,
                                             child: ListView(
                                               children: [
                                                 ...listaNomesCadastrados.map(
@@ -522,7 +540,10 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                           );
                         }
                       },
-                      child: Text(Textos.btnAvancar,style: TextStyle(color: Colors.black),),
+                      child: Text(
+                        Textos.btnAvancar,
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ),
                 ),

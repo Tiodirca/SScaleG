@@ -45,8 +45,8 @@ class Constantes {
   static const diaDomingo = "Domingo";
 
   //Complementos da geracao de escala
-  static const dataCulto = "1_Data";
-  static const horarioTrabalho = "2_Horario_de_Trabalho";
+  static const dataCulto = "01_data";
+  static const horarioTrabalho = "02_horario_de_Trabalho";
   static const editar = "Editar";
   static const excluir = "Excluir";
   static const idDocumento = "idDocumento";

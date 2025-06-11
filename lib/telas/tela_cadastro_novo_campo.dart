@@ -31,33 +31,29 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   bool exibirWidgetTelaCarregamento = true;
   String nomeCampoFormatado = "";
   final validacaoFormulario = GlobalKey<FormState>();
-  List<String> cabecalhoEscala = [];
   Map itensRecebidosCabecalhoLinha = {};
   String idItemAtualizar = "";
+  int quantidadeNomes = 2;
   TextEditingController nomeAdicionarCampo = TextEditingController(text: "");
 
   @override
   void initState() {
     super.initState();
     realizarBuscaDadosFireBase(widget.idDocumento, "");
-    cabecalhoEscala = PassarPegarDados.recuperarCamposItem();
-    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItensAtualizar();
+    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
     idItemAtualizar = PassarPegarDados.recuperarIdAtualizarSelecionado();
+    print(itensRecebidosCabecalhoLinha.toString());
   }
 
   @override
   void dispose() {
     super.dispose();
-    PassarPegarDados.passarCamposItem([]);
-    PassarPegarDados.passarItensAtualizar({});
+    PassarPegarDados.passarItens({});
     PassarPegarDados.passarIdAtualizarSelecionado("");
     PassarPegarDados.passarDataComComplemento("");
   }
 
   realizarBuscaDadosFireBase(String idDocumento, String tipoBusca) async {
-    setState(() {
-      //exibirWidgetCarregamento = true;
-    });
     try {
       var db = FirebaseFirestore.instance;
       //instanciano variavel
@@ -99,6 +95,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   }
 
   carregarDados(var querySnapshot, String tipoBusca) {
+    print("fsdfsd");
     // for para percorrer todos os dados que a variavel recebeu
     for (var documentoFirebase in querySnapshot.docs) {
       if (!tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
@@ -113,15 +110,22 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   }
 
   validarTipoBusca(var querySnapshot, String tipoBusca) {
+    List<String> listaCabecalho = [];
     if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
       setState(() {
-        cabecalhoEscala = querySnapshot.docs.first.data().keys.toList();
+        listaCabecalho = querySnapshot.docs.first.data().keys.toList();
+        for (var element in listaCabecalho) {
+          if (!itensRecebidosCabecalhoLinha.keys.contains(element)) {
+            itensRecebidosCabecalhoLinha[element] = "";
+          }
+        }
         //adicionando no cabecalho colunas de editar e excluir
-        cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
+        itensRecebidosCabecalhoLinha[Constantes.editar] = "";
+        itensRecebidosCabecalhoLinha[Constantes.excluir] = "";
       });
       if (widget.tipoTelaAnterior == Constantes.tipoTelaAnteriorCadastroItem) {
         validarRedirecionamentoTela();
-      } else {}
+      }
     } else {
       setState(() {
         exibirWidgetTelaCarregamento = false;
@@ -171,14 +175,16 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   validarCampoEChamarAtualizarCampo() {
     if (validacaoFormulario.currentState!.validate()) {
       setState(() {
-        cabecalhoEscala.clear();
+        if (idItemAtualizar.isEmpty) {
+          itensRecebidosCabecalhoLinha.clear();
+        }
         chamarAtualizarCampoPercorrerEscala();
       });
     }
   }
 
   redirecionarTelaCadastroItem() {
-    PassarPegarDados.passarCamposItem(cabecalhoEscala);
+    PassarPegarDados.passarItens(itensRecebidosCabecalhoLinha);
     var dados = {};
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeEscala;
     dados[Constantes.rotaArgumentoIDEscalaSelecionada] = widget.idDocumento;
@@ -190,8 +196,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   }
 
   redirecionarTelaAtualizarItem() {
-    PassarPegarDados.passarCamposItem(cabecalhoEscala);
-    //PassarPegarDados.passarItensAtualizar(listaDadosItem);
+    PassarPegarDados.passarItens(itensRecebidosCabecalhoLinha);
     PassarPegarDados.passarIdAtualizarSelecionado(idItemAtualizar);
     var dados = {};
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeEscala;
@@ -204,7 +209,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   }
 
   validarRedirecionamentoTela() {
-    if (idItemAtualizar.isEmpty && itensRecebidosCabecalhoLinha.isEmpty) {
+    if (idItemAtualizar.isEmpty) {
       redirecionarTelaCadastroItem();
     } else {
       redirecionarTelaAtualizarItem();
@@ -217,6 +222,9 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
     String idItem,
     int tamanhoEscala,
   ) async {
+    setState(() {
+      index = 0;
+    });
     try {
       var db = FirebaseFirestore.instance;
       db

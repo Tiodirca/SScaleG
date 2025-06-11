@@ -28,6 +28,9 @@ class _TelaCadastroSelecaoLocalTrabalhoState
   bool exibirWidgetCarregamento = true;
   final validacaoFormulario = GlobalKey<FormState>();
   Estilo estilo = Estilo();
+  int indexTabela = 0;
+  int quantidadeNomes = 2;
+  String nomeCadastro = "";
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeLocaisTrabalho;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeLocaisTrabalho;
   TextEditingController nomeControle = TextEditingController(text: "");
@@ -101,7 +104,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
   }
 
   // metodo para cadastrar item
-  cadastrarNome(String nome) async {
+  cadastrarNome() async {
     setState(() {
       exibirWidgetCarregamento = true;
     });
@@ -111,7 +114,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
       db
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
-          .set({nomeDocumentoFireBase: nomeControle.text})
+          .set({nomeDocumentoFireBase: nomeCadastro})
           .then(
             (value) {
               limparDados();
@@ -153,7 +156,6 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     listaNomesCadastrados.clear();
     nomeControle.clear();
     listaNomesSelecionados.clear();
-
   }
 
   realizarBuscaDadosFireBase() async {
@@ -170,7 +172,10 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                 for (var documentoFirebase in querySnapshot.docs) {
                   // chamando metodo para converter json
                   // recebido do firebase para objeto
-                  converterJsonParaObjeto(documentoFirebase.id);
+                  converterJsonParaObjeto(
+                    documentoFirebase.id,
+                    querySnapshot.size,
+                  );
                 }
               } else {
                 setState(() {
@@ -193,7 +198,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     }
   }
 
-  converterJsonParaObjeto(String id) async {
+  converterJsonParaObjeto(String id, int tamanhoTabela) async {
     var db = FirebaseFirestore.instance;
     final ref = db
         .collection(nomeColecaoFireBase)
@@ -209,12 +214,30 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     if (dados != null) {
       // pegando o id para posteriormente excluir o item caso seja necessario
       dados.id = docSnap.id;
+      indexTabela++;
       //adicionando os dados convertidos na lista
       listaNomesCadastrados.add(dados);
-      setState(() {
-        exibirWidgetCarregamento = false;
-      });
+      if (indexTabela == tamanhoTabela) {
+        setState(() {
+          quantidadeNomes = 2;
+          if (tamanhoTabela == 1) {
+            quantidadeNomes = quantidadeNomes + tamanhoTabela - 1;
+          } else {
+            quantidadeNomes = quantidadeNomes + tamanhoTabela;
+          }
+          indexTabela = 0;
+          ordenarListaOrdemAlfabetica();
+          exibirWidgetCarregamento = false;
+        });
+      }
     }
+  }
+
+  ordenarListaOrdemAlfabetica() {
+    // ordenando a lista por ondem alfabetica de A-Z
+    listaNomesCadastrados.sort((a, b) {
+      return a.texto.compareTo(b.texto);
+    });
   }
 
   // Metodo para chamar deletar tabela
@@ -307,7 +330,17 @@ class _TelaCadastroSelecaoLocalTrabalhoState
   validarCampoEChamarCadastrar() {
     if (validacaoFormulario.currentState!.validate()) {
       setState(() {
-        cadastrarNome(nomeControle.text);
+        // quantidadeNomes = quantidadeNomes + 1;
+        // if (quantidadeNomes < 10) {
+        //   nomeCadastro =
+        //       "0${quantidadeNomes}_${nomeControle.text.trim().replaceAll(" ", "_").toLowerCase()}";
+        // } else {
+        //   nomeCadastro =
+        //       "${quantidadeNomes}_${nomeControle.text.trim().replaceAll(" ", "_").toLowerCase()}";
+        // }
+        nomeCadastro =
+            nomeControle.text.trim().replaceAll(" ", "_").toLowerCase();
+        cadastrarNome();
       });
     }
   }
@@ -508,7 +541,10 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                           redirecionarProximaTela();
                         }
                       },
-                      child: Text(Textos.btnAvancar,style: TextStyle(color: Colors.black),),
+                      child: Text(
+                        Textos.btnAvancar,
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ),
                 ),
