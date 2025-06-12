@@ -51,7 +51,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     carregarCampos();
   }
 
-  carregarCampos(){
+  carregarCampos() {
     itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
     itensRecebidosCabecalhoLinha.removeWhere((key, value) {
       return key.toString().contains(Constantes.editar);
@@ -278,8 +278,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     IconData icone,
     double largura,
     double altura,
-  ) => Container(
-    margin: const EdgeInsets.only(bottom: 10.0),
+  ) => SizedBox(
     height: altura,
     width: largura,
     child: FloatingActionButton(
@@ -293,12 +292,14 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
       onPressed: () async {
         // verificando o tipo do botao
         // para fazer acoes diferentes
-        if (nomeBotao == Textos.btnSalvar) {
+        if (nomeBotao == Textos.btnSalvarItem) {
           if (_formKeyFormulario.currentState!.validate()) {
             chamarAdicionarItens();
           }
         } else if (nomeBotao == Textos.btnAdicionarCampo) {
           redirecionarTelaCadastroNovoCampo();
+        }else if (nomeBotao == Textos.btnRemoverCampo) {
+          //redirecionarTelaCadastroNovoCampo();
         } else if (nomeBotao == Textos.btnData) {
           exibirDataPicker();
         } else if (nomeBotao == Textos.btnOpcaoData) {
@@ -334,7 +335,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
             nomeBotao,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               color: PaletaCores.corAzulMagenta,
             ),
@@ -531,7 +532,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                     ),
                                     botoesAcoes(
                                       Textos.btnOpcaoData,
-                                      Constantes.iconeDataCulto,
+                                      Constantes.iconeEditar,
                                       150,
                                       40,
                                     ),
@@ -563,9 +564,10 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                 ),
                                 Form(
                                   key: _formKeyFormulario,
-                                  child: SizedBox(
+                                  child: Container(
+                                    padding: EdgeInsets.only(bottom: 10),
                                     width: larguraTela,
-                                    height: alturaTela * 0.5,
+                                    height: alturaTela * 0.47,
                                     child: GridView.builder(
                                       gridDelegate:
                                           SliverGridDelegateWithFixedCrossAxisCount(
@@ -610,15 +612,21 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               botoesAcoes(
-                                Textos.btnSalvar,
+                                Textos.btnSalvarItem,
                                 Constantes.iconeSalvar,
-                                90,
+                                110,
                                 60,
                               ),
                               botoesAcoes(
                                 Textos.btnAdicionarCampo,
                                 Constantes.iconeAdicionar,
-                                140,
+                                110,
+                                60,
+                              ),
+                              botoesAcoes(
+                                Textos.btnRemoverCampo,
+                                Constantes.iconeRemover,
+                                110,
                                 60,
                               ),
                             ],

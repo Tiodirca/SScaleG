@@ -1,7 +1,6 @@
 class Textos {
   static String nomeApp = "SScaleG";
   static String btnCriarEscala = "Criar Escala";
-
   static String btnCadastrar = "Cadastrar";
   static String btnAvancar = "Avançar";
   static String btnListarEscalas = "Ver lista de Escalas";
@@ -12,8 +11,10 @@ class Textos {
   static String btnBaixar = "Baixar";
   static String btnOpcaoData = "Opções Adicional da data";
   static String btnData = "Data";
-  static String btnSalvar = "Salvar";
-  static String btnAdicionarCampo = "Adicionar Campo";
+  static String btnSalvarAcao = "Salvar Ação";
+  static String btnSalvarItem = "Salvar Item";
+  static String btnRemoverCampo = "Remover Campos";
+  static String btnAdicionarCampo = "Novo Campo";
   static String btnEditar = "Editar";
   static String btnSalvarOpcaoData = "Salvar Data";
   static String btnVerEscalaAtual = "Escala Atual";
@@ -85,10 +86,10 @@ class Textos {
       "Altere os valores que estão nos campos conforme necessario";
 
   // TELA ADIONAR NOVO CAMPO
-  static String telaCadastroNovoCampoTitulo = "Cadastrar nova coluna";
+  static String telaCadastroNovoCampoTitulo = "Cadastrar novo campo de item";
   static String telaCadastroNovoCampoDescricao =
-      "Digite o nome que a nova coluna/campo irá receber";
-  static String telaCadastroCampoNovolabel = "Nome da coluna";
+      "Digite o nome que a nova coluna/campo que irá compor a escala irá receber";
+  static String telaCadastroCampoNovolabel = "Nome do novo campo";
 
   //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
   static String widgetAjustarHorarioDescricao =

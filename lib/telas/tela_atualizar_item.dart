@@ -284,8 +284,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     IconData icone,
     double largura,
     double altura,
-  ) => Container(
-    margin: const EdgeInsets.only(bottom: 10.0),
+  ) => SizedBox(
     height: altura,
     width: largura,
     child: FloatingActionButton(
@@ -299,13 +298,15 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
       onPressed: () async {
         // verificando o tipo do botao
         // para fazer acoes diferentes
-        if (nomeBotao == Textos.btnSalvar) {
+        if (nomeBotao == Textos.btnSalvarItem) {
           if (_formKeyFormulario.currentState!.validate()) {
             chamarAdicionarItens();
           }
         } else if (nomeBotao == Textos.btnAdicionarCampo) {
           redirecionarTelaCadastroNovoCampo();
-        } else if (nomeBotao == Textos.btnData) {
+        } else if (nomeBotao == Textos.btnRemoverCampo) {
+          //redirecionarTelaCadastroNovoCampo();
+        }else if (nomeBotao == Textos.btnData) {
           exibirDataPicker();
         } else if (nomeBotao == Textos.btnOpcaoData) {
           PassarPegarDados.passarDataComComplemento("");
@@ -340,7 +341,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
             nomeBotao,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               color: PaletaCores.corAzulMagenta,
             ),
@@ -569,9 +570,10 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                                 ),
                                 Form(
                                   key: _formKeyFormulario,
-                                  child: SizedBox(
+                                  child: Container(
+                                    padding: EdgeInsets.only(bottom: 10),
                                     width: larguraTela,
-                                    height: alturaTela * 0.5,
+                                    height: alturaTela * 0.47,
                                     child: GridView.builder(
                                       gridDelegate:
                                           SliverGridDelegateWithFixedCrossAxisCount(
@@ -603,7 +605,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                   visible: !exibirTelaOpcoesData,
                   child: Container(
                     alignment: Alignment.center,
-                    color: Colors.white,
+                    color: Colors.green,
                     width: larguraTela,
                     height: 150,
                     child: Column(
@@ -616,15 +618,21 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               botoesAcoes(
-                                Textos.btnSalvar,
+                                Textos.btnSalvarItem,
                                 Constantes.iconeSalvar,
-                                90,
+                                110,
                                 60,
                               ),
                               botoesAcoes(
                                 Textos.btnAdicionarCampo,
                                 Constantes.iconeAdicionar,
-                                140,
+                                110,
+                                60,
+                              ),
+                              botoesAcoes(
+                                Textos.btnRemoverCampo,
+                                Constantes.iconeRemover,
+                                110,
                                 60,
                               ),
                             ],

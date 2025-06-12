@@ -387,7 +387,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       onPressed: () async {
-        if (nomeBotao == Textos.btnSalvar) {
+        if (nomeBotao == Textos.btnSalvarOpcaoData) {
           PassarPegarDados.passarDataComComplemento(
             dataSelecionadaComDepartamento,
           );

@@ -8,8 +8,8 @@ import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
-class TelaCadastroCampoNovo extends StatefulWidget {
-  const TelaCadastroCampoNovo({
+class TelaRemoverCampos extends StatefulWidget {
+  const TelaRemoverCampos({
     super.key,
     required this.idDocumento,
     required this.nomeEscala,
@@ -21,10 +21,10 @@ class TelaCadastroCampoNovo extends StatefulWidget {
   final String tipoTelaAnterior;
 
   @override
-  State<TelaCadastroCampoNovo> createState() => _TelaCadastroCampoNovoState();
+  State<TelaRemoverCampos> createState() => _TelaRemoverCamposState();
 }
 
-class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
+class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
   List<Map> escalaQuantidadeItensCadastrados = [];
   int index = 0;
   Estilo estilo = Estilo();

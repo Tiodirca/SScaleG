@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:sscaleg/Uteis/paleta_cores.dart';
 
 import '../uteis/constantes.dart';
-import '../uteis/textos.dart';
 
 class BarraNavegacao extends StatelessWidget {
-  BarraNavegacao({Key? key}) : super(key: key);
+  const BarraNavegacao({super.key});
 
   final Color corTextoBotao = PaletaCores.corAzulEscuro;
 

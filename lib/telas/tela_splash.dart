@@ -18,7 +18,7 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
   void initState() {
     super.initState();
     chamarMetodoGravarDadosSharePreferences();
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 1), () {
       Navigator.pushReplacementNamed(context, Constantes.rotaTelaInicial);
     });
   }

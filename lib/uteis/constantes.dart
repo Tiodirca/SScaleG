@@ -54,6 +54,7 @@ class Constantes {
   // ICONES
   static const iconeTelaInicial = Icons.home_filled;
   static const iconeAdicionar = Icons.add;
+  static const iconeRemover = Icons.remove;
   static const iconeAtualizar = Icons.update;
   static const iconeEditar = Icons.edit;
   static const iconeLista = Icons.list_alt_outlined;

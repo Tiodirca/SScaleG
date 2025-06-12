@@ -32,7 +32,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   bool exibirBarraPesquisa = false;
   bool exibirWidgetCarregamento = true;
   bool exibirOcultarBtnAcao = true;
-  late List<Map> escala;
+  List<Map> listaEscalaBancoDados = [];
   List<dynamic> cabecalhoEscala = [];
   List<Map> listaIDDocumento = [];
   List<DataColumn> cabecalhoDataColumn = [];
@@ -45,13 +45,12 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   @override
   void initState() {
     super.initState();
-    escala = [];
     realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
   }
 
   limparVariaveis() {
     setState(() {
-      escala.clear();
+      listaEscalaBancoDados.clear();
       linhasDataRow.clear();
       cabecalhoEscala.clear();
       cabecalhoDataColumn.clear();
@@ -77,25 +76,21 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             if (querySnapshot.docs.isNotEmpty) {
               // for para percorrer todos os dados que a variavel recebeu
               for (var documentoFirebase in querySnapshot.docs) {
-                Map idDocumentoData = {};
-                idDocumentoData[documentoFirebase.id] =
-                    "${documentoFirebase.data().values.elementAt(0)} "
-                    "${documentoFirebase.data().values.elementAt(1)}";
-                listaIDDocumento.addAll([idDocumentoData]);
-                //ordandando lista pela data
-                escala.addAll([documentoFirebase.data()]);
+                //adicionando na lista os id dos documentos
+                listaIDDocumento.addAll([
+                  recuperarIDDocumento(documentoFirebase),
+                ]);
+                //adicionando na lista
+                listaEscalaBancoDados.addAll([documentoFirebase.data()]);
               }
-              //ordenarListaPelaData();
-              if (escala.isEmpty) {
+              if (listaEscalaBancoDados.isEmpty) {
                 setState(() {
                   exibirOcultarBtnAcao = false;
                   exibirWidgetCarregamento = false;
                 });
               } else {
                 setState(() {
-                  print(querySnapshot.docs.first.data().keys.toList());
-
-                  chamarCarregarLinhas();
+                  percorrerListaRetornadaBancoDados();
                   exibirOcultarBtnAcao = true;
                   exibirWidgetCarregamento = false;
                 });
@@ -113,55 +108,91 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         );
   }
 
-  chamarCarregarLinhas() {
-    List<MapEntry> escalaOrdenadaItemMap = [];
-    String dataComparacao = "";
-    Map escalaOrdenadaMap = {};
-    for (var item in escala) {
-      contadorBtnFloat++;
-
-      List<dynamic> elementos = [];
-      // adicinando na lista todos os itens transformados em entries item  a item
-      escalaOrdenadaItemMap.addAll(item.entries);
-      //ordenando a lista para que a data e o
-      escalaOrdenadaItemMap.sort((a, b) {
-        return a.key.toString().compareTo(b.key.toString());
-      });
-      //percorrendo cada item do map que esta na lista Escala
-      item.forEach((key, value) {
-        //verificando se a key corrende ao seguinte valor
-        if (key.contains(Constantes.dataCulto)) {
-          //definindo que variavel vai receber o seguinte valor
-          dataComparacao = value;
-          //percorrendo lista ja ordenada
-          for (var elemento in escalaOrdenadaItemMap) {
-            //verificando se o map NAO contem a data de comparadacao
-            // caso nao tenha entrar no IF
-            if (!(escalaOrdenadaMap.containsKey(dataComparacao))) {
-              //definindo que o map vai receber os valores
-              escalaOrdenadaMap[elemento.key] = elemento.value;
-            }
-          }
-        }
-      });
-      //print(t.toString());
-      if (cabecalhoEscala.isEmpty) {
-        cabecalhoEscala = escalaOrdenadaMap.keys.toList();
-        //adicionando no cabecalho colunas de editar e excluir
-        cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
-        carregarCabecalho();
+  //metodo para recuperar o id e colocar num map onde o key vai receber o id do documento
+  // e no value vai receber a concatenacao da data com o horario de trabalho
+  recuperarIDDocumento(var documentoFirebase) {
+    Map idDocumentoData = {};
+    String dataComHorario = "";
+    //percorrendo map
+    documentoFirebase.data().forEach((key, value) {
+      if (key.toString().contains(Constantes.dataCulto)) {
+        dataComHorario = "$value $dataComHorario";
       }
-      elementos = escalaOrdenadaMap.values.toList();
+      if (key.toString().contains(Constantes.horarioTrabalho)) {
+        dataComHorario = "$value";
+      }
+    });
+    idDocumentoData[documentoFirebase.id] = dataComHorario;
+    return idDocumentoData;
+  }
+
+  percorrerListaRetornadaBancoDados() {
+    Map itemOrdenado = {};
+    List<Map> listaLinhaEscalaOrdenada = [];
+    for (var item in listaEscalaBancoDados) {
+      contadorBtnFloat++;
+      itemOrdenado = fazerOrdenacaoItemAItemMap(item);
+      listaLinhaEscalaOrdenada.add(itemOrdenado);
+    }
+    listaLinhaEscalaOrdenada = ordenarListaPelaDataEHorario(
+      listaLinhaEscalaOrdenada,
+    );
+    chamarCarregarLinhas(listaLinhaEscalaOrdenada, itemOrdenado);
+  }
+
+  //metodo para fazer a ordenacao de cada item que for puxado do banco de dados
+  // para que a data e o horario de trabalho fiquem no comeco
+  fazerOrdenacaoItemAItemMap(var item) {
+    Map escalaOrdenadaMap = {};
+    List<MapEntry> escalaOrdenadaItemMap = [];
+    // adicinando na lista todos os itens transformados em entries item  a item
+    escalaOrdenadaItemMap.addAll(item.entries);
+    //fazendo ordenacao da lista para os itens menores ficarem em primeiro
+    // ou seja os item que contem numeracao no comeco
+    escalaOrdenadaItemMap.sort((a, b) {
+      return a.key.toString().compareTo(b.key.toString());
+    });
+    for (var element in escalaOrdenadaItemMap) {
+      escalaOrdenadaMap[element.key] = element.value;
+    }
+    return escalaOrdenadaMap;
+  }
+
+  chamarCarregarLinhas(List<Map> listaLinhaEscalaOrdenada, Map itemOrdenado) {
+    for (var element in listaLinhaEscalaOrdenada) {
+      List<dynamic> elementos = [];
+      chamarCarregarCabecalho(itemOrdenado);
+      elementos = element.values.toList();
       elementos.addAll([Constantes.editar, Constantes.excluir]);
       adicionarLinhasNaEscala(elementos);
     }
   }
 
-  chamarCarregarCabecalho(Map item) {
-    cabecalhoEscala = item.keys.toList();
-    //adicionando no cabecalho colunas de editar e excluir
-    cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
-    carregarCabecalho();
+  ordenarListaPelaDataEHorario(List<Map> listaOrdernar) {
+    listaOrdernar.sort((a, b) {
+      int data = DateFormat("dd/MM/yyyy EEEE", "pt_BR")
+          .parse(a.values.elementAt(0))
+          .compareTo(
+            DateFormat("dd/MM/yyyy EEEE", "pt_BR").parse(b.values.elementAt(0)),
+          );
+      if (data != 0) {
+        return data;
+      }
+      // caso a condicao acima retorne 0 quer dizer que as datas sao iguais
+      // logo sera colocado em ordem baseado na ordem a baixo
+      return a.values.elementAt(1).compareTo(b.values.elementAt(1));
+    });
+    return listaOrdernar;
+  }
+
+  // metodo para pegar os valores que irao compor o cabecalho
+  chamarCarregarCabecalho(Map escalaOrdenadaMap) {
+    if (cabecalhoEscala.isEmpty) {
+      cabecalhoEscala = escalaOrdenadaMap.keys.toList();
+      //adicionando no cabecalho colunas de editar e excluir
+      cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
+      carregarCabecalho();
+    }
   }
 
   adicionarLinhasNaEscala(List<dynamic> listaItem) {
@@ -207,11 +238,10 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   child: FloatingActionButton(
                     heroTag: "${Constantes.excluir}$contadorBtnFloat",
                     onPressed: () {
+                      String dataComHoraItem =
+                          "${listaItem[0]} ${listaItem[1]}";
                       for (var elemento in listaIDDocumento) {
                         String dataComHora = elemento.values.toString();
-                        String dataComHoraItem =
-                            "${listaItem[0]} ${listaItem[1]}";
-
                         if (dataComHora.contains(dataComHoraItem)) {
                           String idDocumento = elemento.keys
                               .toString()
@@ -266,27 +296,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         ),
       );
     }
-  }
-
-  ordenarListaPelaData() {
-    // ordenando a lista pela data colocando
-    // a data mais antiga no topo da listagem
-    escala.sort((a, b) {
-      //convertendo data para o formato correto
-      int data = DateFormat("dd/MM/yyyy EEEE", "pt_BR")
-          .parse(a.values.elementAt(0))
-          .compareTo(
-            DateFormat("dd/MM/yyyy EEEE", "pt_BR").parse(b.values.elementAt(0)),
-          );
-      // caso a variavel seja diferente de 0 quer dizer que as datas nao sao iguais
-      // logo sera colocado em ordem baseado na ordem acima
-      if (data != 0) {
-        return data;
-      }
-      // caso a condicao acima retorne 0 quer dizer que as datas sao iguais
-      // logo sera colocado em ordem baseado na ordem a baixo
-      return a.values.elementAt(1).compareTo(b.values.elementAt(1));
-    });
   }
 
   validarNomeFoco(String nome) {
@@ -544,7 +553,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             setState(() {
               nomeReacar = textoPesquisa.text;
               linhasDataRow.clear();
-              chamarCarregarLinhas();
+              percorrerListaRetornadaBancoDados();
             });
           }
         } else {
@@ -553,7 +562,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             nomeReacar = "";
             textoPesquisa.clear();
             linhasDataRow.clear();
-            chamarCarregarLinhas();
+            percorrerListaRetornadaBancoDados();
           });
         }
       },
@@ -606,7 +615,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                 ),
                 body: LayoutBuilder(
                   builder: (context, constraints) {
-                    if (escala.isEmpty) {
+                    if (listaEscalaBancoDados.isEmpty) {
                       return Container(
                         color: Colors.white,
                         width: larguraTela,

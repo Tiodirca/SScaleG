@@ -29,7 +29,6 @@ class _TelaCadastroSelecaoLocalTrabalhoState
   final validacaoFormulario = GlobalKey<FormState>();
   Estilo estilo = Estilo();
   int indexTabela = 0;
-  int quantidadeNomes = 2;
   String nomeCadastro = "";
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeLocaisTrabalho;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeLocaisTrabalho;
@@ -219,12 +218,6 @@ class _TelaCadastroSelecaoLocalTrabalhoState
       listaNomesCadastrados.add(dados);
       if (indexTabela == tamanhoTabela) {
         setState(() {
-          quantidadeNomes = 2;
-          if (tamanhoTabela == 1) {
-            quantidadeNomes = quantidadeNomes + tamanhoTabela - 1;
-          } else {
-            quantidadeNomes = quantidadeNomes + tamanhoTabela;
-          }
           indexTabela = 0;
           ordenarListaOrdemAlfabetica();
           exibirWidgetCarregamento = false;
@@ -330,16 +323,14 @@ class _TelaCadastroSelecaoLocalTrabalhoState
   validarCampoEChamarCadastrar() {
     if (validacaoFormulario.currentState!.validate()) {
       setState(() {
-        // quantidadeNomes = quantidadeNomes + 1;
-        // if (quantidadeNomes < 10) {
-        //   nomeCadastro =
-        //       "0${quantidadeNomes}_${nomeControle.text.trim().replaceAll(" ", "_").toLowerCase()}";
-        // } else {
-        //   nomeCadastro =
-        //       "${quantidadeNomes}_${nomeControle.text.trim().replaceAll(" ", "_").toLowerCase()}";
-        // }
         nomeCadastro =
-            nomeControle.text.trim().replaceAll(" ", "_").toLowerCase();
+            nomeControle.text
+                .trim()
+                .replaceAll("-", "")
+                .replaceAll(RegExp(r'[0-9]'), "")
+                .replaceAll(" ", "_")
+                .replaceAll(RegExp(r'[^\w\s]+'), "")
+                .toLowerCase();
         cadastrarNome();
       });
     }
