@@ -22,7 +22,6 @@ class TelaCadastroSelecaoNomesVoluntarios extends StatefulWidget {
 
 class _TelaCadastroSelecaoNomesVoluntariosState
     extends State<TelaCadastroSelecaoNomesVoluntarios> {
-  String ordenarCadastroNomesLocais = "";
   List<CheckBoxModelo> listaNomesCadastrados = [];
   List<String> listaNomesSelecionados = [];
   List<String> listaValidarQuantidadeVoluntarios = [];
@@ -385,7 +384,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                   ),
                                   child: Text(
                                     Textos.descricaoCadastroVoluntario,
-                                    textAlign: TextAlign.justify,
+                                    textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 20),
                                   ),
                                 ),
@@ -416,7 +415,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                         horizontal: 10.0,
                                       ),
                                       width: 100,
-                                      height: 40,
+                                      height: 50,
                                       child: FloatingActionButton(
                                         heroTag: Textos.btnCadastrar,
                                         onPressed: () {

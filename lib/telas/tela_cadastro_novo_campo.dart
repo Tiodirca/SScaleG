@@ -360,7 +360,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
                           onPressed: () {
                             validarCampoEChamarAtualizarCampo();
                           },
-                          child: Text(Textos.btnCadastrar),
+                          child: Text(Textos.btnCadastrar,style: TextStyle(color: Colors.black),),
                         ),
                       ),
                     ],

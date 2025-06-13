@@ -33,6 +33,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   bool exibirWidgetCarregamento = true;
   bool exibirOcultarBtnAcao = true;
   List<Map> listaEscalaBancoDados = [];
+  List<Map> listaLinhaEscalaOrdenada = [];
   List<dynamic> cabecalhoEscala = [];
   List<Map> listaIDDocumento = [];
   List<DataColumn> cabecalhoDataColumn = [];
@@ -119,7 +120,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         dataComHorario = "$value $dataComHorario";
       }
       if (key.toString().contains(Constantes.horarioTrabalho)) {
-        dataComHorario = "$value";
+        dataComHorario = "$dataComHorario$value";
       }
     });
     idDocumentoData[documentoFirebase.id] = dataComHorario;
@@ -128,7 +129,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   percorrerListaRetornadaBancoDados() {
     Map itemOrdenado = {};
-    List<Map> listaLinhaEscalaOrdenada = [];
+
     for (var item in listaEscalaBancoDados) {
       contadorBtnFloat++;
       itemOrdenado = fazerOrdenacaoItemAItemMap(item);
@@ -208,11 +209,10 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   child: FloatingActionButton(
                     heroTag: "${Constantes.editar}$contadorBtnFloat",
                     onPressed: () {
+                      String dataComHoraItem =
+                          "${listaItem[0]} ${listaItem[1]}";
                       for (var elemento in listaIDDocumento) {
                         String dataComHora = elemento.values.toString();
-                        String dataComHoraItem =
-                            "${listaItem[0]} ${listaItem[1]}";
-
                         if (dataComHora.contains(dataComHoraItem)) {
                           String idDocumento = elemento.keys
                               .toString()
@@ -283,19 +283,61 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   carregarCabecalho() {
     for (var element in cabecalhoEscala) {
-      cabecalhoDataColumn.add(
-        DataColumn(
-          label: Text(
-            element
+      cabecalhoDataColumn.add(DataColumn(label: botoesSwitch(element, true)));
+    }
+  }
+
+  Widget botoesSwitch(String label, bool valorBotao) => Container(
+    color: Colors.green,
+    margin: EdgeInsets.symmetric(horizontal: 1.0),
+    width: 160,
+    height: 60,
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          Text(
+            label
                 .toString()
                 .replaceAll("01_", "")
                 .replaceAll("02_", "")
                 .replaceAll("_", " ")
                 .replaceAll(RegExp(r'[0-9]'), ''),
           ),
-        ),
-      );
-    }
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (!(label.contains(Constantes.dataCulto) ||
+                  label.contains(Constantes.horarioTrabalho) ||
+                  label.contains(Constantes.editar) ||
+                  label.contains(Constantes.excluir))) {
+                return Switch(
+                  inactiveThumbColor: PaletaCores.corAzulMagenta,
+                  value: valorBotao,
+                  activeColor: PaletaCores.corAzulMagenta,
+                  onChanged: (bool valor) {
+                    setState(() {
+                      mudarSwitch(label, valor);
+                    });
+                  },
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+
+  // metodo para mudar status dos switch
+  mudarSwitch(String label, bool valor) {
+    // print(label);
+    // if (label == Textos.labelSwitchUniforme) {
+    //   setState(() {
+    //     exibirOcultarCampoUniforme = !exibirOcultarCampoUniforme;
+    //   });
+    // }
   }
 
   validarNomeFoco(String nome) {
@@ -400,6 +442,20 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     );
   }
 
+  redirecionarTelaObservacao() {
+    var dados = {};
+    dados[Constantes.rotaArgumentoCabecalhoEscala] = cabecalhoEscala;
+    dados[Constantes.rotaArgumentoLinhasEscala] = listaLinhaEscalaOrdenada;
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaObservacao,
+      arguments: dados,
+    );
+  }
+
   Future<void> alertaExclusao(
     BuildContext context,
     String data,
@@ -476,7 +532,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       onPressed: () async {
-        if (nomeBotao == Textos.btnBaixar) {
+        if (nomeBotao == Textos.btnObservacaoBaixar) {
+          redirecionarTelaObservacao();
           // GerarPDFEscala gerarPDF = GerarPDFEscala(
           //     escala: escala,
           //     nomeEscala: widget.nomeTabela,
@@ -501,6 +558,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
           Text(
             nomeBotao,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -509,26 +567,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           ),
         ],
       ),
-    ),
-  );
-
-  Widget botoesSwitch(String label, bool valorBotao) => Container(
-    margin: EdgeInsets.symmetric(horizontal: 1.0),
-    width: 180,
-    child: Row(
-      children: [
-        Text(label),
-        Switch(
-          inactiveThumbColor: PaletaCores.corAzulMagenta,
-          value: valorBotao,
-          activeColor: PaletaCores.corAzulMagenta,
-          onChanged: (bool valor) {
-            setState(() {
-              //mudarSwitch(label, valor);
-            });
-          },
-        ),
-      ],
     ),
   );
 
@@ -562,6 +600,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             nomeReacar = "";
             textoPesquisa.clear();
             linhasDataRow.clear();
+            listaLinhaEscalaOrdenada.clear();
             percorrerListaRetornadaBancoDados();
           });
         }
@@ -601,7 +640,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                       40,
                     ),
                   ],
-                  title: Text(Textos.tituloTelaEscalaDetalhada),
+                  title: Text(Textos.telaEscalaDetalhadaTitulo),
                   leading: IconButton(
                     color: Colors.white,
                     onPressed: () {
@@ -684,7 +723,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                     ),
                                     width: larguraTela,
                                     child: Text(
-                                      Textos.descricaoTelaListagemItens,
+                                      Textos.telaEscalaDetalhadaDescricaoItens,
                                       style: const TextStyle(fontSize: 18),
                                       textAlign: TextAlign.center,
                                     ),
@@ -753,7 +792,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                                               Platform.isIOS
                                                           ? 200
                                                           : 300,
-                                                  height: 50,
+                                                  height: 80,
                                                   color: Colors.white,
                                                   child: Form(
                                                     key: validacaoFormulario,
@@ -816,16 +855,16 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               botoesAcoes(
-                                Textos.btnBaixar,
+                                Textos.btnObservacaoBaixar,
                                 Constantes.iconeBaixar,
-                                100,
-                                60,
+                                120,
+                                70,
                               ),
                               botoesAcoes(
                                 Textos.btnAdicionar,
                                 Constantes.iconeAdicionar,
                                 80,
-                                60,
+                                70,
                               ),
                             ],
                           ),

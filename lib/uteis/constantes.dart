@@ -19,11 +19,15 @@ class Constantes {
       "telaListagemEscalaBancoDados";
   static const rotaTelaEscalaDetalhada = "telaEscalaDetalhada";
 
-  //CADASTRO ITEM
+  //CADASTRO E ATUALIZAR ITEM
   static const rotaTelaCadastroItem = "telaCadastroItem";
-  static const rotaTelaCadastroCampoNovo = "telaCadastroCampoNovo";
-
   static const rotaTelaAtualizarItem = "telaAtualizarItem";
+
+  //CADASTRAR E REMOVER CAMPOS
+  static const rotaTelaCadastroCampoNovo = "telaCadastroCampoNovo";
+  static const rotaTelaRemoverCampos = "telaRemoverCampos";
+
+  static const rotaTelaObservacao = "telaObservacao";
 
   static const tipoTelaAnteriorCadastroItem = "telaAnteriorCadastroItem";
   static const tipoTelaAnteriorAtualizarItem = "telaAnteriorAtualizarItem";
@@ -34,6 +38,8 @@ class Constantes {
   static const rotaArgumentoIDItemSelecionado = "IDEscalaSelecionada";
   static const rotaArgumentoTipoTelaAnteriorCadastroCampoNovo =
       "cadastroCampoNovo";
+  static const rotaArgumentoCabecalhoEscala = "cabecalhoEscala";
+  static const rotaArgumentoLinhasEscala = "linhasEscala";
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";
@@ -104,6 +110,10 @@ class Constantes {
   //VOLUNTARIOS
   static const fireBaseColecaoNomeVoluntarios = "nome_voluntarios";
   static const fireBaseDocumentoNomeVoluntarios = "nome";
+
+  //VOLUNTARIOS
+  static const fireBaseColecaoNomeObservacao = "Observacoes";
+  static const fireBaseDocumentoNomeObservacao = "nome";
 
   //VOLUNTARIOS
   static const fireBaseColecaoEscalas = "Escalas";

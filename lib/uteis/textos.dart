@@ -8,7 +8,8 @@ class Textos {
   static String btnRecarregar = "Recarregar";
   static String btnExcluir = "Excluir";
   static String btnTelaInicial = "Tela Inicial";
-  static String btnBaixar = "Baixar";
+  static String btnBaixarPDF = "Baixar arquivo PDF";
+  static String btnObservacaoBaixar = "Observação e Baixar escala";
   static String btnOpcaoData = "Opções Adicional da data";
   static String btnData = "Data";
   static String btnSalvarAcao = "Salvar Ação";
@@ -70,9 +71,10 @@ class Textos {
   static String descricaoTabelaSelecionada = "A Escalas selecionada foi : ";
 
   // TELA ESCALA DETALHADA
-  static String tituloTelaEscalaDetalhada = "Escalas Detalhada";
-  static String descricaoTelaListagemItens =
+  static String telaEscalaDetalhadaTitulo = "Escalas Detalhada";
+  static String telaEscalaDetalhadaDescricaoItens =
       "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
+  static String telaEscalaDetalhadaLabelPesquisa = "Digite um nome";
 
   // TELA DE CADASTRO DE ITEM
   static String telaCadastroTitulo = "Cadastro de item na Escalas";
@@ -91,6 +93,21 @@ class Textos {
       "Digite o nome que a nova coluna/campo que irá compor a escala irá receber";
   static String telaCadastroCampoNovolabel = "Nome do novo campo";
 
+  // TELA REMOVER CAMPO
+  static String telaRemoverCamposTitulo = "Remover Campos";
+  static String telaRemoverCamposDescricao =
+      "Marque Quais campos voce deseja remover";
+  static String telaRemoverCamposDescricaoAlerta =
+      "Lembrando que ao remover os campos você estara removendo"
+      " o campo selecionado de todos os itens que estão nesta escala,tenha certeza desta ação";
+
+  // TELA ADIONAR OBSERVACOES
+  static String telaObservacaoTitulo = "Adição de Observações";
+  static String telaObservacaoCadastro =
+      "Digite a observação que você deseja adicionar";
+  static String telaObservacaoDescricaoSelecao =
+      "Selecione quais observações você deseja adicionar ao arquivo PDF";
+
   //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
   static String widgetAjustarHorarioDescricao =
       "Selecione qual o horario"
@@ -99,6 +116,11 @@ class Textos {
   static String widgetAjustarHorarioFinalSemana =
       "Horario durante final de semana";
   static String widgetAjustarHorarioInicio = "Iniciar às : ";
+
+  //WIDGET Configuracao PDF
+  static String widgetConfiguracaoPDFTitulo = "Configurações do PDF";
+  static String widgetConfiguracaoPDFDescricao =
+      "Selecione quais campos deverão ser exibidos no arquivo PDF";
 
   //MENSAGENS DE ERROS
   static String erroCampoVazio = "Preencha este campo";
@@ -123,4 +145,10 @@ class Textos {
   //MENSAGEM DE NOTIFICACOES
   static String notificacaoSucesso = "Sucesso ao realizar ação";
   static String notificacaoErro = "Erro ao realizar ação";
+
+  static String txtCabecalhoPDF =
+      "Escalas  voluntaria de cooperador(a) da ADTL Parque São Carlos";
+
+  static String txtRodapePDF =
+      "Quem sua mão ao arado já pois, constante precisa ser.";
 }

@@ -22,7 +22,6 @@ class TelaCadastroSelecaoLocalTrabalho extends StatefulWidget {
 
 class _TelaCadastroSelecaoLocalTrabalhoState
     extends State<TelaCadastroSelecaoLocalTrabalho> {
-  String ordenarCadastroNomesLocais = "";
   List<CheckBoxModelo> listaNomesCadastrados = [];
   List<String> listaNomesSelecionados = [];
   bool exibirWidgetCarregamento = true;
@@ -89,17 +88,6 @@ class _TelaCadastroSelecaoLocalTrabalhoState
         listaNomesSelecionados.remove(element.texto);
       }
     }
-  }
-
-  exibirOrdemSlides(CheckBoxModelo checkBoxModel) {
-    String indexPosicaoLista = "";
-    for (int i = 0; i < listaNomesSelecionados.length; i++) {
-      if (listaNomesSelecionados[i] == checkBoxModel.texto) {
-        indexPosicaoLista = i.toString();
-        checkBoxModel.checked = true;
-      }
-    }
-    return indexPosicaoLista.toString();
   }
 
   // metodo para cadastrar item
@@ -391,7 +379,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                   ),
                                   child: Text(
                                     Textos.descricaoCadastroLocalTrabalho,
-                                    textAlign: TextAlign.justify,
+                                    textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 20),
                                   ),
                                 ),
@@ -422,7 +410,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                         horizontal: 10.0,
                                       ),
                                       width: 100,
-                                      height: 40,
+                                      height: 50,
                                       child: FloatingActionButton(
                                         heroTag: Textos.btnCadastrar,
                                         onPressed: () {

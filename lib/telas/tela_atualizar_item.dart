@@ -103,6 +103,22 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     );
   }
 
+  redirecionarTelaRemoverCampos() {
+    var dados = {};
+    PassarPegarDados.passarItens(itensRecebidosCabecalhoLinha);
+    PassarPegarDados.passarIdAtualizarSelecionado(idItem);
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    dados[Constantes.rotaArgumentoTipoTelaAnteriorCadastroCampoNovo] =
+        Constantes.tipoTelaAnteriorCadastroItem;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaRemoverCampos,
+      arguments: dados,
+    );
+  }
+
   // // metodo para recuperar os horarios definidos
   // // e gravados no share preferences
   recuperarHorarioTroca() async {
@@ -275,7 +291,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
       },
       initialValue: itemDigitado[label],
       keyboardType: TextInputType.text,
-      decoration: InputDecoration(labelText: label),
+      decoration: InputDecoration(labelText: label.replaceAll("_", " ")),
     ),
   );
 
@@ -305,8 +321,8 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
         } else if (nomeBotao == Textos.btnAdicionarCampo) {
           redirecionarTelaCadastroNovoCampo();
         } else if (nomeBotao == Textos.btnRemoverCampo) {
-          //redirecionarTelaCadastroNovoCampo();
-        }else if (nomeBotao == Textos.btnData) {
+          redirecionarTelaRemoverCampos();
+        } else if (nomeBotao == Textos.btnData) {
           exibirDataPicker();
         } else if (nomeBotao == Textos.btnOpcaoData) {
           PassarPegarDados.passarDataComComplemento("");
@@ -605,8 +621,8 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                   visible: !exibirTelaOpcoesData,
                   child: Container(
                     alignment: Alignment.center,
-                    color: Colors.green,
                     width: larguraTela,
+                    color: Colors.white,
                     height: 150,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,

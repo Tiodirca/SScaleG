@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_local_trabalho.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_nomes_voluntarios.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_gerar_escala.dart';
+import 'package:sscaleg/telas/geracao_escalas/tela_observacao.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_dias_semana.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_intervalo_trabalho.dart';
 import 'package:sscaleg/telas/tela_atualizar_item.dart';
@@ -10,6 +11,7 @@ import 'package:sscaleg/telas/tela_cadastro_novo_campo.dart';
 import 'package:sscaleg/telas/tela_escala_detalhada.dart';
 import 'package:sscaleg/telas/tela_inicial.dart';
 import 'package:sscaleg/telas/tela_listagem_escala_banco_dados.dart';
+import 'package:sscaleg/telas/tela_remover_campos.dart';
 
 import '../telas/tela_splash.dart';
 import 'constantes.dart';
@@ -71,6 +73,19 @@ class Rotas {
         } else {
           return erroRota(settings);
         }
+      case Constantes.rotaTelaAtualizarItem:
+        if (args is Map) {
+          return MaterialPageRoute(
+            builder:
+                (_) => TelaAtualizarItem(
+                  nomeTabela: args[Constantes.rotaArgumentoNomeEscala],
+                  idTabelaSelecionada:
+                      args[Constantes.rotaArgumentoIDEscalaSelecionada],
+                ),
+          );
+        } else {
+          return erroRota(settings);
+        }
       case Constantes.rotaTelaCadastroCampoNovo:
         if (args is Map) {
           return MaterialPageRoute(
@@ -87,14 +102,34 @@ class Rotas {
         } else {
           return erroRota(settings);
         }
-      case Constantes.rotaTelaAtualizarItem:
+      case Constantes.rotaTelaRemoverCampos:
         if (args is Map) {
           return MaterialPageRoute(
             builder:
-                (_) => TelaAtualizarItem(
+                (_) => TelaRemoverCampos(
+                  nomeEscala: args[Constantes.rotaArgumentoNomeEscala],
+                  idDocumento:
+                      args[Constantes.rotaArgumentoIDEscalaSelecionada],
+                  tipoTelaAnterior:
+                      args[Constantes
+                          .rotaArgumentoTipoTelaAnteriorCadastroCampoNovo],
+                ),
+          );
+        } else {
+          return erroRota(settings);
+        }
+      case Constantes.rotaTelaObservacao:
+        if (args is Map) {
+          return MaterialPageRoute(
+            builder:
+                (_) => TelaObservacao(
+                  cabecalhoEscala:
+                      args[Constantes.rotaArgumentoCabecalhoEscala],
+
+                  linhasEscala: args[Constantes.rotaArgumentoLinhasEscala],
                   nomeTabela: args[Constantes.rotaArgumentoNomeEscala],
                   idTabelaSelecionada:
-                      args[Constantes.rotaArgumentoIDEscalaSelecionada],
+                  args[Constantes.rotaArgumentoIDEscalaSelecionada],
                 ),
           );
         } else {

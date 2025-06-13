@@ -95,6 +95,21 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     );
   }
 
+  redirecionarTelaRemoverCampos() {
+    var dados = {};
+    PassarPegarDados.passarItens(itensRecebidosCabecalhoLinha);
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    dados[Constantes.rotaArgumentoTipoTelaAnteriorCadastroCampoNovo] =
+        Constantes.tipoTelaAnteriorCadastroItem;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaRemoverCampos,
+      arguments: dados,
+    );
+  }
+
   // // metodo para recuperar os horarios definidos
   // // e gravados no share preferences
   recuperarHorarioTroca() async {
@@ -269,7 +284,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
         itemDigitado[label] = value;
       },
       keyboardType: TextInputType.text,
-      decoration: InputDecoration(labelText: label),
+      decoration: InputDecoration(labelText: label.replaceAll("_", " ")),
     ),
   );
 
@@ -298,8 +313,8 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           }
         } else if (nomeBotao == Textos.btnAdicionarCampo) {
           redirecionarTelaCadastroNovoCampo();
-        }else if (nomeBotao == Textos.btnRemoverCampo) {
-          //redirecionarTelaCadastroNovoCampo();
+        } else if (nomeBotao == Textos.btnRemoverCampo) {
+         redirecionarTelaRemoverCampos();
         } else if (nomeBotao == Textos.btnData) {
           exibirDataPicker();
         } else if (nomeBotao == Textos.btnOpcaoData) {
