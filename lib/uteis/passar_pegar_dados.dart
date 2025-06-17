@@ -4,6 +4,7 @@ class PassarPegarDados {
   static List<String> listaDiasSemana = [];
   static List<String> listaIntervaloTrabalho = [];
   static List<String> listaCamposLinhaItem = [];
+  static List<String> listaObservacoesPDF = [];
   static List<dynamic> listaItensAtualizar = [];
   static Map itensCadastrarAtualizar = {};
   static String idItemAtualizarSelecionado = "";
@@ -111,5 +112,14 @@ class PassarPegarDados {
 
   static Map recuperarItens() {
     return itensCadastrarAtualizar;
+  }
+
+  static List<String> passarObservacoesPDF(List<String> observacoes) {
+    listaObservacoesPDF = observacoes;
+    return listaObservacoesPDF;
+  }
+
+  static List<String> recuperarObservacoesPDF() {
+    return listaObservacoesPDF;
   }
 }

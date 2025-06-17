@@ -502,8 +502,8 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
                     children: [
                       Container(
                         margin: EdgeInsets.all(20),
-                        width: 100,
-                        height: 50,
+                        width: 120,
+                        height: 40,
                         child: FloatingActionButton(
                           heroTag: Textos.btnRemoverCampo,
                           onPressed: () {

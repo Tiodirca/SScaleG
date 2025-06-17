@@ -416,7 +416,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                         onPressed: () {
                                           validarCampoEChamarCadastrar();
                                         },
-                                        child: Text(Textos.btnCadastrar),
+                                        child: Text(Textos.btnCadastrar,style: TextStyle(color: Colors.black),),
                                       ),
                                     ),
                                   ],

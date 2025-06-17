@@ -7,48 +7,44 @@ import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
-import '../../Modelo/check_box_modelo.dart';
-import '../../uteis/estilo.dart';
-import '../../uteis/paleta_cores.dart';
-import '../../uteis/constantes.dart';
+import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
+import '../Modelo/check_box_modelo.dart';
+import '../uteis/estilo.dart';
+import '../uteis/paleta_cores.dart';
+import '../uteis/constantes.dart';
 
-class TelaCadastroSelecaoNomesVoluntarios extends StatefulWidget {
-  const TelaCadastroSelecaoNomesVoluntarios({super.key});
+class TelaObservacao extends StatefulWidget {
+  const TelaObservacao({
+    super.key,
+    required this.nomeTabela,
+    required this.idTabelaSelecionada,
+  });
+
+  final String nomeTabela;
+  final String idTabelaSelecionada;
 
   @override
-  State<TelaCadastroSelecaoNomesVoluntarios> createState() =>
-      _TelaCadastroSelecaoNomesVoluntariosState();
+  State<TelaObservacao> createState() => _TelaObservacaoState();
 }
 
-class _TelaCadastroSelecaoNomesVoluntariosState
-    extends State<TelaCadastroSelecaoNomesVoluntarios> {
+class _TelaObservacaoState extends State<TelaObservacao> {
   List<CheckBoxModelo> listaNomesCadastrados = [];
-  List<String> listaNomesSelecionados = [];
-  List<String> listaValidarQuantidadeVoluntarios = [];
+  List<String> listaObservacaoSelecionadas = [];
   bool exibirWidgetCarregamento = true;
   final validacaoFormulario = GlobalKey<FormState>();
   Estilo estilo = Estilo();
-  String nomeCadastro = "";
-  TextEditingController nomeControle = TextEditingController(text: "");
+  bool exibirWidgetConfiguracaoPDF = false;
   int indexTabela = 0;
-  String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeVoluntarios;
-  String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeVoluntarios;
+  String nomeCadastro = "";
+  String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeObservacao;
+  String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeObservacao;
+  TextEditingController nomeControle = TextEditingController(text: "");
 
   @override
   void initState() {
     super.initState();
+    listaObservacaoSelecionadas = PassarPegarDados.recuperarObservacoesPDF();
     realizarBuscaDadosFireBase();
-  }
-
-  validarQuantidadeVoluntarios() {
-    listaValidarQuantidadeVoluntarios =
-        PassarPegarDados.recuperarNomesLocaisTrabalho();
-    if (listaValidarQuantidadeVoluntarios.length <=
-        listaNomesSelecionados.length) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   Widget checkBoxPersonalizado(CheckBoxModelo checkBoxModel) =>
@@ -91,19 +87,22 @@ class _TelaCadastroSelecaoNomesVoluntariosState
       //verificando se o usuario selecionou um item
       if (element.checked == true) {
         // verificando se o item Nao foi adicionado anteriormente na lista
-        if (!(listaNomesSelecionados.contains(element.texto))) {
+        if (!(listaObservacaoSelecionadas.contains(element.texto))) {
           //add item
-          listaNomesSelecionados.add(element.texto);
+          listaObservacaoSelecionadas.add(element.texto);
         }
       } else if (element.checked == false) {
         // removendo item caso seja desmarcado
-        listaNomesSelecionados.remove(element.texto);
+        listaObservacaoSelecionadas.remove(element.texto);
       }
     }
   }
 
   // metodo para cadastrar item
   cadastrarNome() async {
+    setState(() {
+      exibirWidgetCarregamento = true;
+    });
     try {
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
@@ -113,7 +112,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
           .set({nomeDocumentoFireBase: nomeCadastro})
           .then(
             (value) {
-              chamarTelaCarregamento();
+              limparDados();
               realizarBuscaDadosFireBase();
               chamarExibirMensagemSucesso();
             },
@@ -121,7 +120,9 @@ class _TelaCadastroSelecaoNomesVoluntariosState
               setState(() {
                 exibirWidgetCarregamento = false;
               });
-              chamarExibirMensagemErro("Erro ao cadastrar : ${e.toString()}");
+              chamarExibirMensagemErro(
+                "Erro Cadastrar Observação: ${e.toString()}",
+              );
             },
           );
     } catch (e) {
@@ -148,13 +149,9 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     );
   }
 
-  chamarTelaCarregamento() {
+  limparDados() {
     listaNomesCadastrados.clear();
     nomeControle.clear();
-    listaNomesSelecionados.clear();
-    setState(() {
-      exibirWidgetCarregamento = true;
-    });
   }
 
   realizarBuscaDadosFireBase() async {
@@ -187,7 +184,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                 exibirWidgetCarregamento = false;
               });
               chamarExibirMensagemErro(
-                "Erro Buscar Voluntarios: ${e.toString()}",
+                "Erro Buscar Observações: ${e.toString()}",
               );
             },
           );
@@ -199,7 +196,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     }
   }
 
-  converterJsonParaObjeto(String id, int tamanhoEscala) async {
+  converterJsonParaObjeto(String id, int tamanhoTabela) async {
     var db = FirebaseFirestore.instance;
     final ref = db
         .collection(nomeColecaoFireBase)
@@ -218,11 +215,24 @@ class _TelaCadastroSelecaoNomesVoluntariosState
       indexTabela++;
       //adicionando os dados convertidos na lista
       listaNomesCadastrados.add(dados);
-      if (indexTabela == tamanhoEscala) {
+      if (indexTabela == tamanhoTabela) {
         setState(() {
           indexTabela = 0;
+          for (var element in listaObservacaoSelecionadas) {
+            recuperarCheckBoxMarcado(element);
+          }
           ordenarListaOrdemAlfabetica();
           exibirWidgetCarregamento = false;
+        });
+      }
+    }
+  }
+
+  recuperarCheckBoxMarcado(String item) {
+    for (var element in listaNomesCadastrados) {
+      if (item == element.texto) {
+        setState(() {
+          element.checked = true;
         });
       }
     }
@@ -235,8 +245,17 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    PassarPegarDados.passarObservacoesPDF([]);
+  }
+
   // Metodo para chamar deletar tabela
   chamarDeletar(CheckBoxModelo checkbox) async {
+    setState(() {
+      exibirWidgetCarregamento = true;
+    });
     var db = FirebaseFirestore.instance;
     await db
         .collection(nomeColecaoFireBase)
@@ -245,7 +264,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
         .then(
           (doc) {
             setState(() {
-              chamarTelaCarregamento();
+              limparDados();
               realizarBuscaDadosFireBase();
               chamarExibirMensagemSucesso();
             });
@@ -311,21 +330,26 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     );
   }
 
-  redirecionarProximaTela() {
-    PassarPegarDados.passarNomesVoluntarios(listaNomesSelecionados);
-    Navigator.pushReplacementNamed(
-      context,
-      Constantes.rotaTelaSelecaoDiasSemana,
-    );
-  }
-
   validarCampoEChamarCadastrar() {
     if (validacaoFormulario.currentState!.validate()) {
       setState(() {
-        nomeCadastro = nomeControle.text.trim().replaceAll(" ", "_").toLowerCase();
+        nomeCadastro = nomeControle.text.trim();
         cadastrarNome();
       });
     }
+  }
+
+  redirecionarTelaAnterior() {
+    PassarPegarDados.passarObservacoesPDF(listaObservacaoSelecionadas);
+    var dados = {};
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaEscalaDetalhada,
+      arguments: dados,
+    );
   }
 
   @override
@@ -351,15 +375,11 @@ class _TelaCadastroSelecaoNomesVoluntariosState
             } else {
               return Scaffold(
                 appBar: AppBar(
-                  title: Text(Textos.tituloTelaCadastroSelecaoVoluntarios),
+                  title: Text(Textos.telaObservacaoTitulo),
                   leading: IconButton(
                     color: Colors.white,
                     onPressed: () {
-                      PassarPegarDados.passarNomesLocaisTrabalho([]);
-                      Navigator.popAndPushNamed(
-                        context,
-                        Constantes.rotaTelaCadastroSelecaoLocalTrabalho,
-                      );
+                      redirecionarTelaAnterior();
                     },
                     icon: const Icon(Icons.arrow_back_ios),
                   ),
@@ -372,18 +392,27 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                     child: Column(
                       children: [
                         Container(
-                          height: alturaTela * 0.2,
+                          height: alturaTela * 0.3,
                           padding: const EdgeInsets.only(bottom: 20.0),
                           width: larguraTela,
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
                                 Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                                  width: larguraTela,
+                                  child: Text(
+                                    Textos.descricaoTabelaSelecionada +
+                                        widget.nomeTabela,
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                                Container(
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10.0,
                                   ),
                                   child: Text(
-                                    Textos.descricaoCadastroVoluntario,
+                                    Textos.telaObservacaoCadastro,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 20),
                                   ),
@@ -395,8 +424,12 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                     Form(
                                       key: validacaoFormulario,
                                       child: SizedBox(
-                                        width: Platform.isWindows ? 300 : 200,
+                                        width:
+                                            Platform.isWindows
+                                                ? larguraTela * 0.6
+                                                : larguraTela * 0.9,
                                         child: TextFormField(
+                                          maxLines: 3,
                                           controller: nomeControle,
                                           onFieldSubmitted: (value) {
                                             validarCampoEChamarCadastrar();
@@ -411,11 +444,15 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                       ),
                                     ),
                                     Container(
-                                      margin: const EdgeInsets.symmetric(
+                                      margin: EdgeInsets.symmetric(
+                                        vertical:
+                                            Platform.isAndroid || Platform.isIOS
+                                                ? 10
+                                                : 0,
                                         horizontal: 10.0,
                                       ),
                                       width: 100,
-                                      height: 50,
+                                      height: 40,
                                       child: FloatingActionButton(
                                         heroTag: Textos.btnCadastrar,
                                         onPressed: () {
@@ -432,61 +469,54 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                         ),
                         // area de listagem de nomes geral
                         SizedBox(
-                          height: alturaTela * 0.55,
                           width: larguraTela,
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               if (listaNomesCadastrados.isNotEmpty) {
                                 // area de exibicao de descricao e listagem de nomes
-                                return SizedBox(
-                                  width: larguraTela,
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.symmetric(
-                                            horizontal: 10.0,
+                                return SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        width: larguraTela,
+                                        child: Text(
+                                          textAlign: TextAlign.center,
+                                          Textos.telaObservacaoDescricaoSelecao,
+                                          style: const TextStyle(fontSize: 20),
+                                        ),
+                                      ),
+                                      // Area de Exibicao da lista com os nomes dos voluntarios
+                                      Card(
+                                        color: Colors.white,
+                                        shape: const OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(20),
                                           ),
-                                          width: larguraTela,
-                                          child: Text(
-                                            textAlign: TextAlign.center,
-                                            Textos.descricaoSelecaoVoluntarios,
-                                            style: const TextStyle(
-                                              fontSize: 20,
-                                            ),
+                                          borderSide: BorderSide(
+                                            width: 1,
+                                            color: PaletaCores.corCastanho,
                                           ),
                                         ),
-                                        // Area de Exibicao da lista com os nomes dos voluntarios
-                                        Card(
-                                          color: Colors.white,
-                                          shape: const OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(20),
-                                            ),
-                                            borderSide: BorderSide(
-                                              width: 1,
-                                              color: PaletaCores.corCastanho,
-                                            ),
-                                          ),
-                                          child: SizedBox(
-                                            height: alturaTela * 0.45,
-                                            width:
-                                                Platform.isAndroid ||
-                                                        Platform.isIOS
-                                                    ? larguraTela
-                                                    : larguraTela * 0.8,
-                                            child: ListView(
-                                              children: [
-                                                ...listaNomesCadastrados.map(
-                                                  (e) =>
-                                                      checkBoxPersonalizado(e),
-                                                ),
-                                              ],
-                                            ),
+                                        child: SizedBox(
+                                          height: alturaTela * 0.4,
+                                          width:
+                                              Platform.isAndroid ||
+                                                      Platform.isIOS
+                                                  ? larguraTela
+                                                  : larguraTela * 0.8,
+                                          child: ListView(
+                                            children: [
+                                              ...listaNomesCadastrados.map(
+                                                (e) => checkBoxPersonalizado(e),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               } else {
@@ -514,36 +544,11 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                   alignment: Alignment.center,
                   color: Colors.white,
                   width: larguraTela,
-                  height: 50,
-                  child: SizedBox(
-                    width: 100,
-                    height: 40,
-                    child: FloatingActionButton(
-                      heroTag: Textos.btnAvancar,
-                      onPressed: () {
-                        if (validarQuantidadeVoluntarios()) {
-                          redirecionarProximaTela();
-                        } else if (validarQuantidadeVoluntarios() == false) {
-                          MetodosAuxiliares.exibirMensagens(
-                            Constantes.tipoNotificacaoErro,
-                            Textos.erroQuantidadeSelecionadaInsuficiente +
-                                listaValidarQuantidadeVoluntarios.length
-                                    .toString(),
-                            context,
-                          );
-                        } else {
-                          MetodosAuxiliares.exibirMensagens(
-                            Constantes.tipoNotificacaoErro,
-                            Textos.erroListaVazia,
-                            context,
-                          );
-                        }
-                      },
-                      child: Text(
-                        Textos.btnAvancar,
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
+                  height: 70,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [BarraNavegacao()],
                   ),
                 ),
               );

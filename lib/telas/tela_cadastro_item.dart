@@ -265,6 +265,8 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
               });
             } else if (icone == Constantes.iconeMudarHorario) {
               exibirTimePicker();
+            } else if (icone == Constantes.iconeDataCulto) {
+              exibirDataPicker();
             }
           },
           child: Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
@@ -307,16 +309,15 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
       onPressed: () async {
         // verificando o tipo do botao
         // para fazer acoes diferentes
-        if (nomeBotao == Textos.btnSalvarItem) {
+        if (nomeBotao == Textos.btnSalvar) {
           if (_formKeyFormulario.currentState!.validate()) {
             chamarAdicionarItens();
           }
         } else if (nomeBotao == Textos.btnAdicionarCampo) {
           redirecionarTelaCadastroNovoCampo();
         } else if (nomeBotao == Textos.btnRemoverCampo) {
-         redirecionarTelaRemoverCampos();
+          redirecionarTelaRemoverCampos();
         } else if (nomeBotao == Textos.btnData) {
-          exibirDataPicker();
         } else if (nomeBotao == Textos.btnOpcaoData) {
           PassarPegarDados.passarDataComComplemento("");
           setState(() {
@@ -334,7 +335,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           });
         }
       },
-      child: Column(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           LayoutBuilder(
@@ -346,13 +347,15 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
               }
             },
           ),
-          Text(
-            nomeBotao,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: PaletaCores.corAzulMagenta,
+          SizedBox(
+            width: nomeBotao == Textos.btnOpcaoData ? 120 : 90,
+            child: Text(
+              nomeBotao,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black,
+              ),
             ),
           ),
         ],
@@ -401,9 +404,9 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: PaletaCores.corVerdeCiano,
-              onPrimary: Colors.white,
-              surface: PaletaCores.corAzulMagenta,
+              primary: Colors.white,
+              onPrimary: PaletaCores.corCastanho,
+              surface: PaletaCores.corAzulEscuro,
               onSurface: Colors.white,
             ),
           ),
@@ -495,8 +498,8 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                       botoesAcoes(
                                         Textos.btnSalvarOpcaoData,
                                         Constantes.iconeSalvar,
-                                        100,
-                                        50,
+                                        120,
+                                        40
                                       ),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
@@ -504,7 +507,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                         ),
                                         child: botoesIcones(
                                           Constantes.iconeExclusao,
-                                          40,
+                                          30,
                                           PaletaCores.corRosaAvermelhado,
                                         ),
                                       ),
@@ -539,11 +542,10 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    botoesAcoes(
-                                      Textos.btnData,
+                                    botoesIcones(
                                       Constantes.iconeDataCulto,
-                                      50,
-                                      50,
+                                      40,
+                                      PaletaCores.corCastanho,
                                     ),
                                     botoesAcoes(
                                       Textos.btnOpcaoData,
@@ -627,22 +629,22 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               botoesAcoes(
-                                Textos.btnSalvarItem,
+                                Textos.btnSalvar,
                                 Constantes.iconeSalvar,
-                                110,
-                                60,
+                                120,
+                                40,
                               ),
                               botoesAcoes(
                                 Textos.btnAdicionarCampo,
                                 Constantes.iconeAdicionar,
-                                110,
-                                60,
+                                120,
+                                40,
                               ),
                               botoesAcoes(
                                 Textos.btnRemoverCampo,
                                 Constantes.iconeRemover,
-                                110,
-                                60,
+                                120,
+                                40,
                               ),
                             ],
                           ),

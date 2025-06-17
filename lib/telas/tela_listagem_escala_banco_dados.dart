@@ -409,24 +409,24 @@ class _TelaListagemTabelasBancoDadosState
                                             Textos.btnExcluir,
                                             Constantes.iconeExclusao,
                                             PaletaCores.corRosaAvermelhado,
-                                            40,
-                                            40,
+                                            35,
+                                            35,
                                           ),
                                         ),
                                       ],
                                     ),
                                     Container(
                                       margin: const EdgeInsets.all(20),
-                                      width: 200,
-                                      height: 50,
-                                      child: ElevatedButton(
+                                      width: 120,
+                                      height: 40,
+                                      child: FloatingActionButton(
                                         child: Text(
                                           Textos.btnUsarEscala,
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black,
-                                            fontSize: 18,
+                                            fontSize: 14,
                                           ),
                                         ),
                                         onPressed: () {

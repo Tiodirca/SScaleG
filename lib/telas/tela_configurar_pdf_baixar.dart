@@ -8,48 +8,86 @@ import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
-import 'package:sscaleg/widgets/widget_configuracao_pdf.dart';
-import '../../Modelo/check_box_modelo.dart';
-import '../../uteis/estilo.dart';
-import '../../uteis/paleta_cores.dart';
-import '../../uteis/constantes.dart';
+import '../Modelo/check_box_modelo.dart';
+import '../uteis/estilo.dart';
+import '../uteis/paleta_cores.dart';
+import '../uteis/constantes.dart';
 
-class TelaObservacao extends StatefulWidget {
-  const TelaObservacao({
+class TelaConfigurarPDFBaixar extends StatefulWidget {
+  const TelaConfigurarPDFBaixar({
     super.key,
     required this.cabecalhoEscala,
     required this.linhasEscala,
+    required this.observacoes,
     required this.nomeTabela,
     required this.idTabelaSelecionada,
   });
 
   final List<dynamic> cabecalhoEscala;
   final List<Map> linhasEscala;
+  final List<String> observacoes;
   final String nomeTabela;
   final String idTabelaSelecionada;
 
   @override
-  State<TelaObservacao> createState() => _TelaObservacaoState();
+  State<TelaConfigurarPDFBaixar> createState() =>
+      _TelaConfigurarPDFBaixarState();
 }
 
-class _TelaObservacaoState extends State<TelaObservacao> {
+class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
   List<CheckBoxModelo> listaNomesCadastrados = [];
-  List<String> listaObservacaoSelecionadas = [];
+  List<CheckBoxModelo> listaCabecalhosExibicao = [];
+  List<String> listaObservacoes = [];
   bool exibirWidgetCarregamento = true;
+  bool exibirSelecaoCamposEscala = false;
   final validacaoFormulario = GlobalKey<FormState>();
   Estilo estilo = Estilo();
-  bool exibirWidgetConfiguracaoPDF = false;
+  String checkBoxSelecionado = "";
   int indexTabela = 0;
   String nomeCadastro = "";
-  String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeObservacao;
-  String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeObservacao;
+  String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeCabecalhoPDF;
+  String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeCabecalhoPDF;
   TextEditingController nomeControle = TextEditingController(text: "");
 
   @override
   void initState() {
     super.initState();
+    listaObservacoes = PassarPegarDados.recuperarObservacoesPDF();
+    for (var element in widget.cabecalhoEscala) {
+      if (!(element.contains(Constantes.dataCulto) ||
+          element.contains(Constantes.horarioTrabalho) ||
+          element.contains(Constantes.editar) ||
+          element.contains(Constantes.excluir))) {
+        listaCabecalhosExibicao.add(
+          CheckBoxModelo(texto: element, checked: true),
+        );
+      }
+    }
     realizarBuscaDadosFireBase();
   }
+
+  Widget botoesSwitch(String label,bool valorSwitch) => Container(
+    color: Colors.green,
+    margin: EdgeInsets.symmetric(horizontal: 1.0),
+    width: 120,
+    height: 60,
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          Text(label),
+          Switch(
+            inactiveThumbColor: PaletaCores.corAzulMagenta,
+            value: valorSwitch,
+            activeColor: PaletaCores.corAzulMagenta,
+            onChanged: (bool valor) {
+              setState(() {});
+            },
+          ),
+        ],
+      ),
+    ),
+  );
 
   Widget checkBoxPersonalizado(CheckBoxModelo checkBoxModel) =>
       CheckboxListTile(
@@ -78,26 +116,42 @@ class _TelaObservacaoState extends State<TelaObservacao> {
           setState(() {
             // verificando se o balor
             checkBoxModel.checked = value!;
-            verificarItensSelecionados();
+            validarSelecoes(checkBoxModel);
           });
         },
       );
 
-  // metodo para verificar se o item foi selecionado
-  // para adicionar na lista de itens selecionados
-  verificarItensSelecionados() {
-    //verificando cada elemento da lista de nomes cadastrados
+  Widget checkBox(CheckBoxModelo checkBoxModel) => CheckboxListTile(
+    activeColor: PaletaCores.corAzulEscuro,
+    checkColor: PaletaCores.corRosaClaro,
+    title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 20)),
+    value: checkBoxModel.checked,
+    side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
+    onChanged: (value) {
+      setState(() {
+        // verificando se o balor
+        checkBoxModel.checked = value!;
+        //validarSelecoes(checkBoxModel);
+      });
+    },
+  );
+
+  validarSelecoes(CheckBoxModelo checkBoxModel) {
+    //verificando se o checkbox selecionado
+    if (checkBoxModel.checked == true) {
+      // caso tenha sido definir que a variavel receber o valor
+      checkBoxSelecionado = checkBoxModel.texto;
+    } else {
+      // caso seja desmarcado vai receber o seguinte valor
+      checkBoxSelecionado = "";
+    }
+    //percorrendo a lista
     for (var element in listaNomesCadastrados) {
-      //verificando se o usuario selecionou um item
-      if (element.checked == true) {
-        // verificando se o item Nao foi adicionado anteriormente na lista
-        if (!(listaObservacaoSelecionadas.contains(element.texto))) {
-          //add item
-          listaObservacaoSelecionadas.add(element.texto);
-        }
-      } else if (element.checked == false) {
-        // removendo item caso seja desmarcado
-        listaObservacaoSelecionadas.remove(element.texto);
+      //caso a variavel seja DIFERENTE do elemento passado
+      if (checkBoxSelecionado != element.texto) {
+        // definir que o valor do elemento sera
+        // false para poder desmarcar na lista de checkbox
+        element.checked = false;
       }
     }
   }
@@ -124,7 +178,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
               setState(() {
                 exibirWidgetCarregamento = false;
               });
-              chamarExibirMensagemErro("Erro Cadastrar Local: ${e.toString()}");
+              chamarExibirMensagemErro("Erro Cadastrar : ${e.toString()}");
             },
           );
     } catch (e) {
@@ -154,7 +208,6 @@ class _TelaObservacaoState extends State<TelaObservacao> {
   limparDados() {
     listaNomesCadastrados.clear();
     nomeControle.clear();
-    listaObservacaoSelecionadas.clear();
   }
 
   realizarBuscaDadosFireBase() async {
@@ -186,7 +239,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
               setState(() {
                 exibirWidgetCarregamento = false;
               });
-              chamarExibirMensagemErro("Erro Buscar Locais: ${e.toString()}");
+              chamarExibirMensagemErro("Erro Buscar Item: ${e.toString()}");
             },
           );
     } catch (e) {
@@ -231,6 +284,12 @@ class _TelaObservacaoState extends State<TelaObservacao> {
     listaNomesCadastrados.sort((a, b) {
       return a.texto.compareTo(b.texto);
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    PassarPegarDados.passarObservacoesPDF([]);
   }
 
   // Metodo para chamar deletar tabela
@@ -312,14 +371,6 @@ class _TelaObservacaoState extends State<TelaObservacao> {
     );
   }
 
-  redirecionarProximaTela() {
-    PassarPegarDados.passarNomesLocaisTrabalho(listaObservacaoSelecionadas);
-    Navigator.pushReplacementNamed(
-      context,
-      Constantes.rotaTelaCadastroSelecaoVoluntarios,
-    );
-  }
-
   validarCampoEChamarCadastrar() {
     if (validacaoFormulario.currentState!.validate()) {
       setState(() {
@@ -330,6 +381,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
   }
 
   redirecionarTelaAnterior() {
+    PassarPegarDados.passarObservacoesPDF(listaObservacoes);
     var dados = {};
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
     dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
@@ -341,70 +393,78 @@ class _TelaObservacaoState extends State<TelaObservacao> {
     );
   }
 
-  Widget botoesAcoes(String nomeBotao, IconData icone) => SizedBox(
-    height: 60,
-    width: 150,
-    child: FloatingActionButton(
-      elevation: 0,
-      heroTag: nomeBotao,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(color: PaletaCores.corCastanho),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      onPressed: () async {
-        if (nomeBotao == Textos.btnBaixarPDF) {
-          setState(() {
-            exibirWidgetConfiguracaoPDF = true;
-          });
-          // GerarPDFEscala gerarPDF = GerarPDFEscala(
-          //     escala: escala,
-          //     nomeEscala: widget.nomeTabela,
-          //     exibirMesaApoio: exibirOcultarCampoMesaApoio,
-          //     exibirRecolherOferta: exibirOcultarCampoRecolherOferta,
-          //     exibirIrmaoReserva: exibirOcultarCampoIrmaoReserva,
-          //     exibirServirSantaCeia: exibirOcultarServirSantaCeia,
-          //     exibirUniformes: exibirOcultarCampoUniforme);
-          // gerarPDF.pegarDados();
-        }
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
-          Text(
-            nomeBotao,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: PaletaCores.corAzulMagenta,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-
-  Widget botaoIcone(
+  Widget botoesAcoes(
+    String nomeBotao,
     IconData icone,
     Color corBotao,
     double largura,
     double altura,
-  ) => Container(
-    margin: EdgeInsets.symmetric(horizontal: 5.0),
-    width: largura,
+  ) => SizedBox(
     height: altura,
+    width: largura,
     child: FloatingActionButton(
-      heroTag: icone.toString(),
-      onPressed: () {
-        if (icone == Constantes.iconeExclusao) {
+      heroTag: nomeBotao,
+      elevation: 0,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: corBotao),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
+      onPressed: () async {
+        if (nomeBotao == Textos.btnAvancar) {
+          if (checkBoxSelecionado.isNotEmpty) {
+            setState(() {
+              exibirSelecaoCamposEscala = true;
+            });
+          } else {
+            MetodosAuxiliares.exibirMensagens(
+              Constantes.tipoNotificacaoErro,
+              Textos.erroListaVazia,
+              context,
+            );
+          }
+        } else if (nomeBotao == Textos.btnBaixarPDF) {
+          List<Map> linhas = widget.linhasEscala;
+
+          for (var element in linhas) {}
+          for (var element in listaCabecalhosExibicao) {
+            print("T${element.texto} ${element.checked}");
+          }
+        } else if (nomeBotao == Textos.btnExcluir) {
           setState(() {
-            exibirWidgetConfiguracaoPDF = false;
+            exibirSelecaoCamposEscala = false;
           });
         }
       },
-      child: Icon(icone, color: corBotao, size: 25),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Visibility(
+            visible: nomeBotao == Textos.btnAvancar ? false : true,
+            child: Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
+          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (nomeBotao == Textos.btnExcluir) {
+                return Container();
+              } else {
+                return SizedBox(
+                  width: 90,
+                  child: Text(
+                    nomeBotao,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
     ),
   );
 
@@ -431,7 +491,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
             } else {
               return Scaffold(
                 appBar: AppBar(
-                  title: Text(Textos.telaObservacaoTitulo),
+                  title: Text(Textos.telaConfiguracaoPDFTitulo),
                   leading: IconButton(
                     color: Colors.white,
                     onPressed: () {
@@ -440,24 +500,80 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                     icon: const Icon(Icons.arrow_back_ios),
                   ),
                 ),
-                body: LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (exibirWidgetConfiguracaoPDF) {
-                      return WidgetConfiguracaoPDF(
-                        cabecalhoEscala: widget.cabecalhoEscala,
-                        escalaCompleta: widget.linhasEscala,
-                        observacoes: listaObservacaoSelecionadas,
-                      );
-                    } else {
-                      return Container(
-                        color: Colors.white,
-                        width: larguraTela,
-                        height: alturaTela,
-                        child: SingleChildScrollView(
-                          child: Column(
+                body: Container(
+                  color: Colors.white,
+                  width: larguraTela,
+                  height: alturaTela,
+                  child: SingleChildScrollView(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (exibirSelecaoCamposEscala) {
+                          return Column(
                             children: [
                               Container(
-                                height: alturaTela * 0.22,
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                ),
+                                width: larguraTela,
+                                child: Text(
+                                  Textos.descricaoTabelaSelecionada +
+                                      widget.nomeTabela,
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                ),
+                                child: Text(
+                                  Textos.telaConfiguracaoPDFDescricao,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                              ),
+                              Card(
+                                color: Colors.white,
+                                shape: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: PaletaCores.corCastanho,
+                                  ),
+                                ),
+                                child: SizedBox(
+                                  height: alturaTela * 0.4,
+                                  width:
+                                      Platform.isAndroid || Platform.isIOS
+                                          ? larguraTela
+                                          : larguraTela * 0.8,
+                                  child: ListView(
+                                    children: [
+                                      ...listaCabecalhosExibicao.map(
+                                        (e) => checkBox(e),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                ),
+                                child: Text(
+                                  Textos.switchDescricao,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                              ),
+                            ],
+                          );
+                        } else {
+                          return Column(
+                            children: [
+                              Container(
+                                height: alturaTela * 0.2,
                                 padding: const EdgeInsets.only(bottom: 20.0),
                                 width: larguraTela,
                                 child: SingleChildScrollView(
@@ -467,8 +583,20 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                         margin: const EdgeInsets.symmetric(
                                           horizontal: 10.0,
                                         ),
+                                        width: larguraTela,
                                         child: Text(
-                                          Textos.telaObservacaoCadastro,
+                                          Textos.descricaoTabelaSelecionada +
+                                              widget.nomeTabela,
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        child: Text(
+                                          Textos
+                                              .telaConfiguracaoPDFDescricaoCadastroTitulo,
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(fontSize: 20),
                                         ),
@@ -483,10 +611,9 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                             child: SizedBox(
                                               width:
                                                   Platform.isWindows
-                                                      ? larguraTela * 0.6
+                                                      ? 400
                                                       : 200,
                                               child: TextFormField(
-                                                maxLines: 3,
                                                 controller: nomeControle,
                                                 onFieldSubmitted: (value) {
                                                   validarCampoEChamarCadastrar();
@@ -502,17 +629,27 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                             ),
                                           ),
                                           Container(
-                                            margin: const EdgeInsets.symmetric(
+                                            margin: EdgeInsets.symmetric(
+                                              vertical:
+                                                  Platform.isAndroid ||
+                                                          Platform.isIOS
+                                                      ? 10
+                                                      : 0,
                                               horizontal: 10.0,
                                             ),
                                             width: 100,
-                                            height: 50,
+                                            height: 40,
                                             child: FloatingActionButton(
                                               heroTag: Textos.btnCadastrar,
                                               onPressed: () {
                                                 validarCampoEChamarCadastrar();
                                               },
-                                              child: Text(Textos.btnCadastrar),
+                                              child: Text(
+                                                Textos.btnCadastrar,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -523,7 +660,6 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                               ),
                               // area de listagem de nomes geral
                               SizedBox(
-                                height: alturaTela * 0.48,
                                 width: larguraTela,
                                 child: LayoutBuilder(
                                   builder: (context, constraints) {
@@ -541,7 +677,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                               child: Text(
                                                 textAlign: TextAlign.center,
                                                 Textos
-                                                    .telaObservacaoDescricaoSelecao,
+                                                    .telaConfiguracaoPDFDescricaoSelecaoTitulo,
                                                 style: const TextStyle(
                                                   fontSize: 20,
                                                 ),
@@ -561,7 +697,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                                 ),
                                               ),
                                               child: SizedBox(
-                                                height: alturaTela * 0.37,
+                                                height: alturaTela * 0.4,
                                                 width:
                                                     Platform.isAndroid ||
                                                             Platform.isIOS
@@ -600,37 +736,58 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                      );
-                    }
-                  },
+                          );
+                        }
+                      },
+                    ),
+                  ),
                 ),
                 bottomNavigationBar: Container(
                   alignment: Alignment.center,
                   color: Colors.white,
                   width: larguraTela,
-                  height: 140,
+                  height: 100,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          if (exibirWidgetConfiguracaoPDF) {
-                            return botaoIcone(
+                      Visibility(
+                        visible: !exibirSelecaoCamposEscala,
+                        child: botoesAcoes(
+                          Textos.btnAvancar,
+                          Constantes.iconeLista,
+                          PaletaCores.corCastanho,
+                          120,
+                          40,
+                        ),
+                      ),
+                      Visibility(
+                        visible: exibirSelecaoCamposEscala,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 120,
+                              height: 40,
+                              child: botoesAcoes(
+                                Textos.btnBaixarPDF,
+                                Constantes.iconeBaixar,
+                                PaletaCores.corCastanho,
+                                120,
+                                40,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            botoesAcoes(
+                              Textos.btnExcluir,
                               Constantes.iconeExclusao,
                               PaletaCores.corRosaAvermelhado,
-                              50,
-                              50,
-                            );
-                          } else {
-                            return botoesAcoes(
-                              Textos.btnBaixarPDF,
-                              Constantes.iconeBaixar,
-                            );
-                          }
-                        },
+                              35,
+                              35,
+                            ),
+                          ],
+                        ),
                       ),
                       BarraNavegacao(),
                     ],

@@ -4,16 +4,15 @@ class Textos {
   static String btnCadastrar = "Cadastrar";
   static String btnAvancar = "Avançar";
   static String btnListarEscalas = "Ver lista de Escalas";
-  static String btnAdicionar = "Adicionar";
+  static String btnAdicionar = "Adicionar Item";
   static String btnRecarregar = "Recarregar";
   static String btnExcluir = "Excluir";
   static String btnTelaInicial = "Tela Inicial";
-  static String btnBaixarPDF = "Baixar arquivo PDF";
-  static String btnObservacaoBaixar = "Observação e Baixar escala";
+  static String btnBaixarPDF = "Baixar PDF";
+  static String btnObservacaoAdicionar = "Adicionar Observações";
   static String btnOpcaoData = "Opções Adicional da data";
   static String btnData = "Data";
-  static String btnSalvarAcao = "Salvar Ação";
-  static String btnSalvarItem = "Salvar Item";
+  static String btnSalvar = "Salvar";
   static String btnRemoverCampo = "Remover Campos";
   static String btnAdicionarCampo = "Novo Campo";
   static String btnEditar = "Editar";
@@ -101,12 +100,13 @@ class Textos {
       "Lembrando que ao remover os campos você estara removendo"
       " o campo selecionado de todos os itens que estão nesta escala,tenha certeza desta ação";
 
-  // TELA ADIONAR OBSERVACOES
+  // TELA ADICIONAR OBSERVACOES
   static String telaObservacaoTitulo = "Adição de Observações";
   static String telaObservacaoCadastro =
       "Digite a observação que você deseja adicionar";
   static String telaObservacaoDescricaoSelecao =
-      "Selecione quais observações você deseja adicionar ao arquivo PDF";
+      "Selecione quais observações você deseja adicionar ao arquivo PDF, "
+      "ao selecionar/desmarcar um item ele já é adicionado/removido automaticamente";
 
   //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
   static String widgetAjustarHorarioDescricao =
@@ -117,10 +117,19 @@ class Textos {
       "Horario durante final de semana";
   static String widgetAjustarHorarioInicio = "Iniciar às : ";
 
-  //WIDGET Configuracao PDF
-  static String widgetConfiguracaoPDFTitulo = "Configurações do PDF";
-  static String widgetConfiguracaoPDFDescricao =
+  //Tela Configuracao PDF
+  static String telaConfiguracaoPDFTitulo = "Configurações do PDF";
+  static String telaConfiguracaoPDFDescricao =
       "Selecione quais campos deverão ser exibidos no arquivo PDF";
+  static String telaConfiguracaoPDFDescricaoCadastroTitulo =
+      "Digite o cabeçalho que o PDF irá ter";
+  static String telaConfiguracaoPDFDescricaoSelecaoTitulo =
+      "Selecione qual cabeçalho o PDF irá ter, permitido selecionar apenas um";
+
+  static String switchDescricao =
+      "Selecione qual a orientação da Pagina do PDF";
+  static String switchHorizontalPDF = "Horizontal";
+  static String switchVerticalPDF = "Vertical";
 
   //MENSAGENS DE ERROS
   static String erroCampoVazio = "Preencha este campo";
@@ -136,6 +145,8 @@ class Textos {
   static String telaCarregamentoAguarde = "Aguarde Carregando";
   static String descricaoDataPicker = "Selecione uma data";
   static String descricaoDataSelecionada = "A data Selecionada foi : ";
+  static String observacaoSem = "Sem Observações";
+  static String observacaoTitulo = "Observações";
 
   //ALERTA EXCLUSAO
   static String tituloAlertaExclusao = "Excluir Item";

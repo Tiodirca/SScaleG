@@ -34,8 +34,11 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   bool exibirOcultarBtnAcao = true;
   List<Map> listaEscalaBancoDados = [];
   List<Map> listaLinhaEscalaOrdenada = [];
+  List<String> listaObservacoesPDF = [];
   List<dynamic> cabecalhoEscala = [];
   List<Map> listaIDDocumento = [];
+  Map mapExibirCampos = {};
+  int indexSwitch = 0;
   List<DataColumn> cabecalhoDataColumn = [];
   List<DataRow> linhasDataRow = [];
   String nomeReacar = "";
@@ -46,6 +49,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   @override
   void initState() {
     super.initState();
+    listaObservacoesPDF = PassarPegarDados.recuperarObservacoesPDF();
     realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
   }
 
@@ -283,14 +287,25 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   carregarCabecalho() {
     for (var element in cabecalhoEscala) {
-      cabecalhoDataColumn.add(DataColumn(label: botoesSwitch(element, true)));
+      cabecalhoDataColumn.add(
+        DataColumn(
+          label: Text(
+            element
+                .toString()
+                .replaceAll("01_", "")
+                .replaceAll("02_", "")
+                .replaceAll("_", " ")
+                .replaceAll(RegExp(r'[0-9]'), ''),
+          ),
+        ),
+      );
     }
   }
 
-  Widget botoesSwitch(String label, bool valorBotao) => Container(
+  Widget botoesSwitch(String label) => Container(
     color: Colors.green,
     margin: EdgeInsets.symmetric(horizontal: 1.0),
-    width: 160,
+    width: 120,
     height: 60,
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -310,14 +325,15 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   label.contains(Constantes.horarioTrabalho) ||
                   label.contains(Constantes.editar) ||
                   label.contains(Constantes.excluir))) {
+                indexSwitch++;
+                mapExibirCampos[label] = true;
+                print(indexSwitch);
                 return Switch(
                   inactiveThumbColor: PaletaCores.corAzulMagenta,
-                  value: valorBotao,
+                  value: mapExibirCampos.values.elementAt(indexSwitch),
                   activeColor: PaletaCores.corAzulMagenta,
                   onChanged: (bool valor) {
-                    setState(() {
-                      mudarSwitch(label, valor);
-                    });
+                    setState(() {});
                   },
                 );
               } else {
@@ -329,16 +345,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
       ),
     ),
   );
-
-  // metodo para mudar status dos switch
-  mudarSwitch(String label, bool valor) {
-    // print(label);
-    // if (label == Textos.labelSwitchUniforme) {
-    //   setState(() {
-    //     exibirOcultarCampoUniforme = !exibirOcultarCampoUniforme;
-    //   });
-    // }
-  }
 
   validarNomeFoco(String nome) {
     //colocando tudo em minuscolo pois se tiver maiusculo nao localiza
@@ -444,14 +450,28 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   redirecionarTelaObservacao() {
     var dados = {};
-    dados[Constantes.rotaArgumentoCabecalhoEscala] = cabecalhoEscala;
-    dados[Constantes.rotaArgumentoLinhasEscala] = listaLinhaEscalaOrdenada;
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
     dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
         widget.idTabelaSelecionada;
     Navigator.pushReplacementNamed(
       context,
       Constantes.rotaTelaObservacao,
+      arguments: dados,
+    );
+  }
+
+  redirecionarTelaConfigurarPDFBaixar() {
+    var dados = {};
+    PassarPegarDados.passarObservacoesPDF(listaObservacoesPDF);
+    dados[Constantes.rotaArgumentoCabecalhoEscala] = cabecalhoEscala;
+    dados[Constantes.rotaArgumentoLinhasEscala] = listaLinhaEscalaOrdenada;
+    dados[Constantes.rotaArgumentoObservacaoEscala] = listaObservacoesPDF;
+    dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeTabela;
+    dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
+        widget.idTabelaSelecionada;
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaConfigurarPDFBaixar,
       arguments: dados,
     );
   }
@@ -520,6 +540,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     IconData icone,
     double largura,
     double altura,
+    Color corIcone,
   ) => SizedBox(
     height: altura,
     width: largura,
@@ -532,19 +553,13 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       onPressed: () async {
-        if (nomeBotao == Textos.btnObservacaoBaixar) {
+        if (nomeBotao == Textos.telaObservacaoTitulo) {
+          PassarPegarDados.passarObservacoesPDF(listaObservacoesPDF);
           redirecionarTelaObservacao();
-          // GerarPDFEscala gerarPDF = GerarPDFEscala(
-          //     escala: escala,
-          //     nomeEscala: widget.nomeTabela,
-          //     exibirMesaApoio: exibirOcultarCampoMesaApoio,
-          //     exibirRecolherOferta: exibirOcultarCampoRecolherOferta,
-          //     exibirIrmaoReserva: exibirOcultarCampoIrmaoReserva,
-          //     exibirServirSantaCeia: exibirOcultarServirSantaCeia,
-          //     exibirUniformes: exibirOcultarCampoUniforme);
-          // gerarPDF.pegarDados();
         } else if (nomeBotao == Textos.btnAdicionar) {
           redirecionarTelaCadastroItem();
+        } else if (nomeBotao == Textos.btnBaixarPDF) {
+          redirecionarTelaConfigurarPDFBaixar();
         } else if (nomeBotao == Textos.btnRecarregar) {
           setState(() {
             exibirWidgetCarregamento = true;
@@ -552,17 +567,21 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           });
         }
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        alignment: WrapAlignment.center,
         children: [
-          Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
-          Text(
-            nomeBotao,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: PaletaCores.corAzulMagenta,
+          Icon(icone, color: corIcone, size: 25),
+          SizedBox(
+            width: 90,
+            child: Text(
+              nomeBotao,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
         ],
@@ -682,12 +701,14 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                   Constantes.iconeRecarregar,
                                   100,
                                   60,
+                                  PaletaCores.corAzulMagenta,
                                 ),
                                 botoesAcoes(
                                   Textos.btnAdicionar,
                                   Constantes.iconeAdicionar,
                                   100,
                                   60,
+                                  PaletaCores.corAzulMagenta,
                                 ),
                               ],
                             ),
@@ -699,139 +720,216 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                         color: Colors.white,
                         width: larguraTela,
                         height: alturaTela,
-                        child: SingleChildScrollView(
-                          child: Stack(
-                            alignment: AlignmentDirectional.topEnd,
-                            children: [
-                              Column(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Stack(
                                 children: [
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 10.0,
-                                    ),
-                                    width: larguraTela,
-                                    child: Text(
-                                      Textos.descricaoTabelaSelecionada +
-                                          widget.nomeTabela,
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 10.0,
-                                      horizontal: 0,
-                                    ),
-                                    width: larguraTela,
-                                    child: Text(
-                                      Textos.telaEscalaDetalhadaDescricaoItens,
-                                      style: const TextStyle(fontSize: 18),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 10.0,
-                                      vertical: 0.0,
-                                    ),
-                                    height:
-                                        Platform.isWindows
-                                            ? alturaTela * 0.6
-                                            : alturaTela * 0.55,
-                                    width: larguraTela,
-                                    child: Card(
-                                      color: Colors.white,
-                                      shape: const OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(20),
+                                  SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                          ),
+                                          width: larguraTela,
+                                          child: Text(
+                                            Textos.descricaoTabelaSelecionada +
+                                                widget.nomeTabela,
+                                            textAlign: TextAlign.end,
+                                          ),
                                         ),
-                                        borderSide: BorderSide(
-                                          width: 1,
-                                          color: PaletaCores.corCastanho,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: ListView(
-                                          scrollDirection: Axis.vertical,
-                                          children: [
-                                            SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              child: DataTable(
-                                                columnSpacing: 20,
-                                                columns: cabecalhoDataColumn,
-                                                rows: linhasDataRow,
-                                              ),
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            vertical: 10.0,
+                                            horizontal: 0,
+                                          ),
+                                          width: larguraTela,
+                                          child: Text(
+                                            Textos
+                                                .telaEscalaDetalhadaDescricaoItens,
+                                            style: const TextStyle(
+                                              fontSize: 18,
                                             ),
-                                          ],
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: exibirBarraPesquisa,
+                                    child: Positioned(
+                                      right: 0,
+                                      child: Center(
+                                        child: Container(
+                                          padding: EdgeInsets.all(10),
+                                          child: Card(
+                                            color: Colors.transparent,
+                                            elevation: 0,
+                                            child: Column(
+                                              children: [
+                                                Wrap(
+                                                  children: [
+                                                    Container(
+                                                      width:
+                                                          Platform.isAndroid ||
+                                                                  Platform.isIOS
+                                                              ? 200
+                                                              : 300,
+                                                      height: 80,
+                                                      color: Colors.white,
+                                                      child: Form(
+                                                        key:
+                                                            validacaoFormulario,
+                                                        child: TextFormField(
+                                                          controller:
+                                                              textoPesquisa,
+                                                          validator: (value) {
+                                                            if (value!
+                                                                .isEmpty) {
+                                                              return Textos
+                                                                  .erroCampoVazio;
+                                                            }
+                                                            return null;
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    botoesAreaPesquisa(
+                                                      Constantes
+                                                          .iconeBarraPesquisar,
+                                                      PaletaCores.corVerdeCiano,
+                                                      40,
+                                                      40,
+                                                    ),
+                                                    botoesAreaPesquisa(
+                                                      Constantes.iconeExclusao,
+                                                      PaletaCores.corVermelha,
+                                                      35,
+                                                      35,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              Visibility(
-                                visible: exibirBarraPesquisa,
-                                child: Positioned(
-                                  right: 0,
+                            ),
+                            Expanded(
+                              flex: 6,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                  vertical: 0.0,
+                                ),
+                                width: larguraTela,
+                                child: Card(
+                                  color: Colors.white,
+                                  shape: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(20),
+                                    ),
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: PaletaCores.corCastanho,
+                                    ),
+                                  ),
                                   child: Center(
-                                    child: Container(
-                                      padding: EdgeInsets.all(10),
-                                      width:
-                                          Platform.isAndroid || Platform.isIOS
-                                              ? larguraTela
-                                              : larguraTela * 0.3,
-                                      child: Card(
-                                        color: Colors.transparent,
-                                        elevation: 0,
-                                        child: Column(
-                                          children: [
-                                            Wrap(
-                                              children: [
-                                                Container(
-                                                  width:
-                                                      Platform.isAndroid ||
-                                                              Platform.isIOS
-                                                          ? 200
-                                                          : 300,
-                                                  height: 80,
-                                                  color: Colors.white,
-                                                  child: Form(
-                                                    key: validacaoFormulario,
-                                                    child: TextFormField(
-                                                      controller: textoPesquisa,
-                                                      validator: (value) {
-                                                        if (value!.isEmpty) {
-                                                          return Textos
-                                                              .erroCampoVazio;
-                                                        }
-                                                        return null;
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                                botoesAreaPesquisa(
-                                                  Constantes
-                                                      .iconeBarraPesquisar,
-                                                  PaletaCores.corVerdeCiano,
-                                                  50,
-                                                  50,
-                                                ),
-                                                botoesAreaPesquisa(
-                                                  Constantes.iconeExclusao,
-                                                  PaletaCores.corVermelha,
-                                                  35,
-                                                  35,
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                    child: ListView(
+                                      scrollDirection: Axis.vertical,
+                                      children: [
+                                        SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: DataTable(
+                                            columnSpacing: 20,
+                                            columns: cabecalhoDataColumn,
+                                            rows: linhasDataRow,
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                  vertical: 0.0,
+                                ),
+                                width: larguraTela,
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    if (listaObservacoesPDF.isEmpty) {
+                                      return Center(
+                                        child: Text(
+                                          textAlign: TextAlign.center,
+                                          Textos.observacaoSem,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Card(
+                                        color: Colors.white,
+                                        shape: const OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(20),
+                                          ),
+                                          borderSide: BorderSide(
+                                            width: 1,
+                                            color: PaletaCores.corCastanho,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                textAlign: TextAlign.center,
+                                                Textos.observacaoTitulo,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 100,
+                                                width: larguraTela,
+                                                child: ListView.builder(
+                                                  itemCount:
+                                                      listaObservacoesPDF
+                                                          .length,
+                                                  itemBuilder: (
+                                                    context,
+                                                    index,
+                                                  ) {
+                                                    return Text(
+                                                      listaObservacoesPDF
+                                                          .elementAt(index)
+                                                          .toString(),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     }
@@ -841,33 +939,39 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   alignment: Alignment.center,
                   color: Colors.white,
                   width: larguraTela,
-                  height: 150,
+                  height: 110,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Visibility(
                         visible: exibirOcultarBtnAcao,
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              botoesAcoes(
-                                Textos.btnObservacaoBaixar,
-                                Constantes.iconeBaixar,
-                                120,
-                                70,
-                              ),
-                              botoesAcoes(
-                                Textos.btnAdicionar,
-                                Constantes.iconeAdicionar,
-                                80,
-                                70,
-                              ),
-                            ],
-                          ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            botoesAcoes(
+                              Textos.btnBaixarPDF,
+                              Constantes.iconeBaixar,
+                              120,
+                              40,
+                              PaletaCores.corAzulMagenta,
+                            ),
+                            botoesAcoes(
+                              Textos.telaObservacaoTitulo,
+                              Constantes.iconeObservacao,
+                              120,
+                              40,
+                              PaletaCores.corAzulMagenta,
+                            ),
+                            botoesAcoes(
+                              Textos.btnAdicionar,
+                              Constantes.iconeAdicionar,
+                              120,
+                              40,
+                              PaletaCores.corAzulMagenta,
+                            ),
+                          ],
                         ),
                       ),
                       BarraNavegacao(),

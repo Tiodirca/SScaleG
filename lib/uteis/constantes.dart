@@ -29,6 +29,8 @@ class Constantes {
 
   static const rotaTelaObservacao = "telaObservacao";
 
+  static const rotaTelaConfigurarPDFBaixar = "telaConfigurarPDFBaixar";
+
   static const tipoTelaAnteriorCadastroItem = "telaAnteriorCadastroItem";
   static const tipoTelaAnteriorAtualizarItem = "telaAnteriorAtualizarItem";
 
@@ -40,6 +42,7 @@ class Constantes {
       "cadastroCampoNovo";
   static const rotaArgumentoCabecalhoEscala = "cabecalhoEscala";
   static const rotaArgumentoLinhasEscala = "linhasEscala";
+  static const rotaArgumentoObservacaoEscala = "observacaoEscala";
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";
@@ -66,6 +69,7 @@ class Constantes {
   static const iconeLista = Icons.list_alt_outlined;
   static const iconeOpcoesData = Icons.settings;
   static const iconeExclusao = Icons.close;
+  static const iconeObservacao = Icons.add_alert;
   static const iconeRecarregar = Icons.refresh;
   static const iconeBaixar = Icons.download_rounded;
   static const iconeSalvar = Icons.save;
@@ -111,9 +115,13 @@ class Constantes {
   static const fireBaseColecaoNomeVoluntarios = "nome_voluntarios";
   static const fireBaseDocumentoNomeVoluntarios = "nome";
 
-  //VOLUNTARIOS
+  //OBSERVACOES
   static const fireBaseColecaoNomeObservacao = "Observacoes";
   static const fireBaseDocumentoNomeObservacao = "nome";
+
+  //CABECALHO PDF
+  static const fireBaseColecaoNomeCabecalhoPDF = "cabecalhoPDF";
+  static const fireBaseDocumentoNomeCabecalhoPDF = "nome";
 
   //VOLUNTARIOS
   static const fireBaseColecaoEscalas = "Escalas";

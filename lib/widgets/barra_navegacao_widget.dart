@@ -10,8 +10,8 @@ class BarraNavegacao extends StatelessWidget {
 
   Widget botoesIcones(BuildContext context, IconData icon) =>
       SizedBox(
-          height: 50,
-          width: 50,
+          height: 45,
+          width: 45,
           child: FloatingActionButton(
             heroTag: icon.toString(),
             onPressed: () {
@@ -26,7 +26,7 @@ class BarraNavegacao extends StatelessWidget {
             child: Center(
               child: Icon(
                 icon,
-                size: 25,
+                size: 30,
                 color: corTextoBotao,
               ),
             ),
@@ -41,7 +41,7 @@ class BarraNavegacao extends StatelessWidget {
 
     return SizedBox(
       width: larguraTela,
-      height: 65,
+      height: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [

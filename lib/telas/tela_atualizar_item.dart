@@ -270,6 +270,8 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
               });
             } else if (icone == Constantes.iconeMudarHorario) {
               exibirTimePicker();
+            } else if (icone == Constantes.iconeDataCulto) {
+              exibirDataPicker();
             }
           },
           child: Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
@@ -314,7 +316,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
       onPressed: () async {
         // verificando o tipo do botao
         // para fazer acoes diferentes
-        if (nomeBotao == Textos.btnSalvarItem) {
+        if (nomeBotao == Textos.btnSalvar) {
           if (_formKeyFormulario.currentState!.validate()) {
             chamarAdicionarItens();
           }
@@ -322,8 +324,6 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
           redirecionarTelaCadastroNovoCampo();
         } else if (nomeBotao == Textos.btnRemoverCampo) {
           redirecionarTelaRemoverCampos();
-        } else if (nomeBotao == Textos.btnData) {
-          exibirDataPicker();
         } else if (nomeBotao == Textos.btnOpcaoData) {
           PassarPegarDados.passarDataComComplemento("");
           setState(() {
@@ -341,7 +341,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
           });
         }
       },
-      child: Column(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           LayoutBuilder(
@@ -353,13 +353,12 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
               }
             },
           ),
-          Text(
-            nomeBotao,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: PaletaCores.corAzulMagenta,
+          SizedBox(
+            width: nomeBotao == Textos.btnOpcaoData ? 120 : 90,
+            child: Text(
+              nomeBotao,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: Colors.black),
             ),
           ),
         ],
@@ -408,9 +407,9 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: PaletaCores.corVerdeCiano,
-              onPrimary: Colors.white,
-              surface: PaletaCores.corAzulMagenta,
+              primary: Colors.white,
+              onPrimary: PaletaCores.corCastanho,
+              surface: PaletaCores.corAzulEscuro,
               onSurface: Colors.white,
             ),
           ),
@@ -502,8 +501,8 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                                       botoesAcoes(
                                         Textos.btnSalvarOpcaoData,
                                         Constantes.iconeSalvar,
-                                        100,
-                                        50,
+                                        120,
+                                        40,
                                       ),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
@@ -546,15 +545,14 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    botoesAcoes(
-                                      Textos.btnData,
+                                    botoesIcones(
                                       Constantes.iconeDataCulto,
-                                      50,
-                                      50,
+                                      40,
+                                      PaletaCores.corCastanho,
                                     ),
                                     botoesAcoes(
                                       Textos.btnOpcaoData,
-                                      Constantes.iconeDataCulto,
+                                      Constantes.iconeEditar,
                                       150,
                                       40,
                                     ),
@@ -634,22 +632,22 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               botoesAcoes(
-                                Textos.btnSalvarItem,
+                                Textos.btnSalvar,
                                 Constantes.iconeSalvar,
-                                110,
-                                60,
+                                120,
+                                40,
                               ),
                               botoesAcoes(
                                 Textos.btnAdicionarCampo,
                                 Constantes.iconeAdicionar,
-                                110,
-                                60,
+                                120,
+                                40,
                               ),
                               botoesAcoes(
                                 Textos.btnRemoverCampo,
                                 Constantes.iconeRemover,
-                                110,
-                                60,
+                                120,
+                                40,
                               ),
                             ],
                           ),

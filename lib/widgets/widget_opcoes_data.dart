@@ -482,13 +482,13 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                                 horizontal: 10.0,
                               ),
                               width: 100,
-                              height: 50,
+                              height: 40,
                               child: FloatingActionButton(
                                 heroTag: Textos.btnCadastrar,
                                 onPressed: () {
                                   validarCampoEChamarCadastrar();
                                 },
-                                child: Text(Textos.btnCadastrar),
+                                child: Text(Textos.btnCadastrar,style: TextStyle(color: Colors.black),),
                               ),
                             ),
                           ],
