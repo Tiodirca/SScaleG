@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
@@ -11,6 +13,7 @@ import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 import '../Modelo/check_box_modelo.dart';
 import '../uteis/estilo.dart';
 import '../uteis/paleta_cores.dart';
+import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import '../uteis/constantes.dart';
 
 class TelaConfigurarPDFBaixar extends StatefulWidget {
@@ -35,19 +38,23 @@ class TelaConfigurarPDFBaixar extends StatefulWidget {
 }
 
 class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
-  List<CheckBoxModelo> listaNomesCadastrados = [];
+  List<CheckBoxModelo> listaNomeCabecalhoPDF = [];
   List<CheckBoxModelo> listaCabecalhosExibicao = [];
   List<String> listaObservacoes = [];
   bool exibirWidgetCarregamento = true;
   bool exibirSelecaoCamposEscala = false;
   final validacaoFormulario = GlobalKey<FormState>();
   Estilo estilo = Estilo();
-  String checkBoxSelecionado = "";
+  String nomeCabelhadoPDFSelecionado = "";
   int indexTabela = 0;
+  int valorRadioButtonSelecionado = 0;
   String nomeCadastro = "";
+  List<Map> linhasRecebidas = [];
+
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeCabecalhoPDF;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeCabecalhoPDF;
   TextEditingController nomeControle = TextEditingController(text: "");
+  XFile? imagemLogo;
 
   @override
   void initState() {
@@ -66,7 +73,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
     realizarBuscaDadosFireBase();
   }
 
-  Widget botoesSwitch(String label,bool valorSwitch) => Container(
+  Widget botoesSwitch(String label, bool valorSwitch) => Container(
     color: Colors.green,
     margin: EdgeInsets.symmetric(horizontal: 1.0),
     width: 120,
@@ -140,15 +147,15 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
     //verificando se o checkbox selecionado
     if (checkBoxModel.checked == true) {
       // caso tenha sido definir que a variavel receber o valor
-      checkBoxSelecionado = checkBoxModel.texto;
+      nomeCabelhadoPDFSelecionado = checkBoxModel.texto;
     } else {
       // caso seja desmarcado vai receber o seguinte valor
-      checkBoxSelecionado = "";
+      nomeCabelhadoPDFSelecionado = "";
     }
     //percorrendo a lista
-    for (var element in listaNomesCadastrados) {
+    for (var element in listaNomeCabecalhoPDF) {
       //caso a variavel seja DIFERENTE do elemento passado
-      if (checkBoxSelecionado != element.texto) {
+      if (nomeCabelhadoPDFSelecionado != element.texto) {
         // definir que o valor do elemento sera
         // false para poder desmarcar na lista de checkbox
         element.checked = false;
@@ -206,7 +213,8 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
   }
 
   limparDados() {
-    listaNomesCadastrados.clear();
+    nomeCabelhadoPDFSelecionado = "";
+    listaNomeCabecalhoPDF.clear();
     nomeControle.clear();
   }
 
@@ -268,7 +276,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
       dados.id = docSnap.id;
       indexTabela++;
       //adicionando os dados convertidos na lista
-      listaNomesCadastrados.add(dados);
+      listaNomeCabecalhoPDF.add(dados);
       if (indexTabela == tamanhoTabela) {
         setState(() {
           indexTabela = 0;
@@ -281,7 +289,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
 
   ordenarListaOrdemAlfabetica() {
     // ordenando a lista por ondem alfabetica de A-Z
-    listaNomesCadastrados.sort((a, b) {
+    listaNomeCabecalhoPDF.sort((a, b) {
       return a.texto.compareTo(b.texto);
     });
   }
@@ -393,6 +401,72 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
     );
   }
 
+  selecionarLogoImagem() async {
+    final ImagePicker logoImagem = ImagePicker();
+    try {
+      if (Platform.isIOS || Platform.isAndroid) {
+        XFile? arquivoImagem = await logoImagem.pickImage(
+          source: ImageSource.gallery,
+        );
+        if (arquivoImagem != null) {
+          setState(() {
+            imagemLogo = arquivoImagem;
+          });
+        }
+      } else {
+        selecionarLogoWindows(context);
+      }
+    } catch (e) {
+      chamarExibirMensagemErro("Erro ao importar Imagem : ${e.toString()}");
+    }
+  }
+
+  Future<void> selecionarLogoWindows(BuildContext context) async {
+    // #docregion SingleOpen
+    const XTypeGroup tipoImagem = XTypeGroup(
+      label: 'images',
+      extensions: <String>['jpg', 'png'],
+    );
+    final XFile? arquivo = await openFile(
+      acceptedTypeGroups: <XTypeGroup>[tipoImagem],
+    );
+    if (arquivo == null) {
+      return;
+    }
+    final String arquivoCaminho = arquivo.path;
+
+    if (context.mounted) {
+      setState(() {
+        imagemLogo = XFile(arquivoCaminho);
+      });
+    }
+  }
+
+  percorrer() {
+    linhasRecebidas = PassarPegarDados.recuperarTeste();
+    if (linhasRecebidas.isEmpty) {
+      print("fd");
+      Timer(const Duration(seconds: 3), () {
+        percorrer();
+      });
+    } else {
+      for (var itemRemover in listaCabecalhosExibicao) {
+        if (itemRemover.checked == false) {
+          print(itemRemover.texto);
+          for (var element in linhasRecebidas) {
+            print("Antes:$element");
+            element.removeWhere((key, value) {
+              return key.toString().contains(itemRemover.texto);
+            });
+          }
+        }
+      }
+      linhasRecebidas.forEach((element) {
+        print("Depois :$element");
+      });
+    }
+  }
+
   Widget botoesAcoes(
     String nomeBotao,
     IconData icone,
@@ -412,7 +486,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
       ),
       onPressed: () async {
         if (nomeBotao == Textos.btnAvancar) {
-          if (checkBoxSelecionado.isNotEmpty) {
+          if (nomeCabelhadoPDFSelecionado.isNotEmpty) {
             setState(() {
               exibirSelecaoCamposEscala = true;
             });
@@ -424,12 +498,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
             );
           }
         } else if (nomeBotao == Textos.btnBaixarPDF) {
-          List<Map> linhas = widget.linhasEscala;
-
-          for (var element in linhas) {}
-          for (var element in listaCabecalhosExibicao) {
-            print("T${element.texto} ${element.checked}");
-          }
+          percorrer();
         } else if (nomeBotao == Textos.btnExcluir) {
           setState(() {
             exibirSelecaoCamposEscala = false;
@@ -465,6 +534,25 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
           ),
         ],
       ),
+    ),
+  );
+
+  Widget radioButton(int valor, String nomeBtn) => SizedBox(
+    width: 150,
+    height: 40,
+    child: Row(
+      children: [
+        Radio(
+          value: valor,
+          groupValue: valorRadioButtonSelecionado,
+          onChanged: (value) {
+            setState(() {
+              valorRadioButtonSelecionado = valor;
+            });
+          },
+        ),
+        Text(nomeBtn),
+      ],
     ),
   );
 
@@ -505,240 +593,298 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                   width: larguraTela,
                   height: alturaTela,
                   child: SingleChildScrollView(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        if (exibirSelecaoCamposEscala) {
-                          return Column(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                ),
-                                width: larguraTela,
-                                child: Text(
-                                  Textos.descricaoTabelaSelecionada +
-                                      widget.nomeTabela,
-                                  textAlign: TextAlign.end,
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                ),
-                                child: Text(
-                                  Textos.telaConfiguracaoPDFDescricao,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 20),
-                                ),
-                              ),
-                              Card(
-                                color: Colors.white,
-                                shape: const OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20),
+                    child: Column(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                          width: larguraTela,
+                          child: Text(
+                            Textos.descricaoTabelaSelecionada +
+                                widget.nomeTabela,
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            if (exibirSelecaoCamposEscala) {
+                              return Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    child: Text(
+                                      Textos.telaConfiguracaoPDFDescricao,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
                                   ),
-                                  borderSide: BorderSide(
-                                    width: 1,
-                                    color: PaletaCores.corCastanho,
-                                  ),
-                                ),
-                                child: SizedBox(
-                                  height: alturaTela * 0.4,
-                                  width:
-                                      Platform.isAndroid || Platform.isIOS
+                                  Card(
+                                    color: Colors.white,
+                                    shape: const OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(20),
+                                      ),
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: PaletaCores.corCastanho,
+                                      ),
+                                    ),
+                                    child: SizedBox(
+                                      height: alturaTela * 0.2,
+                                      width:
+                                      Platform.isAndroid ||
+                                          Platform.isIOS
                                           ? larguraTela
-                                          : larguraTela * 0.8,
-                                  child: ListView(
-                                    children: [
-                                      ...listaCabecalhosExibicao.map(
-                                        (e) => checkBox(e),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                ),
-                                child: Text(
-                                  Textos.switchDescricao,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 20),
-                                ),
-                              ),
-                            ],
-                          );
-                        } else {
-                          return Column(
-                            children: [
-                              Container(
-                                height: alturaTela * 0.2,
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                width: larguraTela,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 10.0,
-                                        ),
-                                        width: larguraTela,
-                                        child: Text(
-                                          Textos.descricaoTabelaSelecionada +
-                                              widget.nomeTabela,
-                                          textAlign: TextAlign.end,
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 10.0,
-                                        ),
-                                        child: Text(
-                                          Textos
-                                              .telaConfiguracaoPDFDescricaoCadastroTitulo,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(fontSize: 20),
-                                        ),
-                                      ),
-                                      Wrap(
-                                        crossAxisAlignment:
-                                            WrapCrossAlignment.start,
-                                        alignment: WrapAlignment.center,
+                                          : larguraTela * 0.4,
+                                      child: ListView(
                                         children: [
-                                          Form(
-                                            key: validacaoFormulario,
-                                            child: SizedBox(
-                                              width:
-                                                  Platform.isWindows
-                                                      ? 400
-                                                      : 200,
-                                              child: TextFormField(
-                                                controller: nomeControle,
-                                                onFieldSubmitted: (value) {
-                                                  validarCampoEChamarCadastrar();
-                                                },
-                                                validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return Textos
-                                                        .erroCampoVazio;
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.symmetric(
-                                              vertical:
-                                                  Platform.isAndroid ||
-                                                          Platform.isIOS
-                                                      ? 10
-                                                      : 0,
-                                              horizontal: 10.0,
-                                            ),
-                                            width: 100,
-                                            height: 40,
-                                            child: FloatingActionButton(
-                                              heroTag: Textos.btnCadastrar,
-                                              onPressed: () {
-                                                validarCampoEChamarCadastrar();
-                                              },
-                                              child: Text(
-                                                Textos.btnCadastrar,
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ),
+                                          ...listaCabecalhosExibicao.map(
+                                            (e) => checkBox(e),
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                              // area de listagem de nomes geral
-                              SizedBox(
-                                width: larguraTela,
-                                child: LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (listaNomesCadastrados.isNotEmpty) {
-                                      // area de exibicao de descricao e listagem de nomes
-                                      return SingleChildScrollView(
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 10.0,
-                                                  ),
-                                              width: larguraTela,
-                                              child: Text(
-                                                textAlign: TextAlign.center,
-                                                Textos
-                                                    .telaConfiguracaoPDFDescricaoSelecaoTitulo,
-                                                style: const TextStyle(
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                            ),
-                                            // Area de Exibicao da lista com os nomes dos voluntarios
-                                            Card(
-                                              color: Colors.white,
-                                              shape: const OutlineInputBorder(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(20),
-                                                ),
-                                                borderSide: BorderSide(
-                                                  width: 1,
-                                                  color:
-                                                      PaletaCores.corCastanho,
-                                                ),
-                                              ),
-                                              child: SizedBox(
-                                                height: alturaTela * 0.4,
-                                                width:
-                                                    Platform.isAndroid ||
-                                                            Platform.isIOS
-                                                        ? larguraTela
-                                                        : larguraTela * 0.8,
-                                                child: ListView(
-                                                  children: [
-                                                    ...listaNomesCadastrados.map(
-                                                      (e) =>
-                                                          checkBoxPersonalizado(
-                                                            e,
-                                                          ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
                                         ),
-                                      );
-                                    } else {
-                                      // area caso nao tenha
-                                      // nenhum voluntario cadastrado
-                                      return Container(
-                                        margin: const EdgeInsets.all(10.0),
-                                        transformAlignment: Alignment.center,
-                                        alignment: Alignment.center,
                                         child: Text(
-                                          Textos.erroBaseDadosVazia,
+                                          Textos.telaConfiguracaoPDFAdicaoLogo,
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(fontSize: 18),
                                         ),
-                                      );
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                                      ),
+                                      SizedBox(
+                                        width: 400,
+                                        height: 50,
+                                        child: ListTile(
+                                          enableFeedback: true,
+                                          trailing:
+                                              imagemLogo != null
+                                                  ? Image.file(
+                                                    File(imagemLogo!.path),
+                                                  )
+                                                  : null,
+
+                                          title: Text(
+                                            Textos.btnAdicionarLogoImagem,
+                                          ),
+                                          leading: Icon(Icons.attach_file),
+                                          onTap: () {
+                                            selecionarLogoImagem();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    child: Text(
+                                      Textos
+                                          .telaConfiguracaoPDFDescricaoCadastroTitulo,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: alturaTela * 0.1,
+                                    width: larguraTela,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          Wrap(
+                                            crossAxisAlignment:
+                                                WrapCrossAlignment.start,
+                                            alignment: WrapAlignment.center,
+                                            children: [
+                                              Form(
+                                                key: validacaoFormulario,
+                                                child: SizedBox(
+                                                  width:
+                                                      Platform.isWindows
+                                                          ? 300
+                                                          : 200,
+                                                  child: TextFormField(
+                                                    controller: nomeControle,
+                                                    onFieldSubmitted: (value) {
+                                                      validarCampoEChamarCadastrar();
+                                                    },
+                                                    validator: (value) {
+                                                      if (value!.isEmpty) {
+                                                        return Textos
+                                                            .erroCampoVazio;
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                margin: EdgeInsets.symmetric(
+                                                  horizontal: 10.0,
+                                                ),
+                                                width: 100,
+                                                height: 40,
+                                                child: FloatingActionButton(
+                                                  heroTag: Textos.btnCadastrar,
+                                                  onPressed: () {
+                                                    validarCampoEChamarCadastrar();
+                                                  },
+                                                  child: Text(
+                                                    Textos.btnCadastrar,
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // area de listagem de nomes geral
+                                  SizedBox(
+                                    width: larguraTela,
+                                    child: LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        if (listaNomeCabecalhoPDF.isNotEmpty) {
+                                          // area de exibicao de descricao e listagem de nomes
+                                          return SingleChildScrollView(
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 10.0,
+                                                      ),
+                                                  width: larguraTela,
+                                                  child: Text(
+                                                    textAlign: TextAlign.center,
+                                                    Textos
+                                                        .telaConfiguracaoPDFDescricaoSelecaoTitulo,
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                    ),
+                                                  ),
+                                                ),
+                                                // Area de Exibicao da lista com os nomes
+                                                Card(
+                                                  color: Colors.white,
+                                                  shape:
+                                                      const OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                              Radius.circular(
+                                                                20,
+                                                              ),
+                                                            ),
+                                                        borderSide: BorderSide(
+                                                          width: 1,
+                                                          color:
+                                                              PaletaCores
+                                                                  .corCastanho,
+                                                        ),
+                                                      ),
+                                                  child: SizedBox(
+                                                    height: alturaTela * 0.2,
+                                                    width:
+                                                        Platform.isAndroid ||
+                                                                Platform.isIOS
+                                                            ? larguraTela
+                                                            : larguraTela * 0.4,
+                                                    child: ListView(
+                                                      children: [
+                                                        ...listaNomeCabecalhoPDF
+                                                            .map(
+                                                              (e) =>
+                                                                  checkBoxPersonalizado(
+                                                                    e,
+                                                                  ),
+                                                            ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // area caso nao tenha
+                                          // nenhum voluntario cadastrado
+                                          return Container(
+                                            margin: const EdgeInsets.all(10.0),
+                                            transformAlignment:
+                                                Alignment.center,
+                                            alignment: Alignment.center,
+                                            child: SizedBox(
+                                              width: larguraTela * 0.5,
+                                              child: Text(
+                                                Textos.erroBaseDadosVazia,
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color:
+                                                      PaletaCores
+                                                          .corRosaAvermelhado,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    child: Text(
+                                      Textos
+                                          .telaConfiguracaoPDFRadioButtonDescricao,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      radioButton(
+                                        0,
+                                        Textos
+                                            .telaConfiguracaoPDFRadioButtonHorizontalPDF,
+                                      ),
+                                      radioButton(
+                                        1,
+                                        Textos
+                                            .telaConfiguracaoPDFRadioButtonVerticalPDF,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:sscaleg/telas/campos/tela_cadastro_novo_campo.dart';
+import 'package:sscaleg/telas/campos/tela_remover_campos.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_local_trabalho.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_nomes_voluntarios.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_gerar_escala.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_dias_semana.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_intervalo_trabalho.dart';
+import 'package:sscaleg/telas/listagem/tela_escala_detalhada.dart';
+import 'package:sscaleg/telas/listagem/tela_listagem_escala_banco_dados.dart';
 import 'package:sscaleg/telas/tela_atualizar_item.dart';
 import 'package:sscaleg/telas/tela_cadastro_item.dart';
-import 'package:sscaleg/telas/tela_cadastro_novo_campo.dart';
 import 'package:sscaleg/telas/tela_configurar_pdf_baixar.dart';
-import 'package:sscaleg/telas/tela_escala_detalhada.dart';
 import 'package:sscaleg/telas/tela_inicial.dart';
-import 'package:sscaleg/telas/tela_listagem_escala_banco_dados.dart';
 import 'package:sscaleg/telas/tela_observacao.dart';
-import 'package:sscaleg/telas/tela_remover_campos.dart';
 
 import '../telas/tela_splash.dart';
 import 'constantes.dart';

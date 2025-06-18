@@ -30,6 +30,7 @@ class TelaEscalaDetalhada extends StatefulWidget {
 class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   Estilo estilo = Estilo();
   bool exibirBarraPesquisa = false;
+  bool exibirObservacoes = false;
   bool exibirWidgetCarregamento = true;
   bool exibirOcultarBtnAcao = true;
   List<Map> listaEscalaBancoDados = [];
@@ -38,11 +39,12 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   List<dynamic> cabecalhoEscala = [];
   List<Map> listaIDDocumento = [];
   Map mapExibirCampos = {};
+  int contadorBtnFloat = 0;
   int indexSwitch = 0;
+  int quantidadeRepeticaoNomePesquisa = 0;
   List<DataColumn> cabecalhoDataColumn = [];
   List<DataRow> linhasDataRow = [];
   String nomeReacar = "";
-  int contadorBtnFloat = 0;
   final validacaoFormulario = GlobalKey<FormState>();
   TextEditingController textoPesquisa = TextEditingController(text: "");
 
@@ -133,7 +135,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   percorrerListaRetornadaBancoDados() {
     Map itemOrdenado = {};
-
     for (var item in listaEscalaBancoDados) {
       contadorBtnFloat++;
       itemOrdenado = fazerOrdenacaoItemAItemMap(item);
@@ -302,54 +303,11 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     }
   }
 
-  Widget botoesSwitch(String label) => Container(
-    color: Colors.green,
-    margin: EdgeInsets.symmetric(horizontal: 1.0),
-    width: 120,
-    height: 60,
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          Text(
-            label
-                .toString()
-                .replaceAll("01_", "")
-                .replaceAll("02_", "")
-                .replaceAll("_", " ")
-                .replaceAll(RegExp(r'[0-9]'), ''),
-          ),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (!(label.contains(Constantes.dataCulto) ||
-                  label.contains(Constantes.horarioTrabalho) ||
-                  label.contains(Constantes.editar) ||
-                  label.contains(Constantes.excluir))) {
-                indexSwitch++;
-                mapExibirCampos[label] = true;
-                print(indexSwitch);
-                return Switch(
-                  inactiveThumbColor: PaletaCores.corAzulMagenta,
-                  value: mapExibirCampos.values.elementAt(indexSwitch),
-                  activeColor: PaletaCores.corAzulMagenta,
-                  onChanged: (bool valor) {
-                    setState(() {});
-                  },
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-        ],
-      ),
-    ),
-  );
-
   validarNomeFoco(String nome) {
     //colocando tudo em minuscolo pois se tiver maiusculo nao localiza
     if (nome.toLowerCase().contains(nomeReacar.toLowerCase()) &&
         nomeReacar.isNotEmpty) {
+      quantidadeRepeticaoNomePesquisa++;
       return BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border(
@@ -462,6 +420,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   redirecionarTelaConfigurarPDFBaixar() {
     var dados = {};
+    PassarPegarDados.passarTeste(listaLinhaEscalaOrdenada);
     PassarPegarDados.passarObservacoesPDF(listaObservacoesPDF);
     dados[Constantes.rotaArgumentoCabecalhoEscala] = cabecalhoEscala;
     dados[Constantes.rotaArgumentoLinhasEscala] = listaLinhaEscalaOrdenada;
@@ -589,7 +548,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     ),
   );
 
-  Widget botoesAreaPesquisa(
+  Widget botoesIcone(
     IconData icone,
     Color corBotao,
     double largura,
@@ -610,6 +569,9 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             setState(() {
               nomeReacar = textoPesquisa.text;
               linhasDataRow.clear();
+              linhasDataRow.clear();
+              listaLinhaEscalaOrdenada.clear();
+              quantidadeRepeticaoNomePesquisa = 0;
               percorrerListaRetornadaBancoDados();
             });
           }
@@ -620,6 +582,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             textoPesquisa.clear();
             linhasDataRow.clear();
             listaLinhaEscalaOrdenada.clear();
+            quantidadeRepeticaoNomePesquisa = 0;
             percorrerListaRetornadaBancoDados();
           });
         }
@@ -652,7 +615,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
               return Scaffold(
                 appBar: AppBar(
                   actions: [
-                    botoesAreaPesquisa(
+                    botoesIcone(
                       Constantes.iconeAbrirBarraPesquisa,
                       PaletaCores.corAzulMagenta,
                       40,
@@ -723,7 +686,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                         child: Column(
                           children: [
                             Expanded(
-                              flex: 1,
+                              flex: 0,
                               child: Stack(
                                 children: [
                                   SingleChildScrollView(
@@ -784,6 +747,12 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                                         key:
                                                             validacaoFormulario,
                                                         child: TextFormField(
+                                                          decoration:
+                                                              InputDecoration(
+                                                                hintText:
+                                                                    Textos
+                                                                        .telaEscalaDetalhadaLabelPesquisa,
+                                                              ),
                                                           controller:
                                                               textoPesquisa,
                                                           validator: (value) {
@@ -797,14 +766,14 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                                         ),
                                                       ),
                                                     ),
-                                                    botoesAreaPesquisa(
+                                                    botoesIcone(
                                                       Constantes
                                                           .iconeBarraPesquisar,
                                                       PaletaCores.corVerdeCiano,
                                                       40,
                                                       40,
                                                     ),
-                                                    botoesAreaPesquisa(
+                                                    botoesIcone(
                                                       Constantes.iconeExclusao,
                                                       PaletaCores.corVermelha,
                                                       35,
@@ -823,7 +792,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                               ),
                             ),
                             Expanded(
-                              flex: 6,
+                              flex: 4,
                               child: Container(
                                 margin: const EdgeInsets.symmetric(
                                   horizontal: 10.0,
@@ -859,74 +828,20 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                 ),
                               ),
                             ),
-                            Expanded(
-                              flex: 2,
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                  vertical: 0.0,
-                                ),
-                                width: larguraTela,
-                                child: LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (listaObservacoesPDF.isEmpty) {
-                                      return Center(
-                                        child: Text(
-                                          textAlign: TextAlign.center,
-                                          Textos.observacaoSem,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      return Card(
-                                        color: Colors.white,
-                                        shape: const OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(20),
-                                          ),
-                                          borderSide: BorderSide(
-                                            width: 1,
-                                            color: PaletaCores.corCastanho,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                textAlign: TextAlign.center,
-                                                Textos.observacaoTitulo,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 100,
-                                                width: larguraTela,
-                                                child: ListView.builder(
-                                                  itemCount:
-                                                      listaObservacoesPDF
-                                                          .length,
-                                                  itemBuilder: (
-                                                    context,
-                                                    index,
-                                                  ) {
-                                                    return Text(
-                                                      listaObservacoesPDF
-                                                          .elementAt(index)
-                                                          .toString(),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
+                            Visibility(
+                              visible: exibirBarraPesquisa,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    Textos
+                                        .telaEscalaDetalhadaQuantiNomePesquisa,
+                                  ),
+                                  Text(
+                                    quantidadeRepeticaoNomePesquisa.toString(),
+                                  ),
+                                ],
                               ),
                             ),
                           ],

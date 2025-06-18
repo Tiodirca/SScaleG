@@ -67,7 +67,6 @@ class Constantes {
   static const iconeAtualizar = Icons.update;
   static const iconeEditar = Icons.edit;
   static const iconeLista = Icons.list_alt_outlined;
-  static const iconeOpcoesData = Icons.settings;
   static const iconeExclusao = Icons.close;
   static const iconeObservacao = Icons.add_alert;
   static const iconeRecarregar = Icons.refresh;
@@ -75,7 +74,6 @@ class Constantes {
   static const iconeSalvar = Icons.save;
   static const iconeAbrirBarraPesquisa = Icons.search;
   static const iconeBarraPesquisar = Icons.send;
-  static const iconeSalvarOpcoes = Icons.save_as;
   static const iconeDataCulto = Icons.date_range_outlined;
   static const iconeMudarHorario = Icons.access_time_filled_outlined;
 

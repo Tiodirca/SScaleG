@@ -192,7 +192,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     }
   }
 
-  chamarAdicionarItens() {
+  chamarAtualizarItens() {
     itemDigitado[Constantes.dataCulto] = dataFormatada;
     itemDigitado[Constantes.horarioTrabalho] = horarioTroca;
     atualizarItem(widget.idTabelaSelecionada);
@@ -316,9 +316,9 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
       onPressed: () async {
         // verificando o tipo do botao
         // para fazer acoes diferentes
-        if (nomeBotao == Textos.btnSalvar) {
+        if (nomeBotao == Textos.btnAtualizar) {
           if (_formKeyFormulario.currentState!.validate()) {
-            chamarAdicionarItens();
+            chamarAtualizarItens();
           }
         } else if (nomeBotao == Textos.btnAdicionarCampo) {
           redirecionarTelaCadastroNovoCampo();
@@ -632,8 +632,8 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               botoesAcoes(
-                                Textos.btnSalvar,
-                                Constantes.iconeSalvar,
+                                Textos.btnAtualizar,
+                                Constantes.iconeAtualizar,
                                 120,
                                 40,
                               ),

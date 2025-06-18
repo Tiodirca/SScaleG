@@ -414,7 +414,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                   child: Text(
                                     Textos.telaObservacaoCadastro,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 20),
+                                    style: const TextStyle(fontSize: 18),
                                   ),
                                 ),
                                 Wrap(
@@ -429,7 +429,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                                 ? larguraTela * 0.6
                                                 : larguraTela * 0.9,
                                         child: TextFormField(
-                                          maxLines: 3,
+                                          maxLines: 2,
                                           controller: nomeControle,
                                           onFieldSubmitted: (value) {
                                             validarCampoEChamarCadastrar();
@@ -485,7 +485,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                         child: Text(
                                           textAlign: TextAlign.center,
                                           Textos.telaObservacaoDescricaoSelecao,
-                                          style: const TextStyle(fontSize: 20),
+                                          style: const TextStyle(fontSize: 18),
                                         ),
                                       ),
                                       // Area de Exibicao da lista com os nomes dos voluntarios
@@ -501,7 +501,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                           ),
                                         ),
                                         child: SizedBox(
-                                          height: alturaTela * 0.4,
+                                          height: alturaTela * 0.35,
                                           width:
                                               Platform.isAndroid ||
                                                       Platform.isIOS

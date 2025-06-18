@@ -7,17 +7,20 @@ class Textos {
   static String btnAdicionar = "Adicionar Item";
   static String btnRecarregar = "Recarregar";
   static String btnExcluir = "Excluir";
+  static String btnAtualizar = "Atualizar";
   static String btnTelaInicial = "Tela Inicial";
   static String btnBaixarPDF = "Baixar PDF";
   static String btnObservacaoAdicionar = "Adicionar Observações";
   static String btnOpcaoData = "Opções Adicional da data";
   static String btnData = "Data";
+  static String btnVerObservacao = "Ver Observação";
   static String btnSalvar = "Salvar";
   static String btnRemoverCampo = "Remover Campos";
   static String btnAdicionarCampo = "Novo Campo";
   static String btnEditar = "Editar";
   static String btnSalvarOpcaoData = "Salvar Data";
   static String btnVerEscalaAtual = "Escala Atual";
+  static String btnAdicionarLogoImagem = "Adicionar Logo/Imagem";
   static String btnUsarEscala = "Utilizar está escala";
 
   //WIDGET OPCOES DATA
@@ -74,6 +77,7 @@ class Textos {
   static String telaEscalaDetalhadaDescricaoItens =
       "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
   static String telaEscalaDetalhadaLabelPesquisa = "Digite um nome";
+  static String telaEscalaDetalhadaQuantiNomePesquisa = "Vezes que o nome se repete : ";
 
   // TELA DE CADASTRO DE ITEM
   static String telaCadastroTitulo = "Cadastro de item na Escalas";
@@ -117,19 +121,25 @@ class Textos {
       "Horario durante final de semana";
   static String widgetAjustarHorarioInicio = "Iniciar às : ";
 
-  //Tela Configuracao PDF
+  //Tela CONFIGURACAO PDF
   static String telaConfiguracaoPDFTitulo = "Configurações do PDF";
   static String telaConfiguracaoPDFDescricao =
-      "Selecione quais campos deverão ser exibidos no arquivo PDF";
+      "Desmarque as caixas para deixar de exibir determinada coluna "
+      "no arquivo PDF,deixe todos marcados para exibir todos";
   static String telaConfiguracaoPDFDescricaoCadastroTitulo =
       "Digite o cabeçalho que o PDF irá ter";
   static String telaConfiguracaoPDFDescricaoSelecaoTitulo =
-      "Selecione qual cabeçalho o PDF irá ter, permitido selecionar apenas um";
+      "Selecione qual cabeçalho o PDF irá ter,permitido selecionar apenas um";
 
-  static String switchDescricao =
+  // TELA CONFIGURACAO PDF ORIENTACAO PAGINA
+  static String telaConfiguracaoPDFRadioButtonDescricao =
       "Selecione qual a orientação da Pagina do PDF";
-  static String switchHorizontalPDF = "Horizontal";
-  static String switchVerticalPDF = "Vertical";
+  static String telaConfiguracaoPDFRadioButtonHorizontalPDF = "Horizontal";
+  static String telaConfiguracaoPDFRadioButtonVerticalPDF = "Vertical";
+
+  // TELA CONFIGURACAO PDF SELECAO DE ARQUIVO DE IMAGEM
+  static String telaConfiguracaoPDFAdicaoLogo =
+      "Selecione uma Logo/Imagem para compor o cabeçalho do arquivo PDF";
 
   //MENSAGENS DE ERROS
   static String erroCampoVazio = "Preencha este campo";
