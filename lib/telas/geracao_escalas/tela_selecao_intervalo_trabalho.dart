@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:sscaleg/Modelo/check_box_modelo.dart';
 import 'package:sscaleg/Uteis/paleta_cores.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
@@ -210,14 +209,6 @@ class _TelaSelecaoIntervaloTrabalhoState
                     child: Visibility(
                       visible: exibirListagemIntervalo,
                       child: Card(
-                        color: Colors.white,
-                        shape: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          borderSide: BorderSide(
-                            width: 1,
-                            color: PaletaCores.corCastanho,
-                          ),
-                        ),
                         child: ListView.builder(
                           itemCount: listaDatasFinal.length,
                           itemBuilder: (context, index) {
@@ -283,7 +274,10 @@ class _TelaSelecaoIntervaloTrabalhoState
                     );
                   }
                 },
-                child: Text(Textos.btnAvancar,style: TextStyle(color: Colors.black),),
+                child: Text(
+                  Textos.btnAvancar,
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ),
           ),

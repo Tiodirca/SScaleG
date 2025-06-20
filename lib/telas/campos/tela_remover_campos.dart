@@ -447,16 +447,6 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
                                     ),
                                     // Area de Exibicao da lista com os nomes dos voluntarios
                                     Card(
-                                      color: Colors.white,
-                                      shape: const OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(20),
-                                        ),
-                                        borderSide: BorderSide(
-                                          width: 1,
-                                          color: PaletaCores.corCastanho,
-                                        ),
-                                      ),
                                       child: SizedBox(
                                         height: alturaTela * 0.5,
                                         width:
@@ -502,7 +492,7 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
                     children: [
                       Container(
                         margin: EdgeInsets.all(20),
-                        width: 120,
+                        width: 110,
                         height: 40,
                         child: FloatingActionButton(
                           heroTag: Textos.btnRemoverCampo,

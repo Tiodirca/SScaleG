@@ -7,7 +7,7 @@ import '../Widgets/tela_carregamento.dart';
 import '../uteis/constantes.dart';
 
 class TelaSplashScreen extends StatefulWidget {
-  const TelaSplashScreen({Key? key}) : super(key: key);
+  const TelaSplashScreen({super.key});
 
   @override
   State<TelaSplashScreen> createState() => _TelaSplashScreenState();

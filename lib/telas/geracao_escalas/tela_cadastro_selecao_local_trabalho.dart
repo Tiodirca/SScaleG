@@ -392,6 +392,12 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                       child: SizedBox(
                                         width: Platform.isWindows ? 300 : 200,
                                         child: TextFormField(
+                                          decoration:
+                                          InputDecoration(
+                                            hintText:
+                                            Textos
+                                                .labelTextFieldCampo,
+                                          ),
                                           controller: nomeControle,
                                           onFieldSubmitted: (value) {
                                             validarCampoEChamarCadastrar();
@@ -410,7 +416,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                         horizontal: 10.0,
                                       ),
                                       width: 100,
-                                      height: 50,
+                                      height: 40,
                                       child: FloatingActionButton(
                                         heroTag: Textos.btnCadastrar,
                                         onPressed: () {
@@ -449,16 +455,6 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                       ),
                                       // Area de Exibicao da lista com os nomes dos voluntarios
                                       Card(
-                                        color: Colors.white,
-                                        shape: const OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(20),
-                                          ),
-                                          borderSide: BorderSide(
-                                            width: 1,
-                                            color: PaletaCores.corCastanho,
-                                          ),
-                                        ),
                                         child: SizedBox(
                                           height: alturaTela * 0.45,
                                           width:

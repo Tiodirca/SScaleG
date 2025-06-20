@@ -1,67 +1,46 @@
-import 'package:flutter/services.dart';
+import 'dart:io';
+
+import 'package:file_selector/file_selector.dart';
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pdfLib;
+import 'package:pdf/widgets.dart' as pdflib;
 
 import '../textos.dart';
-import 'salvarPDF/SavePDFWeb.dart'
+import 'salvarPDF/save_pdf_web.dart'
     if (dart.library.html) 'salvarPDF/SavePDFWeb.dart';
 
 class GerarPDFEscala {
-  static List<String> listaLegenda = [];
+  List<dynamic> listaLegenda = [];
   List<Map> escala;
+  int valorOrientacaoPagina;
   String nomeEscala;
+  String nomeCabecalho;
+  List<String> observacoes;
+  XFile? imagemLogo;
 
-  GerarPDFEscala({required this.escala, required this.nomeEscala});
+  GerarPDFEscala({
+    required this.escala,
+    required this.nomeEscala,
+    required this.nomeCabecalho,
+    required this.imagemLogo,
+    required this.observacoes,
+    required this.valorOrientacaoPagina,
+  });
 
-  pegarDados() {
-    // listaLegenda.addAll([Textos.labelData]);
-    // if (exibirMesaApoio) {
-    //   listaLegenda.addAll([Textos.labelMesaApoio]);
-    // }
-    // if (exibirMesaApoio == false) {
-    //   listaLegenda.addAll([
-    //     Textos.labelPrimeiroHoraPulpito,
-    //   ]);
-    // }
-    // listaLegenda.addAll([
-    //   Textos.labelPrimeiroHoraEntrada,
-    // ]);
-    //
-    // if (exibirUniformes) {
-    //   listaLegenda.addAll([
-    //     Textos.labelUniforme,
-    //   ]);
-    // }
-    // listaLegenda.addAll([Textos.labelHorario]);
-    // if (exibirServirSantaCeia) {
-    //   listaLegenda.add(Textos.labelServirSantaCeia);
-    // } else {
-    //   listaLegenda.add("");
-    // }
-    // if (exibirIrmaoReserva && exibirRecolherOferta) {
-    //   listaLegenda
-    //       .addAll([Textos.labelRecolherOferta, Textos.labelIrmaoReserva]);
-    // } else if (exibirRecolherOferta) {
-    //   listaLegenda.add(Textos.labelRecolherOferta);
-    // } else if (exibirRecolherOferta == false && exibirIrmaoReserva) {
-    //   listaLegenda.addAll(["", Textos.labelIrmaoReserva]);
-    // }
+  pegarDados() async {
+    listaLegenda = escala.first.keys.toList();
     gerarPDF();
   }
 
   gerarPDF() async {
-    final pdfLib.Document pdf = pdfLib.Document();
+    final pdflib.Document pdf = pdflib.Document();
     //definindo que a variavel vai receber o caminho da
     // imagem para serem exibidas
-    final image =
-        (await rootBundle.load(
-          'assets/imagens/logo_nova_adtl_psc.png',
-        )).buffer.asUint8List();
+    final image = pdflib.MemoryImage(File(imagemLogo!.path).readAsBytesSync());
     //adicionando a pagina ao pdf
     pdf.addPage(
-      pdfLib.MultiPage(
+      pdflib.MultiPage(
         //definindo formato
-        margin: const pdfLib.EdgeInsets.only(
+        margin: const pdflib.EdgeInsets.only(
           left: 5,
           top: 5,
           right: 5,
@@ -69,54 +48,45 @@ class GerarPDFEscala {
         ),
         //CABECALHO DO PDF
         header:
-            (context) => pdfLib.Column(
+            (context) => pdflib.Column(
               children: [
-                pdfLib.Container(
-                  alignment: pdfLib.Alignment.centerRight,
-                  child: pdfLib.Column(
-                    children: [
-                      pdfLib.Image(
-                        pdfLib.MemoryImage(image),
-                        width: 60,
-                        height: 60,
-                      ),
-                    ],
+                pdflib.Container(
+                  alignment: pdflib.Alignment.centerRight,
+                  child: pdflib.Column(
+                    children: [pdflib.Image(image, width: 60, height: 60)],
                   ),
                 ),
-                pdfLib.SizedBox(height: 5),
-                pdfLib.Text(
-                  Textos.txtCabecalhoPDF,
-                  textAlign: pdfLib.TextAlign.center,
-                ),
+                pdflib.SizedBox(height: 5),
+                pdflib.Text(nomeCabecalho, textAlign: pdflib.TextAlign.center),
               ],
             ),
         //RODAPE DO PDF
         footer:
-            (context) => pdfLib.Column(
+            (context) => pdflib.Column(
               children: [
-                pdfLib.Container(
-                  child: pdfLib.Column(
-                    mainAxisAlignment: pdfLib.MainAxisAlignment.spaceBetween,
+                pdflib.Container(
+                  child: pdflib.Column(
+                    mainAxisAlignment: pdflib.MainAxisAlignment.spaceBetween,
                     children: [
-                      pdfLib.Text(
+                      pdflib.Text(
                         Textos.txtRodapePDF,
-                        textAlign: pdfLib.TextAlign.center,
+                        textAlign: pdflib.TextAlign.center,
                       ),
                     ],
                   ),
                 ),
-                pdfLib.Container(
-                  padding: const pdfLib.EdgeInsets.only(
+                pdflib.Container(
+                  padding: const pdflib.EdgeInsets.only(
                     left: 0.0,
                     top: 10.0,
                     bottom: 0.0,
                     right: 0.0,
                   ),
-                  alignment: pdfLib.Alignment.centerRight,
-                  child: pdfLib.Container(
-                    alignment: pdfLib.Alignment.centerRight,
-                    child: pdfLib.Row(
-                      mainAxisAlignment: pdfLib.MainAxisAlignment.end,
+                  alignment: pdflib.Alignment.centerRight,
+                  child: pdflib.Container(
+                    alignment: pdflib.Alignment.centerRight,
+                    child: pdflib.Row(
+                      mainAxisAlignment: pdflib.MainAxisAlignment.end,
                       children: [],
                     ),
                   ),
@@ -125,29 +95,52 @@ class GerarPDFEscala {
             ),
         pageFormat: PdfPageFormat.a4,
 
-        orientation: pdfLib.PageOrientation.portrait,
+        orientation: validarOrientacaoPagina(),
         //CORPO DO PDF
         build:
             (context) => [
-              pdfLib.SizedBox(height: 20),
-              pdfLib.TableHelper.fromTextArray(
-                cellPadding: pdfLib.EdgeInsets.symmetric(
+              pdflib.SizedBox(height: 20),
+              pdflib.TableHelper.fromTextArray(
+                cellPadding: pdflib.EdgeInsets.symmetric(
                   horizontal: 0.0,
                   vertical: 5.0,
                 ),
-                headerPadding: pdfLib.EdgeInsets.symmetric(
+                headerPadding: pdflib.EdgeInsets.symmetric(
                   horizontal: 0.0,
                   vertical: 1.0,
                 ),
-                cellAlignment: pdfLib.Alignment.center,
+                cellAlignment: pdflib.Alignment.center,
                 data: listagemDados(),
               ),
-              pdfLib.Container(
-                margin: pdfLib.EdgeInsets.all(10.0),
-                child: pdfLib.Text(
-                  "Textos.descricaoObsPDFConversa",
-                  textAlign: pdfLib.TextAlign.center,
-                  style: pdfLib.TextStyle(fontWeight: pdfLib.FontWeight.bold),
+              pdflib.LayoutBuilder(
+                builder: (context, constraints) {
+                  if (observacoes.isNotEmpty) {
+                    return pdflib.Container(
+                      color: PdfColors.green,
+                      margin: pdflib.EdgeInsets.all(10.0),
+                      child: pdflib.Text(
+                        Textos.observacaoTitulo,
+                        textAlign: pdflib.TextAlign.center,
+                      ),
+                    );
+                  } else {
+                    return pdflib.Container();
+                  }
+                },
+              ),
+              pdflib.Container(
+                margin: pdflib.EdgeInsets.all(10.0),
+                child: pdflib.ListView.builder(
+                  itemCount: observacoes.length,
+                  itemBuilder: (context, index) {
+                    return pdflib.Text(
+                      observacoes.elementAt(index),
+                      textAlign: pdflib.TextAlign.center,
+                      style: pdflib.TextStyle(
+                        fontWeight: pdflib.FontWeight.bold,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -159,66 +152,23 @@ class GerarPDFEscala {
     listaLegenda = [];
   }
 
+  validarOrientacaoPagina() {
+    //se for 0 é horizontal
+    if (valorOrientacaoPagina == 0) {
+      return pdflib.PageOrientation.landscape;
+    } else {
+      return pdflib.PageOrientation.portrait;
+    }
+  }
+
   listagemDados() {
-    // if (exibirMesaApoio && exibirUniformes == true) {
-    //   return <List<String>>[
-    //     listaLegenda,
-    //     ...escala.map((e) {
-    //       return [
-    //         e.dataCulto,
-    //         e.mesaApoio,
-    //         e.primeiraHoraEntrada,
-    //         e.uniforme,
-    //         e.horarioTroca,
-    //         e.servirSantaCeia,
-    //         e.recolherOferta,
-    //         e.irmaoReserva
-    //       ];
-    //     }),
-    //   ];
-    // } else if (exibirMesaApoio == false && exibirUniformes == true) {
-    //   return <List<String>>[
-    //     listaLegenda,
-    //     ...escala.map((e) => [
-    //           e.dataCulto,
-    //           e.primeiraHoraPulpito,
-    //           e.primeiraHoraEntrada,
-    //           e.uniforme,
-    //           e.horarioTroca,
-    //           e.servirSantaCeia,
-    //           e.recolherOferta,
-    //           e.irmaoReserva
-    //         ])
-    //   ];
-    // }
-    // if (exibirMesaApoio && exibirUniformes == false) {
-    //   return <List<String>>[
-    //     listaLegenda,
-    //     ...escala.map((e) {
-    //       return [
-    //         e.dataCulto,
-    //         e.mesaApoio,
-    //         e.primeiraHoraEntrada,
-    //         e.horarioTroca,
-    //         e.servirSantaCeia,
-    //         e.recolherOferta,
-    //         e.irmaoReserva
-    //       ];
-    //     }),
-    //   ];
-    // } else if (exibirMesaApoio == false && exibirUniformes == false) {
-    //   return <List<String>>[
-    //     listaLegenda,
-    //     ...escala.map((e) => [
-    //           e.dataCulto,
-    //           e.primeiraHoraPulpito,
-    //           e.primeiraHoraEntrada,
-    //           e.horarioTroca,
-    //           e.servirSantaCeia,
-    //           e.recolherOferta,
-    //           e.irmaoReserva
-    //         ])
-    //   ];
-    // }
+    int index = -1;
+    return <List<dynamic>>[
+      listaLegenda,
+      ...escala.map((e) {
+        index++;
+        return escala.elementAt(index).values.toList();
+      }),
+    ];
   }
 }

@@ -66,9 +66,10 @@ class Constantes {
   static const iconeRemover = Icons.remove;
   static const iconeAtualizar = Icons.update;
   static const iconeEditar = Icons.edit;
+  static const iconeVoltar = Icons.arrow_back_ios_new_outlined;
   static const iconeLista = Icons.list_alt_outlined;
   static const iconeExclusao = Icons.close;
-  static const iconeObservacao = Icons.add_alert;
+  static const iconeObservacao = Icons.notifications;
   static const iconeRecarregar = Icons.refresh;
   static const iconeBaixar = Icons.download_rounded;
   static const iconeSalvar = Icons.save;

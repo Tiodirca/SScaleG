@@ -297,22 +297,13 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     ),
   );
 
-  Widget botoesAcoes(
-    String nomeBotao,
-    IconData icone,
-    double largura,
-    double altura,
-  ) => SizedBox(
-    height: altura,
-    width: largura,
+  Widget botoesAcoes(String nomeBotao) => SizedBox(
+    height: 40,
+    width: nomeBotao == Textos.btnOpcaoData ? 120 : 110,
     child: FloatingActionButton(
       heroTag: nomeBotao,
       elevation: 0,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(color: PaletaCores.corCastanho),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
       onPressed: () async {
         // verificando o tipo do botao
         // para fazer acoes diferentes
@@ -341,27 +332,10 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
           });
         }
       },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (nomeBotao == Textos.btnOpcaoData) {
-                return Container();
-              } else {
-                return Icon(icone, color: PaletaCores.corAzulMagenta, size: 30);
-              }
-            },
-          ),
-          SizedBox(
-            width: nomeBotao == Textos.btnOpcaoData ? 120 : 90,
-            child: Text(
-              nomeBotao,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Colors.black),
-            ),
-          ),
-        ],
+      child: Text(
+        nomeBotao,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 14, color: Colors.black),
       ),
     ),
   );
@@ -498,19 +472,14 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                                         CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      botoesAcoes(
-                                        Textos.btnSalvarOpcaoData,
-                                        Constantes.iconeSalvar,
-                                        120,
-                                        40,
-                                      ),
+                                      botoesAcoes(Textos.btnSalvarOpcaoData),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: 10,
                                         ),
                                         child: botoesIcones(
                                           Constantes.iconeExclusao,
-                                          40,
+                                          30,
                                           PaletaCores.corRosaAvermelhado,
                                         ),
                                       ),
@@ -550,12 +519,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                                       40,
                                       PaletaCores.corCastanho,
                                     ),
-                                    botoesAcoes(
-                                      Textos.btnOpcaoData,
-                                      Constantes.iconeEditar,
-                                      150,
-                                      40,
-                                    ),
+                                    botoesAcoes(Textos.btnOpcaoData),
                                     botoesIcones(
                                       Constantes.iconeMudarHorario,
                                       40,
@@ -621,7 +585,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                     alignment: Alignment.center,
                     width: larguraTela,
                     color: Colors.white,
-                    height: 150,
+                    height: 100,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -631,24 +595,9 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              botoesAcoes(
-                                Textos.btnAtualizar,
-                                Constantes.iconeAtualizar,
-                                120,
-                                40,
-                              ),
-                              botoesAcoes(
-                                Textos.btnAdicionarCampo,
-                                Constantes.iconeAdicionar,
-                                120,
-                                40,
-                              ),
-                              botoesAcoes(
-                                Textos.btnRemoverCampo,
-                                Constantes.iconeRemover,
-                                120,
-                                40,
-                              ),
+                              botoesAcoes(Textos.btnAtualizar),
+                              botoesAcoes(Textos.btnAdicionarCampo),
+                              botoesAcoes(Textos.btnRemoverCampo),
                             ],
                           ),
                         ),

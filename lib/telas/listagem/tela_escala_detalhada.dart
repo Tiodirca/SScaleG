@@ -335,6 +335,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           .then(
             (doc) {
               setState(() {
+                linhasDataRow.clear();
+                listaLinhaEscalaOrdenada.clear();
                 realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
               });
               chamarExibirMensagemSucesso();
@@ -435,6 +437,18 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     );
   }
 
+  chamarPesquisarNome() {
+    if (validacaoFormulario.currentState!.validate()) {
+      setState(() {
+        nomeReacar = textoPesquisa.text;
+        linhasDataRow.clear();
+        listaLinhaEscalaOrdenada.clear();
+        quantidadeRepeticaoNomePesquisa = 0;
+        percorrerListaRetornadaBancoDados();
+      });
+    }
+  }
+
   Future<void> alertaExclusao(
     BuildContext context,
     String data,
@@ -494,23 +508,13 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     );
   }
 
-  Widget botoesAcoes(
-    String nomeBotao,
-    IconData icone,
-    double largura,
-    double altura,
-    Color corIcone,
-  ) => SizedBox(
-    height: altura,
-    width: largura,
+  Widget botoesAcoes(String nomeBotao) => SizedBox(
+    height: 40,
+    width: 110,
     child: FloatingActionButton(
       elevation: 0,
       heroTag: nomeBotao,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(color: PaletaCores.corCastanho),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
       onPressed: () async {
         if (nomeBotao == Textos.telaObservacaoTitulo) {
           PassarPegarDados.passarObservacoesPDF(listaObservacoesPDF);
@@ -530,18 +534,10 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         crossAxisAlignment: WrapCrossAlignment.center,
         alignment: WrapAlignment.center,
         children: [
-          Icon(icone, color: corIcone, size: 25),
-          SizedBox(
-            width: 90,
-            child: Text(
-              nomeBotao,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+          Text(
+            nomeBotao,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, color: Colors.black),
           ),
         ],
       ),
@@ -565,16 +561,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             exibirBarraPesquisa = true;
           });
         } else if (icone == Constantes.iconeBarraPesquisar) {
-          if (validacaoFormulario.currentState!.validate()) {
-            setState(() {
-              nomeReacar = textoPesquisa.text;
-              linhasDataRow.clear();
-              linhasDataRow.clear();
-              listaLinhaEscalaOrdenada.clear();
-              quantidadeRepeticaoNomePesquisa = 0;
-              percorrerListaRetornadaBancoDados();
-            });
-          }
+          chamarPesquisarNome();
         } else {
           setState(() {
             exibirBarraPesquisa = false;
@@ -615,11 +602,19 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
               return Scaffold(
                 appBar: AppBar(
                   actions: [
-                    botoesIcone(
-                      Constantes.iconeAbrirBarraPesquisa,
-                      PaletaCores.corAzulMagenta,
-                      40,
-                      40,
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (listaLinhaEscalaOrdenada.isEmpty) {
+                          return Container();
+                        } else {
+                          return botoesIcone(
+                            Constantes.iconeAbrirBarraPesquisa,
+                            PaletaCores.corAzulMagenta,
+                            40,
+                            40,
+                          );
+                        }
+                      },
                     ),
                   ],
                   title: Text(Textos.telaEscalaDetalhadaTitulo),
@@ -658,22 +653,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                botoesAcoes(
-                                  Textos.btnRecarregar,
-                                  Constantes.iconeRecarregar,
-                                  100,
-                                  60,
-                                  PaletaCores.corAzulMagenta,
-                                ),
-                                botoesAcoes(
-                                  Textos.btnAdicionar,
-                                  Constantes.iconeAdicionar,
-                                  100,
-                                  60,
-                                  PaletaCores.corAzulMagenta,
-                                ),
-                              ],
+                              children: [botoesAcoes(Textos.btnRecarregar)],
                             ),
                           ],
                         ),
@@ -728,61 +708,59 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                       child: Center(
                                         child: Container(
                                           padding: EdgeInsets.all(10),
-                                          child: Card(
-                                            color: Colors.transparent,
-                                            elevation: 0,
-                                            child: Column(
-                                              children: [
-                                                Wrap(
-                                                  children: [
-                                                    Container(
-                                                      width:
-                                                          Platform.isAndroid ||
-                                                                  Platform.isIOS
-                                                              ? 200
-                                                              : 300,
-                                                      height: 80,
-                                                      color: Colors.white,
-                                                      child: Form(
-                                                        key:
-                                                            validacaoFormulario,
-                                                        child: TextFormField(
-                                                          decoration:
-                                                              InputDecoration(
-                                                                hintText:
-                                                                    Textos
-                                                                        .telaEscalaDetalhadaLabelPesquisa,
-                                                              ),
-                                                          controller:
-                                                              textoPesquisa,
-                                                          validator: (value) {
-                                                            if (value!
-                                                                .isEmpty) {
-                                                              return Textos
-                                                                  .erroCampoVazio;
-                                                            }
-                                                            return null;
-                                                          },
+                                          child: Column(
+                                            children: [
+                                              Wrap(
+                                                children: [
+                                                  Container(
+                                                    width:
+                                                        Platform.isAndroid ||
+                                                                Platform.isIOS
+                                                            ? 200
+                                                            : 300,
+                                                    height: 80,
+                                                    color: Colors.white,
+                                                    child: Form(
+                                                      key: validacaoFormulario,
+                                                      child: TextFormField(
+                                                        onFieldSubmitted: (
+                                                          value,
+                                                        ) {
+                                                          chamarPesquisarNome();
+                                                        },
+                                                        decoration: InputDecoration(
+                                                          hintText:
+                                                              Textos
+                                                                  .labelTextFieldCampo,
                                                         ),
+                                                        controller:
+                                                            textoPesquisa,
+                                                        validator: (value) {
+                                                          if (value!.isEmpty) {
+                                                            return Textos
+                                                                .erroCampoVazio;
+                                                          }
+                                                          return null;
+                                                        },
                                                       ),
                                                     ),
-                                                    botoesIcone(
-                                                      Constantes
-                                                          .iconeBarraPesquisar,
-                                                      PaletaCores.corVerdeCiano,
-                                                      40,
-                                                      40,
-                                                    ),
-                                                    botoesIcone(
-                                                      Constantes.iconeExclusao,
-                                                      PaletaCores.corVermelha,
-                                                      35,
-                                                      35,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
+                                                  ),
+                                                  botoesIcone(
+                                                    Constantes
+                                                        .iconeBarraPesquisar,
+                                                    PaletaCores.corVerdeCiano,
+                                                    40,
+                                                    40,
+                                                  ),
+                                                  botoesIcone(
+                                                    Constantes.iconeExclusao,
+                                                    PaletaCores.corVermelha,
+                                                    35,
+                                                    35,
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -800,16 +778,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                 ),
                                 width: larguraTela,
                                 child: Card(
-                                  color: Colors.white,
-                                  shape: const OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(20),
-                                    ),
-                                    borderSide: BorderSide(
-                                      width: 1,
-                                      color: PaletaCores.corCastanho,
-                                    ),
-                                  ),
                                   child: Center(
                                     child: ListView(
                                       scrollDirection: Axis.vertical,
@@ -817,7 +785,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                         SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: DataTable(
-                                            columnSpacing: 20,
+                                            columnSpacing: 10,
                                             columns: cabecalhoDataColumn,
                                             rows: linhasDataRow,
                                           ),
@@ -865,27 +833,9 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            botoesAcoes(
-                              Textos.btnBaixarPDF,
-                              Constantes.iconeBaixar,
-                              120,
-                              40,
-                              PaletaCores.corAzulMagenta,
-                            ),
-                            botoesAcoes(
-                              Textos.telaObservacaoTitulo,
-                              Constantes.iconeObservacao,
-                              120,
-                              40,
-                              PaletaCores.corAzulMagenta,
-                            ),
-                            botoesAcoes(
-                              Textos.btnAdicionar,
-                              Constantes.iconeAdicionar,
-                              120,
-                              40,
-                              PaletaCores.corAzulMagenta,
-                            ),
+                            botoesAcoes(Textos.btnBaixarPDF),
+                            botoesAcoes(Textos.telaObservacaoTitulo),
+                            botoesAcoes(Textos.btnAdicionar),
                           ],
                         ),
                       ),

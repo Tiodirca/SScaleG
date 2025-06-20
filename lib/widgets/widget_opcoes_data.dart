@@ -464,6 +464,12 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                               child: SizedBox(
                                 width: Platform.isWindows ? 300 : 200,
                                 child: TextFormField(
+                                  decoration:
+                                  InputDecoration(
+                                    hintText:
+                                    Textos
+                                        .labelTextFieldCampo,
+                                  ),
                                   controller: nomeControle,
                                   onFieldSubmitted: (value) {
                                     validarCampoEChamarCadastrar();

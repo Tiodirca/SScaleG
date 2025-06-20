@@ -186,23 +186,22 @@ class _TelaListagemTabelasBancoDadosState
         });
   }
 
-  Widget botoesAcoes(
-    String nomeBotao,
-    IconData icone,
-    Color corBotao,
-    double largura,
-    double altura,
-  ) => SizedBox(
-    height: altura,
-    width: largura,
+  Widget botoesAcoes(String nomeBotao) => Container(
+    margin: EdgeInsets.only(top: nomeBotao != Textos.btnExcluir ? 20 : 0),
+    height: nomeBotao == Textos.btnExcluir ? 30 : 40,
+    width: nomeBotao == Textos.btnExcluir ? 30 : 110,
     child: FloatingActionButton(
-      heroTag: nomeBotao,
-      elevation: 0,
-      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: corBotao),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        side: BorderSide(
+          width: 1,
+          color:
+              nomeBotao == Textos.btnExcluir
+                  ? PaletaCores.corRosaAvermelhado
+                  : PaletaCores.corCastanho,
+        ),
+        borderRadius: BorderRadius.circular(10),
       ),
+      heroTag: nomeBotao,
       onPressed: () async {
         if (nomeBotao == Textos.btnCriarEscala) {
           Navigator.pushReplacementNamed(
@@ -214,6 +213,16 @@ class _TelaListagemTabelasBancoDadosState
             exibirWidgetCarregamento = true;
           });
           chamarConsultarTabelas();
+        } else if (nomeBotao == Textos.btnUsarEscala) {
+          var dados = {};
+          dados[Constantes.rotaArgumentoNomeEscala] = nomeTabelaSelecionada;
+          dados[Constantes.rotaArgumentoIDEscalaSelecionada] =
+              idTabelaSelecionada;
+          Navigator.pushReplacementNamed(
+            context,
+            Constantes.rotaTelaEscalaDetalhada,
+            arguments: dados,
+          );
         } else {
           alertaExclusao(context);
         }
@@ -221,19 +230,15 @@ class _TelaListagemTabelasBancoDadosState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
           LayoutBuilder(
             builder: (context, constraints) {
               if (nomeBotao == Textos.btnExcluir) {
-                return Container();
+                return Icon(Constantes.iconeExclusao);
               } else {
                 return Text(
                   nomeBotao,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: PaletaCores.corAzulMagenta,
-                  ),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 14, color: Colors.black),
                 );
               }
             },
@@ -305,20 +310,8 @@ class _TelaListagemTabelasBancoDadosState
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                botoesAcoes(
-                                  Textos.btnCriarEscala,
-                                  Constantes.iconeAdicionar,
-                                  PaletaCores.corCastanho,
-                                  100,
-                                  60,
-                                ),
-                                botoesAcoes(
-                                  Textos.btnRecarregar,
-                                  Constantes.iconeRecarregar,
-                                  PaletaCores.corCastanho,
-                                  100,
-                                  60,
-                                ),
+                                botoesAcoes(Textos.btnCriarEscala),
+                                botoesAcoes(Textos.btnRecarregar),
                               ],
                             ),
                           ],
@@ -405,46 +398,11 @@ class _TelaListagemTabelasBancoDadosState
                                           margin: const EdgeInsets.symmetric(
                                             horizontal: 20,
                                           ),
-                                          child: botoesAcoes(
-                                            Textos.btnExcluir,
-                                            Constantes.iconeExclusao,
-                                            PaletaCores.corRosaAvermelhado,
-                                            35,
-                                            35,
-                                          ),
+                                          child: botoesAcoes(Textos.btnExcluir),
                                         ),
                                       ],
                                     ),
-                                    Container(
-                                      margin: const EdgeInsets.all(20),
-                                      width: 120,
-                                      height: 40,
-                                      child: FloatingActionButton(
-                                        child: Text(
-                                          Textos.btnUsarEscala,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          var dados = {};
-                                          dados[Constantes
-                                                  .rotaArgumentoNomeEscala] =
-                                              nomeTabelaSelecionada;
-                                          dados[Constantes
-                                                  .rotaArgumentoIDEscalaSelecionada] =
-                                              idTabelaSelecionada;
-                                          Navigator.pushReplacementNamed(
-                                            context,
-                                            Constantes.rotaTelaEscalaDetalhada,
-                                            arguments: dados,
-                                          );
-                                        },
-                                      ),
-                                    ),
+                                    botoesAcoes(Textos.btnUsarEscala),
                                   ],
                                 ),
                               ),

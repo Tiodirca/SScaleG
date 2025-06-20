@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:sscaleg/uteis/ScrollBehaviorPersonalizado.dart';
+import 'package:sscaleg/uteis/scroll_behavior_personalizado.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/rotas.dart';
 import 'package:firebase_core/firebase_core.dart';

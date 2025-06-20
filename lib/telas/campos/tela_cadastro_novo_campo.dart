@@ -353,8 +353,8 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
                       ),
                       Container(
                         margin: EdgeInsets.all(20),
-                        width: 100,
-                        height: 50,
+                        width: 110,
+                        height: 40,
                         child: FloatingActionButton(
                           heroTag: Textos.btnCadastrar,
                           onPressed: () {

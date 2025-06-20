@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../Uteis/paleta_cores.dart';
 import '../uteis/textos.dart';
 class TelaCarregamento extends StatelessWidget {
-  const TelaCarregamento({Key? key}) : super(key: key);
+  const TelaCarregamento({super.key});
 
   @override
   Widget build(BuildContext context) {

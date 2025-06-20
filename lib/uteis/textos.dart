@@ -76,8 +76,9 @@ class Textos {
   static String telaEscalaDetalhadaTitulo = "Escalas Detalhada";
   static String telaEscalaDetalhadaDescricaoItens =
       "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
-  static String telaEscalaDetalhadaLabelPesquisa = "Digite um nome";
-  static String telaEscalaDetalhadaQuantiNomePesquisa = "Vezes que o nome se repete : ";
+
+  static String telaEscalaDetalhadaQuantiNomePesquisa =
+      "Vezes que o nome se repete : ";
 
   // TELA DE CADASTRO DE ITEM
   static String telaCadastroTitulo = "Cadastro de item na Escalas";
@@ -125,7 +126,7 @@ class Textos {
   static String telaConfiguracaoPDFTitulo = "Configurações do PDF";
   static String telaConfiguracaoPDFDescricao =
       "Desmarque as caixas para deixar de exibir determinada coluna "
-      "no arquivo PDF,deixe todos marcados para exibir todos";
+      "no arquivo PDF, deixe marcado para exibir todas as colunas";
   static String telaConfiguracaoPDFDescricaoCadastroTitulo =
       "Digite o cabeçalho que o PDF irá ter";
   static String telaConfiguracaoPDFDescricaoSelecaoTitulo =
@@ -142,6 +143,7 @@ class Textos {
       "Selecione uma Logo/Imagem para compor o cabeçalho do arquivo PDF";
 
   //MENSAGENS DE ERROS
+  static String erroSemLogo = "Selecione uma imagem/logo para proceguir";
   static String erroCampoVazio = "Preencha este campo";
   static String erroListaVazia =
       "Impossivel prosseguir,pois nenhum item foi selecionado";
@@ -157,6 +159,7 @@ class Textos {
   static String descricaoDataSelecionada = "A data Selecionada foi : ";
   static String observacaoSem = "Sem Observações";
   static String observacaoTitulo = "Observações";
+  static String labelTextFieldCampo = "Digite um nome";
 
   //ALERTA EXCLUSAO
   static String tituloAlertaExclusao = "Excluir Item";

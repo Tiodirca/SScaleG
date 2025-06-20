@@ -399,7 +399,9 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                             child: Column(
                               children: [
                                 Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10.0,
+                                  ),
                                   width: larguraTela,
                                   child: Text(
                                     Textos.descricaoTabelaSelecionada +
@@ -458,7 +460,10 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                         onPressed: () {
                                           validarCampoEChamarCadastrar();
                                         },
-                                        child: Text(Textos.btnCadastrar,style: TextStyle(color: Colors.black),),
+                                        child: Text(
+                                          Textos.btnCadastrar,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -490,16 +495,6 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                       ),
                                       // Area de Exibicao da lista com os nomes dos voluntarios
                                       Card(
-                                        color: Colors.white,
-                                        shape: const OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(20),
-                                          ),
-                                          borderSide: BorderSide(
-                                            width: 1,
-                                            color: PaletaCores.corCastanho,
-                                          ),
-                                        ),
                                         child: SizedBox(
                                           height: alturaTela * 0.35,
                                           width:

@@ -322,7 +322,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   validarCampoEChamarCadastrar() {
     if (validacaoFormulario.currentState!.validate()) {
       setState(() {
-        nomeCadastro = nomeControle.text.trim().replaceAll(" ", "_").toLowerCase();
+        nomeCadastro =
+            nomeControle.text.trim().replaceAll(" ", "_").toLowerCase();
         cadastrarNome();
       });
     }
@@ -397,6 +398,10 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                       child: SizedBox(
                                         width: Platform.isWindows ? 300 : 200,
                                         child: TextFormField(
+                                          decoration: InputDecoration(
+                                            hintText:
+                                                Textos.labelTextFieldCampo,
+                                          ),
                                           controller: nomeControle,
                                           onFieldSubmitted: (value) {
                                             validarCampoEChamarCadastrar();
@@ -415,13 +420,16 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                         horizontal: 10.0,
                                       ),
                                       width: 100,
-                                      height: 50,
+                                      height: 40,
                                       child: FloatingActionButton(
                                         heroTag: Textos.btnCadastrar,
                                         onPressed: () {
                                           validarCampoEChamarCadastrar();
                                         },
-                                        child: Text(Textos.btnCadastrar,style: TextStyle(color: Colors.black),),
+                                        child: Text(
+                                          Textos.btnCadastrar,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -458,16 +466,6 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                                         ),
                                         // Area de Exibicao da lista com os nomes dos voluntarios
                                         Card(
-                                          color: Colors.white,
-                                          shape: const OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(20),
-                                            ),
-                                            borderSide: BorderSide(
-                                              width: 1,
-                                              color: PaletaCores.corCastanho,
-                                            ),
-                                          ),
                                           child: SizedBox(
                                             height: alturaTela * 0.45,
                                             width:

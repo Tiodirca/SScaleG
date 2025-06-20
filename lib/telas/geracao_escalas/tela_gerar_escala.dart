@@ -321,6 +321,9 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                               child: SizedBox(
                                 width: Platform.isWindows ? 300 : 200,
                                 child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: Textos.labelTextFieldCampo,
+                                  ),
                                   controller: nomeEscala,
                                   onFieldSubmitted: (value) {
                                     chamarFazerSorteio();
@@ -340,8 +343,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                 horizontal: 10.0,
                                 vertical: 10.0,
                               ),
-                              width: 100,
-                              height: 50,
+                              width: 110,
+                              height: 40,
                               child: FloatingActionButton(
                                 heroTag: Textos.btnCriarEscala,
                                 onPressed: () {
@@ -351,7 +354,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                   Textos.btnCriarEscala,
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),

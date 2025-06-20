@@ -127,14 +127,6 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
                     ),
                   ),
                   Card(
-                    color: Colors.white,
-                    shape: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      borderSide: BorderSide(
-                        width: 1,
-                        color: PaletaCores.corCastanho,
-                      ),
-                    ),
                     child: SizedBox(
                       height: alturaTela * 0.6,
                       width:    Platform.isAndroid ||
