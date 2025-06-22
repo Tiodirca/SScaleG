@@ -71,7 +71,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
             },
           ),
         ),
-        title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 20)),
+        title: Text(checkBoxModel.texto.replaceAll("_", " "), style: const TextStyle(fontSize: 20)),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
@@ -259,6 +259,25 @@ class _TelaCadastroSelecaoNomesVoluntariosState
         );
   }
 
+  redirecionarProximaTela() {
+    PassarPegarDados.passarNomesVoluntarios(listaNomesSelecionados);
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaSelecaoDiasSemana,
+    );
+  }
+
+  validarCampoEChamarCadastrar() {
+    if (validacaoFormulario.currentState!.validate()) {
+      setState(() {
+        nomeCadastro =
+            nomeControle.text.trim().replaceAll(" ", "_").toLowerCase();
+        cadastrarNome();
+      });
+    }
+  }
+
+
   Future<void> alertaExclusao(
     BuildContext context,
     CheckBoxModelo checkbox,
@@ -311,23 +330,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     );
   }
 
-  redirecionarProximaTela() {
-    PassarPegarDados.passarNomesVoluntarios(listaNomesSelecionados);
-    Navigator.pushReplacementNamed(
-      context,
-      Constantes.rotaTelaSelecaoDiasSemana,
-    );
-  }
 
-  validarCampoEChamarCadastrar() {
-    if (validacaoFormulario.currentState!.validate()) {
-      setState(() {
-        nomeCadastro =
-            nomeControle.text.trim().replaceAll(" ", "_").toLowerCase();
-        cadastrarNome();
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

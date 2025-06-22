@@ -59,7 +59,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
             },
           ),
         ),
-        title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 20)),
+        title: Text(checkBoxModel.texto.replaceAll("_", " "), style: const TextStyle(fontSize: 20)),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
@@ -248,6 +248,30 @@ class _TelaCadastroSelecaoLocalTrabalhoState
         );
   }
 
+  redirecionarProximaTela() {
+    PassarPegarDados.passarNomesLocaisTrabalho(listaNomesSelecionados);
+    Navigator.pushReplacementNamed(
+      context,
+      Constantes.rotaTelaCadastroSelecaoVoluntarios,
+    );
+  }
+
+  validarCampoEChamarCadastrar() {
+    if (validacaoFormulario.currentState!.validate()) {
+      setState(() {
+        nomeCadastro =
+            nomeControle.text
+                .trim()
+                .replaceAll("-", "")
+                .replaceAll(RegExp(r'[0-9]'), "")
+                .replaceAll(" ", "_")
+                .replaceAll(RegExp(r'[^\w\s]+'), "")
+                .toLowerCase();
+        cadastrarNome();
+      });
+    }
+  }
+
   Future<void> alertaExclusao(
     BuildContext context,
     CheckBoxModelo checkbox,
@@ -300,29 +324,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     );
   }
 
-  redirecionarProximaTela() {
-    PassarPegarDados.passarNomesLocaisTrabalho(listaNomesSelecionados);
-    Navigator.pushReplacementNamed(
-      context,
-      Constantes.rotaTelaCadastroSelecaoVoluntarios,
-    );
-  }
 
-  validarCampoEChamarCadastrar() {
-    if (validacaoFormulario.currentState!.validate()) {
-      setState(() {
-        nomeCadastro =
-            nomeControle.text
-                .trim()
-                .replaceAll("-", "")
-                .replaceAll(RegExp(r'[0-9]'), "")
-                .replaceAll(" ", "_")
-                .replaceAll(RegExp(r'[^\w\s]+'), "")
-                .toLowerCase();
-        cadastrarNome();
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

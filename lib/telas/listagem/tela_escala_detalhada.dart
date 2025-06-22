@@ -209,8 +209,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             if (e.toString() == Constantes.editar) {
               return DataCell(
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 35,
+                  height: 35,
                   child: FloatingActionButton(
                     heroTag: "${Constantes.editar}$contadorBtnFloat",
                     onPressed: () {
@@ -229,7 +229,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                     },
                     child: Icon(
                       Constantes.iconeEditar,
-                      color: PaletaCores.corAzulMagenta,
+                      color: PaletaCores.corAzulEscuro,
                       size: 25,
                     ),
                   ),
@@ -238,8 +238,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             } else if (e.toString() == Constantes.excluir) {
               return DataCell(
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 35,
+                  height: 35,
                   child: FloatingActionButton(
                     heroTag: "${Constantes.excluir}$contadorBtnFloat",
                     onPressed: () {
@@ -262,7 +262,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                     },
                     child: Icon(
                       Constantes.iconeExclusao,
-                      color: PaletaCores.corAzulMagenta,
+                      color: PaletaCores.corAzulEscuro,
                       size: 25,
                     ),
                   ),
@@ -271,11 +271,14 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
             } else {
               return DataCell(
                 Container(
-                  decoration: validarNomeFoco(e),
+                  decoration: validarNomeFoco(e.replaceAll("_", " ")),
                   width: 90,
                   //SET width
                   child: SingleChildScrollView(
-                    child: Text(e.toString(), textAlign: TextAlign.center),
+                    child: Text(
+                      e.toString().replaceAll("_", " "),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               );
@@ -296,7 +299,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                 .replaceAll("01_", "")
                 .replaceAll("02_", "")
                 .replaceAll("_", " ")
-                .replaceAll(RegExp(r'[0-9]'), ''),
+                .replaceAll(RegExp(r'[0-9]'), '')
+                .toUpperCase(),
           ),
         ),
       );
@@ -422,7 +426,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   redirecionarTelaConfigurarPDFBaixar() {
     var dados = {};
-    PassarPegarDados.passarTeste(listaLinhaEscalaOrdenada);
     PassarPegarDados.passarObservacoesPDF(listaObservacoesPDF);
     dados[Constantes.rotaArgumentoCabecalhoEscala] = cabecalhoEscala;
     dados[Constantes.rotaArgumentoLinhasEscala] = listaLinhaEscalaOrdenada;
@@ -609,7 +612,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                         } else {
                           return botoesIcone(
                             Constantes.iconeAbrirBarraPesquisa,
-                            PaletaCores.corAzulMagenta,
+                            PaletaCores.corAzulEscuro,
                             40,
                             40,
                           );
@@ -754,7 +757,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                                   ),
                                                   botoesIcone(
                                                     Constantes.iconeExclusao,
-                                                    PaletaCores.corVermelha,
+                                                    PaletaCores.corRosaAvermelhado,
                                                     35,
                                                     35,
                                                   ),
@@ -785,7 +788,15 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                         SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: DataTable(
-                                            columnSpacing: 10,
+                                            headingTextStyle: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            columnSpacing: 20,
+                                            horizontalMargin: 10,
+                                            dataTextStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
                                             columns: cabecalhoDataColumn,
                                             rows: linhasDataRow,
                                           ),

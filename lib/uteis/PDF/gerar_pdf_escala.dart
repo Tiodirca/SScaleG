@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdflib;
 
@@ -27,7 +28,17 @@ class GerarPDFEscala {
   });
 
   pegarDados() async {
-    listaLegenda = escala.first.keys.toList();
+    List<dynamic> itens = escala.first.keys.toList();
+    for (var element in itens) {
+      listaLegenda.add(
+        element
+            .toString()
+            .replaceAll("_", " ")
+            .replaceAll("01", "")
+            .replaceAll("02", "")
+            .toUpperCase(),
+      );
+    }
     gerarPDF();
   }
 
@@ -62,36 +73,12 @@ class GerarPDFEscala {
             ),
         //RODAPE DO PDF
         footer:
-            (context) => pdflib.Column(
-              children: [
-                pdflib.Container(
-                  child: pdflib.Column(
-                    mainAxisAlignment: pdflib.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pdflib.Text(
-                        Textos.txtRodapePDF,
-                        textAlign: pdflib.TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-                pdflib.Container(
-                  padding: const pdflib.EdgeInsets.only(
-                    left: 0.0,
-                    top: 10.0,
-                    bottom: 0.0,
-                    right: 0.0,
-                  ),
-                  alignment: pdflib.Alignment.centerRight,
-                  child: pdflib.Container(
-                    alignment: pdflib.Alignment.centerRight,
-                    child: pdflib.Row(
-                      mainAxisAlignment: pdflib.MainAxisAlignment.end,
-                      children: [],
-                    ),
-                  ),
-                ),
-              ],
+            (context) => pdflib.Container(
+              width: 1000,
+              child: pdflib.Text(
+                Textos.txtRodapePDF,
+                textAlign: pdflib.TextAlign.center,
+              ),
             ),
         pageFormat: PdfPageFormat.a4,
 
@@ -99,16 +86,27 @@ class GerarPDFEscala {
         //CORPO DO PDF
         build:
             (context) => [
-              pdflib.SizedBox(height: 20),
+              //adicionando container para dar espacamento entre
+              // cabecalho PDF e comeco da escala
+              pdflib.SizedBox(height: 10),
               pdflib.TableHelper.fromTextArray(
                 cellPadding: pdflib.EdgeInsets.symmetric(
                   horizontal: 0.0,
-                  vertical: 5.0,
+                  vertical: 2.0,
                 ),
                 headerPadding: pdflib.EdgeInsets.symmetric(
-                  horizontal: 0.0,
-                  vertical: 1.0,
+                  horizontal: 1.0,
+                  vertical: 3.0,
                 ),
+                columnWidths: {
+                  0: pdflib.IntrinsicColumnWidth(),
+                  1: pdflib.IntrinsicColumnWidth(),
+                },
+                headerStyle: pdflib.TextStyle(
+                  fontWeight: pdflib.FontWeight.bold,
+                  fontSize: 11,
+                ),
+
                 cellAlignment: pdflib.Alignment.center,
                 data: listagemDados(),
               ),
@@ -116,10 +114,13 @@ class GerarPDFEscala {
                 builder: (context, constraints) {
                   if (observacoes.isNotEmpty) {
                     return pdflib.Container(
-                      color: PdfColors.green,
-                      margin: pdflib.EdgeInsets.all(10.0),
+                      width: 1000,
                       child: pdflib.Text(
                         Textos.observacaoTitulo,
+                        style: pdflib.TextStyle(
+                          fontSize: 13,
+                          fontWeight: pdflib.FontWeight.bold,
+                        ),
                         textAlign: pdflib.TextAlign.center,
                       ),
                     );

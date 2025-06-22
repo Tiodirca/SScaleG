@@ -274,7 +274,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
               exibirDataPicker();
             }
           },
-          child: Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
+          child: Icon(icone, color: PaletaCores.corAzulEscuro, size: 30),
         ),
       );
 

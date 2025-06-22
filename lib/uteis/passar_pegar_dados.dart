@@ -123,13 +123,4 @@ class PassarPegarDados {
   static List<String> recuperarObservacoesPDF() {
     return listaObservacoesPDF;
   }
-
-  static List<Map> passarTeste(List<Map> observacoes) {
-    listaTeste = observacoes;
-    return listaTeste;
-  }
-
-  static List<Map> recuperarTeste() {
-    return listaTeste;
-  }
 }

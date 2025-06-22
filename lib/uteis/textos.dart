@@ -89,7 +89,7 @@ class Textos {
   // TELA DE ATUALIZAR DE ITEM
   static String telaAtualizarItemTitulo = "Atualizar item na Escala";
   static String telaAtualizarDescricao =
-      "Altere os valores que estão nos campos conforme necessario";
+      "Altere os valores que estão nos campos conforme necessário";
 
   // TELA ADIONAR NOVO CAMPO
   static String telaCadastroNovoCampoTitulo = "Cadastrar novo campo de item";
@@ -102,8 +102,8 @@ class Textos {
   static String telaRemoverCamposDescricao =
       "Marque Quais campos voce deseja remover";
   static String telaRemoverCamposDescricaoAlerta =
-      "Lembrando que ao remover os campos você estara removendo"
-      " o campo selecionado de todos os itens que estão nesta escala,tenha certeza desta ação";
+      "Lembrando que ao remover os campos você estará removendo"
+      " o campo selecionado de todos os itens que estão nesta escala, tenha certeza desta ação";
 
   // TELA ADICIONAR OBSERVACOES
   static String telaObservacaoTitulo = "Adição de Observações";
@@ -115,8 +115,8 @@ class Textos {
 
   //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
   static String widgetAjustarHorarioDescricao =
-      "Selecione qual o horario"
-      " do inicio da jornada de trabalho";
+      "Selecione qual o horário"
+      " do início da jornada de trabalho";
   static String widgetAjustarHorarioSemana = "Horário durante semana";
   static String widgetAjustarHorarioFinalSemana =
       "Horario durante final de semana";
@@ -143,7 +143,7 @@ class Textos {
       "Selecione uma Logo/Imagem para compor o cabeçalho do arquivo PDF";
 
   //MENSAGENS DE ERROS
-  static String erroSemLogo = "Selecione uma imagem/logo para proceguir";
+  static String erroSemLogo = "Selecione uma imagem/logo para prosseguir";
   static String erroCampoVazio = "Preencha este campo";
   static String erroListaVazia =
       "Impossivel prosseguir,pois nenhum item foi selecionado";
@@ -176,3 +176,4 @@ class Textos {
   static String txtRodapePDF =
       "Quem sua mão ao arado já pois, constante precisa ser.";
 }
+

@@ -51,7 +51,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     carregarCampos();
   }
 
-  carregarCampos() {
+  carregarCampos() async {
     itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
     itensRecebidosCabecalhoLinha.removeWhere((key, value) {
       return key.toString().contains(Constantes.editar);
@@ -203,8 +203,12 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           .set(criarMapCompativel(itemDigitado))
           .then((value) {
             setState(() {
-              itemDigitado.clear();
-              carregarCampos();
+              itemDigitado.removeWhere((key, value) {
+                return key.toString().contains(Constantes.dataCulto);
+              },);
+              itemDigitado.removeWhere((key, value) {
+                return key.toString().contains(Constantes.horarioTrabalho);
+              },);
               exibirWidgetCarregamento = false;
             });
             chamarExibirMensagemSucesso();
@@ -269,7 +273,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
               exibirDataPicker();
             }
           },
-          child: Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
+          child: Icon(icone, color: PaletaCores.corAzulEscuro, size: 30),
         ),
       );
 
@@ -292,7 +296,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
 
   Widget botoesAcoes(String nomeBotao) => SizedBox(
     height: 40,
-    width: nomeBotao ==Textos.btnOpcaoData ? 120 : 110,
+    width: nomeBotao == Textos.btnOpcaoData ? 120 : 110,
     child: FloatingActionButton(
       heroTag: nomeBotao,
       elevation: 0,

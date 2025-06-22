@@ -27,7 +27,7 @@ class Estilo {
       elevation: 0,
       shape: OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(20)),
-        borderSide: BorderSide(width: 1, color: PaletaCores.corCastanho),
+        borderSide: BorderSide(width: 1, color: PaletaCores.corAzulCiano),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(

@@ -63,7 +63,6 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
     for (var element in widget.linhasEscala) {
       linhasRecebidas.add(element);
     }
-    linhasRecebidas = PassarPegarDados.recuperarTeste();
     listaObservacoes = PassarPegarDados.recuperarObservacoesPDF();
     for (var element in widget.cabecalhoEscala) {
       if (!(element.contains(Constantes.dataCulto) ||
@@ -134,7 +133,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
       CheckboxListTile(
         activeColor: PaletaCores.corAzulEscuro,
         checkColor: PaletaCores.corRosaClaro,
-        title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 20)),
+        title: Text(checkBoxModel.texto.replaceAll("_", " "), style: const TextStyle(fontSize: 20)),
         value: checkBoxModel.checked,
         onChanged: (value) {
           setState(() {
@@ -888,11 +887,10 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                         margin: EdgeInsets.all(20),
                         child: LinearProgressIndicator(
                           value: indicadorPagina,
-                          color: Colors.green,
                           minHeight: 3,
                           borderRadius: BorderRadius.circular(10),
                           valueColor: AlwaysStoppedAnimation(
-                            PaletaCores.corCastanho,
+                            PaletaCores.corAzulEscuro,
                           ),
                         ),
                       ),

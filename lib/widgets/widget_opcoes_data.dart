@@ -396,14 +396,14 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icone, color: PaletaCores.corAzulMagenta, size: 30),
+          Icon(icone, color: PaletaCores.corAzulEscuro, size: 30),
           Text(
             nomeBotao,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: PaletaCores.corAzulMagenta,
+              color: PaletaCores.corAzulEscuro,
             ),
           ),
         ],
