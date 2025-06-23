@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
+import 'package:sscaleg/widgets/widget_ajustar_horario.dart';
 import '../uteis/textos.dart';
 
 class TelaInicial extends StatefulWidget {
@@ -15,6 +16,7 @@ class TelaInicial extends StatefulWidget {
 
 class _TelaInicialState extends State<TelaInicial> {
   Estilo estilo = Estilo();
+  String emailCadastrado = "jhonatansbestevao@gmail.com";
 
   Widget botao(String nomeBtn) => Container(
     margin: const EdgeInsets.all(10),
@@ -25,18 +27,24 @@ class _TelaInicialState extends State<TelaInicial> {
       onPressed: () {
         if (nomeBtn == Textos.btnCriarEscala) {
           Navigator.pushReplacementNamed(
-              context,
-              Constantes.rotaTelaCadastroSelecaoLocalTrabalho);
-        }else if(nomeBtn == Textos.btnListarEscalas){
+            context,
+            Constantes.rotaTelaCadastroSelecaoLocalTrabalho,
+          );
+        } else if (nomeBtn == Textos.btnListarEscalas) {
           Navigator.pushReplacementNamed(
-              context,
-              Constantes.rotaTelaListagemEscalaBandoDados);
+            context,
+            Constantes.rotaTelaListagemEscalaBandoDados,
+          );
         }
       },
       child: Text(
         nomeBtn,
         textAlign: TextAlign.center,
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,color: Colors.black),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: Colors.black,
+        ),
       ),
     ),
   );
@@ -71,17 +79,43 @@ class _TelaInicialState extends State<TelaInicial> {
             children: [
               SizedBox(
                 width: larguraTela,
-                height: alturaTela * 0.6,
+                height: alturaTela * 0.7,
                 child: Wrap(
                   alignment: WrapAlignment.center,
                   children: [
-                    // SizedBox(
-                    // width: larguraTela,
-                    // child: Text(Textos.descricaoTelaInicial,
-                    //     style: const TextStyle(fontSize: 18),
-                    //     textAlign: TextAlign.center)),
+                    Container(
+                      margin: EdgeInsets.only(right: 10.0),
+                      width: larguraTela,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            Textos.telaInicialEmailCadastrado,
+                            style: const TextStyle(fontSize: 14),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            emailCadastrado,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: larguraTela,
+                      child: Text(
+                        Textos.telaInicialDescricao,
+                        style: const TextStyle(fontSize: 18),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                     botao(Textos.btnCriarEscala),
                     botao(Textos.btnListarEscalas),
+                    botao(Textos.btnConfiguracao),
                   ],
                 ),
               ),
@@ -93,7 +127,16 @@ class _TelaInicialState extends State<TelaInicial> {
           color: Colors.white,
           width: larguraTela,
           height: 40,
-          child: Text("Textos.versaoApp", textAlign: TextAlign.end),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(Textos.versaoAppDescricao),
+              Text(
+                Textos.versaoAppNumero,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
       ),
     );

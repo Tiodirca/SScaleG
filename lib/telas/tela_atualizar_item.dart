@@ -286,7 +286,6 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
       bottom: 5.0,
     ),
     height: 100,
-    width: MetodosAuxiliares.ajustarTamanhoTextField(larguraTela),
     child: TextFormField(
       onChanged: (value) {
         itemDigitado[label] = value;

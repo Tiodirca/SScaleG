@@ -9,6 +9,7 @@ import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
+import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
 class TelaSelecaoIntervaloTrabalho extends StatefulWidget {
   const TelaSelecaoIntervaloTrabalho({super.key});
@@ -253,32 +254,38 @@ class _TelaSelecaoIntervaloTrabalhoState
               ),
             ),
           ),
-          bottomSheet: Container(
+          bottomNavigationBar: Container(
             alignment: Alignment.center,
             color: Colors.white,
             width: larguraTela,
-            height: 50,
-            child: SizedBox(
-              width: 100,
-              height: 40,
-              child: FloatingActionButton(
-                heroTag: Textos.btnAvancar,
-                onPressed: () {
-                  if (listaDatasFinal.isNotEmpty) {
-                    redirecionarProximaTela();
-                  } else {
-                    MetodosAuxiliares.exibirMensagens(
-                      Constantes.tipoNotificacaoErro,
-                      Textos.erroListaVazia,
-                      context,
-                    );
-                  }
-                },
-                child: Text(
-                  Textos.btnAvancar,
-                  style: TextStyle(color: Colors.black),
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 100,
+                  height: 40,
+                  child: FloatingActionButton(
+                    heroTag: Textos.btnAvancar,
+                    onPressed: () {
+                      if (listaDatasFinal.isNotEmpty) {
+                        redirecionarProximaTela();
+                      } else {
+                        MetodosAuxiliares.exibirMensagens(
+                          Constantes.tipoNotificacaoErro,
+                          Textos.erroListaVazia,
+                          context,
+                        );
+                      }
+                    },
+                    child: Text(
+                      Textos.btnAvancar,
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
                 ),
-              ),
+                BarraNavegacao(),
+              ],
             ),
           ),
         ),

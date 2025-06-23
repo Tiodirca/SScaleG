@@ -1,6 +1,9 @@
 class Textos {
   static String nomeApp = "SScaleG";
+  static String versaoAppNumero = "1.2";
+  static String versaoAppDescricao = "Versão : ";
   static String btnCriarEscala = "Criar Escala";
+  static String btnConfiguracao = "Configurações";
   static String btnCadastrar = "Cadastrar";
   static String btnAvancar = "Avançar";
   static String btnListarEscalas = "Ver lista de Escalas";
@@ -22,6 +25,10 @@ class Textos {
   static String btnVerEscalaAtual = "Escala Atual";
   static String btnAdicionarLogoImagem = "Adicionar Logo/Imagem";
   static String btnUsarEscala = "Utilizar está escala";
+
+  // TELA INICIAL
+  static String telaInicialDescricao = "Selecione uma opção";
+  static String telaInicialEmailCadastrado = "E-mail da conta : ";
 
   //WIDGET OPCOES DATA
   static String descricaoSelecaoDepartamentos =
@@ -112,6 +119,7 @@ class Textos {
   static String telaObservacaoDescricaoSelecao =
       "Selecione quais observações você deseja adicionar ao arquivo PDF, "
       "ao selecionar/desmarcar um item ele já é adicionado/removido automaticamente";
+  static String telaObservacaoHintTextField = "Digite uma observação";
 
   //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
   static String widgetAjustarHorarioDescricao =
@@ -176,4 +184,3 @@ class Textos {
   static String txtRodapePDF =
       "Quem sua mão ao arado já pois, constante precisa ser.";
 }
-

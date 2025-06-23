@@ -7,6 +7,7 @@ import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
+import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 import '../../Modelo/check_box_modelo.dart';
 import '../../uteis/estilo.dart';
 import '../../uteis/paleta_cores.dart';
@@ -501,29 +502,35 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                   alignment: Alignment.center,
                   color: Colors.white,
                   width: larguraTela,
-                  height: 50,
-                  child: SizedBox(
-                    width: 100,
-                    height: 40,
-                    child: FloatingActionButton(
-                      heroTag: Textos.btnAvancar,
-                      onPressed: () {
-                        if (listaNomesSelecionados.isEmpty) {
-                          MetodosAuxiliares.exibirMensagens(
-                            Constantes.tipoNotificacaoErro,
-                            Textos.erroListaVazia,
-                            context,
-                          );
-                        } else {
-                          redirecionarProximaTela();
-                        }
-                      },
-                      child: Text(
-                        Textos.btnAvancar,
-                        style: TextStyle(color: Colors.black),
+                  height: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        height: 40,
+                        child: FloatingActionButton(
+                          heroTag: Textos.btnAvancar,
+                          onPressed: () {
+                            if (listaNomesSelecionados.isEmpty) {
+                              MetodosAuxiliares.exibirMensagens(
+                                Constantes.tipoNotificacaoErro,
+                                Textos.erroListaVazia,
+                                context,
+                              );
+                            } else {
+                              redirecionarProximaTela();
+                            }
+                          },
+                          child: Text(
+                            Textos.btnAvancar,
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+                      BarraNavegacao()
+                    ],
+                  )
                 ),
               );
             }

@@ -757,7 +757,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                                   ),
                                                   botoesIcone(
                                                     Constantes.iconeExclusao,
-                                                    PaletaCores.corRosaAvermelhado,
+                                                    PaletaCores
+                                                        .corRosaAvermelhado,
                                                     35,
                                                     35,
                                                   ),

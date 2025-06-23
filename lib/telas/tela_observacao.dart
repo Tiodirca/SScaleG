@@ -436,6 +436,9 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                           onFieldSubmitted: (value) {
                                             validarCampoEChamarCadastrar();
                                           },
+                                          decoration: InputDecoration(
+                                            hintText: Textos.telaObservacaoHintTextField
+                                          ),
                                           validator: (value) {
                                             if (value!.isEmpty) {
                                               return Textos.erroCampoVazio;

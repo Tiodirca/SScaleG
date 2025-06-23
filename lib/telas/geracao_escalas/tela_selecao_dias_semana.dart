@@ -10,6 +10,7 @@ import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
+import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
 class TelaSelecaoDiasSemana extends StatefulWidget {
   const TelaSelecaoDiasSemana({super.key});
@@ -129,10 +130,10 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
                   Card(
                     child: SizedBox(
                       height: alturaTela * 0.6,
-                      width:    Platform.isAndroid ||
-                          Platform.isIOS
-                          ? larguraTela
-                          : larguraTela * 0.7,
+                      width:
+                          Platform.isAndroid || Platform.isIOS
+                              ? larguraTela
+                              : larguraTela * 0.7,
                       child: ListView(
                         children: [
                           ...listaDiasSemana.map(
@@ -146,29 +147,37 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
               ),
             ),
           ),
-          bottomSheet: Container(
-            alignment: Alignment.center,
+          bottomNavigationBar: Container(
             color: Colors.white,
             width: larguraTela,
-            height: 50,
-            child: SizedBox(
-              width: 100,
-              height: 40,
-              child: FloatingActionButton(
-                heroTag: Textos.btnAvancar,
-                onPressed: () {
-                  if (listaDiasSelecionado.isNotEmpty) {
-                    redirecionarProximaTela();
-                  } else {
-                    MetodosAuxiliares.exibirMensagens(
-                      Constantes.tipoNotificacaoErro,
-                      Textos.erroListaVazia,
-                      context,
-                    );
-                  }
-                },
-                child: Text(Textos.btnAvancar,style: TextStyle(color: Colors.black),),
-              ),
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 100,
+                  height: 40,
+                  child: FloatingActionButton(
+                    heroTag: Textos.btnAvancar,
+                    onPressed: () {
+                      if (listaDiasSelecionado.isNotEmpty) {
+                        redirecionarProximaTela();
+                      } else {
+                        MetodosAuxiliares.exibirMensagens(
+                          Constantes.tipoNotificacaoErro,
+                          Textos.erroListaVazia,
+                          context,
+                        );
+                      }
+                    },
+                    child: Text(
+                      Textos.btnAvancar,
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ),
+                BarraNavegacao(),
+              ],
             ),
           ),
         ),

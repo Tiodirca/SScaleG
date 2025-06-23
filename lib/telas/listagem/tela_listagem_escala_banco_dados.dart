@@ -9,6 +9,7 @@ import 'package:sscaleg/uteis/paleta_cores.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/modelo/tabelas_modelo.dart';
+import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
 class TelaListagemTabelasBancoDados extends StatefulWidget {
   const TelaListagemTabelasBancoDados({super.key});
@@ -412,6 +413,11 @@ class _TelaListagemTabelasBancoDadosState
                       );
                     }
                   },
+                ),
+                bottomNavigationBar: Container(
+                  color: Colors.white,
+                  width: larguraTela,
+                  child: BarraNavegacao(),
                 ),
               );
             }

@@ -252,12 +252,13 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   }
 
   chamarFazerSorteio() {
-    setState(() {
-      nomeEscalaFormatada =
-          nomeEscala.text.trim().replaceAll(" ", "_").toLowerCase();
-      exibirWidgetCarregamento = true;
-    });
+
     if (validacaoFormulario.currentState!.validate()) {
+      setState(() {
+        nomeEscalaFormatada =
+            nomeEscala.text.trim().replaceAll(" ", "_").toLowerCase();
+        exibirWidgetCarregamento = true;
+      });
       recuperarHorarioDefinidoInicioTrabalho();
       fazerSorteio();
     }
@@ -338,26 +339,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                               ),
                             ),
                             WidgetAjustarHorario(),
-                            Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
-                                vertical: 10.0,
-                              ),
-                              width: 110,
-                              height: 40,
-                              child: FloatingActionButton(
-                                heroTag: Textos.btnCriarEscala,
-                                onPressed: () {
-                                  chamarFazerSorteio();
-                                },
-                                child: Text(
-                                  Textos.btnCriarEscala,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
+
                           ],
                         ),
                       ],
@@ -366,7 +348,29 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                 ),
                 bottomNavigationBar: Container(
                   color: Colors.white,
-                  child: BarraNavegacao(),
+                  height: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        height: 40,
+                        child: FloatingActionButton(
+                          heroTag: Textos.btnCriarEscala,
+                          onPressed: () {
+                            chamarFazerSorteio();
+                          },
+                          child: Text(
+                            Textos.btnCriarEscala,
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      BarraNavegacao()
+                    ],
+                  )
                 ),
               );
             }

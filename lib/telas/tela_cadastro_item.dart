@@ -205,10 +205,10 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
             setState(() {
               itemDigitado.removeWhere((key, value) {
                 return key.toString().contains(Constantes.dataCulto);
-              },);
+              });
               itemDigitado.removeWhere((key, value) {
                 return key.toString().contains(Constantes.horarioTrabalho);
-              },);
+              });
               exibirWidgetCarregamento = false;
             });
             chamarExibirMensagemSucesso();
@@ -248,6 +248,14 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     return itemFinal;
   }
 
+  fecharTelaOpcoesData(){
+    setState(() {
+      exibirTelaOpcoesData = false;
+      exibirAcoesOpcaoData = false;
+      PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
+    });
+  }
+
   Widget botoesIcones(IconData icone, double tamanhoBotao, Color corBotao) =>
       SizedBox(
         height: tamanhoBotao,
@@ -262,11 +270,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           ),
           onPressed: () async {
             if (icone == Constantes.iconeExclusao) {
-              setState(() {
-                exibirTelaOpcoesData = false;
-                exibirAcoesOpcaoData = false;
-                PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
-              });
+              fecharTelaOpcoesData();
             } else if (icone == Constantes.iconeMudarHorario) {
               exibirTimePicker();
             } else if (icone == Constantes.iconeDataCulto) {
@@ -284,7 +288,6 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
       right: 5.0,
       bottom: 5.0,
     ),
-    width: MetodosAuxiliares.ajustarTamanhoTextField(larguraTela),
     child: TextFormField(
       onChanged: (value) {
         itemDigitado[label] = value;
@@ -438,7 +441,12 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                     child: IconButton(
                       color: Colors.white,
                       onPressed: () {
-                        redirecionarTelaAnterior();
+                        if (exibirTelaOpcoesData) {
+                          print("dsfsf");
+                          fecharTelaOpcoesData();
+                        } else {
+                          redirecionarTelaAnterior();
+                        }
                       },
                       icon: const Icon(Icons.arrow_back_ios),
                     ),
