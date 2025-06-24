@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/paleta_cores.dart';
+import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/modelo/tabelas_modelo.dart';
@@ -28,11 +29,17 @@ class _TelaListagemTabelasBancoDadosState
   Estilo estilo = Estilo();
   bool exibirWidgetCarregamento = true;
   List<TabelaModelo> tabelasBancoDados = [];
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
 
   @override
   void initState() {
     super.initState();
-    chamarConsultarTabelas();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    Timer(const Duration(seconds: 1), () {
+      chamarConsultarTabelas();
+    });
   }
 
   chamarConsultarTabelas() async {
@@ -50,22 +57,27 @@ class _TelaListagemTabelasBancoDadosState
     }
   }
 
-  static Future consultarTabelas() async {
+  Future consultarTabelas() async {
     List<TabelaModelo> tabelasBancoDados = [];
     var db = FirebaseFirestore.instance;
-    await db.collection(Constantes.fireBaseColecaoEscalas).get().then((event) {
-      for (var doc in event.docs) {
-        var nomeTabela = doc
-            .data()
-            .values
-            .toString()
-            .replaceAll("(", "")
-            .replaceAll(")", "");
-        tabelasBancoDados.add(
-          TabelaModelo(nomeTabela: nomeTabela, idTabela: doc.id),
-        );
-      }
-    });
+    await db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
+        .collection(Constantes.fireBaseColecaoEscalas)
+        .get()
+        .then((event) {
+          for (var doc in event.docs) {
+            var nomeTabela = doc
+                .data()
+                .values
+                .toString()
+                .replaceAll("(", "")
+                .replaceAll(")", "");
+            tabelasBancoDados.add(
+              TabelaModelo(nomeTabela: nomeTabela, idTabela: doc.id),
+            );
+          }
+        });
     return tabelasBancoDados;
   }
 
@@ -330,7 +342,7 @@ class _TelaListagemTabelasBancoDadosState
                               child: Text(
                                 textAlign: TextAlign.center,
                                 Textos.descricaoDropDownTabelas,
-                                style: const TextStyle(fontSize: 20),
+                                style: const TextStyle(fontSize: 18),
                               ),
                             ),
                             DropdownButton(
@@ -349,7 +361,7 @@ class _TelaListagemTabelasBancoDadosState
                                             item.nomeTabela.toString(),
                                             style: const TextStyle(
                                               fontWeight: FontWeight.normal,
-                                              fontSize: 20,
+                                              fontSize: 18,
                                             ),
                                           ),
                                         ),
@@ -385,7 +397,7 @@ class _TelaListagemTabelasBancoDadosState
                                         Text(
                                           textAlign: TextAlign.center,
                                           Textos.descricaoTabelaSelecionada,
-                                          style: const TextStyle(fontSize: 20),
+                                          style: const TextStyle(fontSize: 18),
                                         ),
                                         Text(
                                           textAlign: TextAlign.center,

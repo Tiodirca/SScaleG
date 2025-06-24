@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,13 +38,21 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   String idItemAtualizar = "";
   int quantidadeNomes = 2;
   TextEditingController nomeAdicionarCampo = TextEditingController(text: "");
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
+  String nomeColecaoFireBase = Constantes.fireBaseColecaoEscalas;
+  String nomeDocumentoFireBase = Constantes.fireBaseDadosCadastrados;
 
   @override
   void initState() {
     super.initState();
-    realizarBuscaDadosFireBase(widget.idDocumento, "");
-    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
-    idItemAtualizar = PassarPegarDados.recuperarIdAtualizarSelecionado();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    Timer(const Duration(seconds: 1), () {
+      realizarBuscaDadosFireBase(widget.idDocumento, "");
+      itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
+      idItemAtualizar = PassarPegarDados.recuperarIdAtualizarSelecionado();
+    });
   }
 
   @override
@@ -59,34 +68,36 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
       var db = FirebaseFirestore.instance;
       //instanciano variavel
       db
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
           .doc(idDocumento)
-          .collection(Constantes.fireBaseDadosCadastrados)
+          .collection(nomeDocumentoFireBase)
           .get()
           .then(
             (querySnapshot) async {
-          //Veficando se nao e vazio
-          if (querySnapshot.docs.isNotEmpty) {
-            carregarDados(querySnapshot, tipoBusca);
-            validarTipoBusca(querySnapshot, tipoBusca);
-          } else {
-            setState(() {
-              if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
-                exibirWidgetTelaCarregamento = false;
+              //Veficando se nao e vazio
+              if (querySnapshot.docs.isNotEmpty) {
+                carregarDados(querySnapshot, tipoBusca);
+                validarTipoBusca(querySnapshot, tipoBusca);
+              } else {
+                setState(() {
+                  if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+                    exibirWidgetTelaCarregamento = false;
+                  }
+                  chamarExibirMensagemErro(Textos.erroBaseDadosVazia);
+                });
               }
-              chamarExibirMensagemErro(Textos.erroBaseDadosVazia);
-            });
-          }
-        },
-        onError: (e) {
-          setState(() {
-            exibirWidgetTelaCarregamento = false;
-          });
-          chamarExibirMensagemErro(
-            "Erro ao buscar escala : ${e.toString()}",
+            },
+            onError: (e) {
+              setState(() {
+                exibirWidgetTelaCarregamento = false;
+              });
+              chamarExibirMensagemErro(
+                "Erro ao buscar escala : ${e.toString()}",
+              );
+            },
           );
-        },
-      );
     } catch (e) {
       setState(() {
         exibirWidgetTelaCarregamento = false;
@@ -113,10 +124,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
     List<String> listaCabecalho = [];
     if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
       setState(() {
-        listaCabecalho = querySnapshot.docs.first
-            .data()
-            .keys
-            .toList();
+        listaCabecalho = querySnapshot.docs.first.data().keys.toList();
         for (var element in listaCabecalho) {
           if (!itensRecebidosCabecalhoLinha.keys.contains(element)) {
             itensRecebidosCabecalhoLinha[element] = "";
@@ -226,41 +234,45 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
     }
   }
 
-  atualizarCampos(List<MapEntry> escala,
-      String idDocumentoFirebase,
-      String idItem,
-      int tamanhoEscala,) async {
+  atualizarCampos(
+    List<MapEntry> escala,
+    String idDocumentoFirebase,
+    String idItem,
+    int tamanhoEscala,
+  ) async {
     setState(() {
       index = 0;
     });
     try {
       var db = FirebaseFirestore.instance;
       db
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
           .doc(idDocumentoFirebase)
-          .collection(Constantes.fireBaseDadosCadastrados)
+          .collection(nomeDocumentoFireBase)
           .doc(idItem)
           .set(criarMapComTodosOsDados(escala))
           .then(
             (value) {
-          //definindo que a cada iteracao o index ira aumentar
-          index++;
-          //caso o index seja igual ao tamanho da escala realizar acoes
-          if (index == tamanhoEscala) {
-            index = 0;
-            realizarBuscaDadosFireBase(
-              widget.idDocumento,
-              Constantes.tipoBuscaAdicionarCampo,
-            );
-            chamarExibirMensagemSucesso();
-          }
-        },
-        onError: (e) {
-          chamarExibirMensagemErro(
-            "Erro ao adicionar campo : ${e.toString()}",
+              //definindo que a cada iteracao o index ira aumentar
+              index++;
+              //caso o index seja igual ao tamanho da escala realizar acoes
+              if (index == tamanhoEscala) {
+                index = 0;
+                realizarBuscaDadosFireBase(
+                  widget.idDocumento,
+                  Constantes.tipoBuscaAdicionarCampo,
+                );
+                chamarExibirMensagemSucesso();
+              }
+            },
+            onError: (e) {
+              chamarExibirMensagemErro(
+                "Erro ao adicionar campo : ${e.toString()}",
+              );
+            },
           );
-        },
-      );
     } catch (e) {
       setState(() {
         exibirWidgetTelaCarregamento = false;
@@ -287,14 +299,8 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
 
   @override
   Widget build(BuildContext context) {
-    double larguraTela = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double alturaTela = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double larguraTela = MediaQuery.of(context).size.width;
+    double alturaTela = MediaQuery.of(context).size.height;
     return Theme(
       data: estilo.estiloGeral,
       child: GestureDetector(
@@ -322,63 +328,66 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
                   width: larguraTela,
                   height: alturaTela,
                   child: Column(
-                      children: [
-                  Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
-                  width: larguraTela,
-                  child: Text(
-                    Textos.descricaoTabelaSelecionada + widget.nomeEscala,
-                    textAlign: TextAlign.end,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                        width: larguraTela,
+                        child: Text(
+                          Textos.descricaoTabelaSelecionada + widget.nomeEscala,
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(10),
+                        child: Text(
+                          Textos.telaCadastroNovoCampoDescricao,
+                          textAlign: TextAlign.justify,
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      SizedBox(
+                        width: Platform.isIOS || Platform.isAndroid ? 300 : 500,
+                        child: Form(
+                          key: validacaoFormulario,
+                          child: TextFormField(
+                            controller: nomeAdicionarCampo,
+                            keyboardType: TextInputType.text,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return Textos.erroCampoVazio;
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              labelText: Textos.telaCadastroCampoNovolabel,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(20),
+                        width: 110,
+                        height: 40,
+                        child: FloatingActionButton(
+                          heroTag: Textos.btnCadastrar,
+                          onPressed: () {
+                            validarCampoEChamarAtualizarCampo();
+                          },
+                          child: Text(
+                            Textos.btnCadastrar,
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.all(10),
-                  child: Text(
-                    Textos.telaCadastroNovoCampoDescricao,
-                    textAlign: TextAlign.justify,
-                    style: const TextStyle(fontSize: 20),
-                  ),
+                bottomNavigationBar: Container(
+                  color: Colors.white,
+                  child: BarraNavegacao(),
                 ),
-                SizedBox(
-                  width: Platform.isIOS || Platform.isAndroid ? 300 : 500,
-                  child: Form(
-                  key: validacaoFormulario,
-                  child: TextFormField(
-                    controller: nomeAdicionarCampo,
-                    keyboardType: TextInputType.text,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return Textos.erroCampoVazio;
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      labelText: Textos.telaCadastroCampoNovolabel,
-                    ),
-                  ),
-                ),
-              ),
-            Container(
-            margin: EdgeInsets.all(20),
-            width: 110,
-            height: 40,
-            child: FloatingActionButton(
-            heroTag: Textos.btnCadastrar,
-            onPressed: () {
-            validarCampoEChamarAtualizarCampo();
-            },
-            child: Text(Textos.btnCadastrar,style: TextStyle(color: Colors.black),),
-            ),
-            ),
-            ],
-            ),
-            ),
-            bottomNavigationBar: Container(
-            color: Colors.white,
-            child: BarraNavegacao(),
-            ),
-            );
-          }
+              );
+            }
           },
         ),
       ),

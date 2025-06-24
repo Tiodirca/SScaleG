@@ -5,6 +5,7 @@ class Textos {
   static String btnCriarEscala = "Criar Escala";
   static String btnConfiguracao = "Configurações";
   static String btnCadastrar = "Cadastrar";
+  static String btnLogin = "Fazer Login";
   static String btnAvancar = "Avançar";
   static String btnListarEscalas = "Ver lista de Escalas";
   static String btnAdicionar = "Adicionar Item";
@@ -25,6 +26,18 @@ class Textos {
   static String btnVerEscalaAtual = "Escala Atual";
   static String btnAdicionarLogoImagem = "Adicionar Logo/Imagem";
   static String btnUsarEscala = "Utilizar está escala";
+
+  static String labelEmail = "E-mail";
+  static String labelSenha = "Senha";
+  static String labelEsqueciSenha = "Esqueci Senha";
+
+  // TELA LOGIN CADASTRO - LOGIN
+  static String telaLoginUsuarioDescricao =
+      "Faça Login ou se cadastre "
+      "para poder estar utilizando o programa";
+
+  //TELA LOGIN CADASTRO - CADASTRO
+  static String telaCadastroUsuarioTitulo = "Cadastro de Usuario";
 
   // TELA INICIAL
   static String telaInicialDescricao = "Selecione uma opção";
@@ -161,6 +174,9 @@ class Textos {
       "Não foi possível encontrar nenhuma informação na base de dados, por favor "
       "verifique a conexão com internet ou cadastre uma informação";
 
+  static String erroValidarUsuarioEmailNaoCadastrado = "E-mail não cadastrado";
+  static String erroValidarUsuarioSenhaErrada = "Senha Incorreta";
+  static String erroValidarUsuarioEmailErrado = "E-mail está incorreto";
   //GERAIS
   static String telaCarregamentoAguarde = "Aguarde Carregando";
   static String descricaoDataPicker = "Selecione uma data";

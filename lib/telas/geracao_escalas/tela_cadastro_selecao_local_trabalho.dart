@@ -30,14 +30,20 @@ class _TelaCadastroSelecaoLocalTrabalhoState
   Estilo estilo = Estilo();
   int indexTabela = 0;
   String nomeCadastro = "";
+  String uidUsuario = "";
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeLocaisTrabalho;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeLocaisTrabalho;
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
   TextEditingController nomeControle = TextEditingController(text: "");
 
   @override
   void initState() {
     super.initState();
-    realizarBuscaDadosFireBase();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    Timer(const Duration(seconds: 1), () {
+      realizarBuscaDadosFireBase();
+    });
   }
 
   Widget checkBoxPersonalizado(CheckBoxModelo checkBoxModel) =>
@@ -60,7 +66,10 @@ class _TelaCadastroSelecaoLocalTrabalhoState
             },
           ),
         ),
-        title: Text(checkBoxModel.texto.replaceAll("_", " "), style: const TextStyle(fontSize: 20)),
+        title: Text(
+          checkBoxModel.texto.replaceAll("_", " "),
+          style: const TextStyle(fontSize: 20),
+        ),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
@@ -100,6 +109,8 @@ class _TelaCadastroSelecaoLocalTrabalhoState
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
           .set({nomeDocumentoFireBase: nomeCadastro})
@@ -151,6 +162,8 @@ class _TelaCadastroSelecaoLocalTrabalhoState
       var db = FirebaseFirestore.instance;
       //instanciano variavel
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase)
           .get()
           .then(
@@ -189,6 +202,8 @@ class _TelaCadastroSelecaoLocalTrabalhoState
   converterJsonParaObjeto(String id, int tamanhoTabela) async {
     var db = FirebaseFirestore.instance;
     final ref = db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
@@ -229,6 +244,8 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     });
     var db = FirebaseFirestore.instance;
     await db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(checkbox.id)
         .delete()
@@ -325,8 +342,6 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     double larguraTela = MediaQuery.of(context).size.width;
@@ -395,11 +410,9 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                       child: SizedBox(
                                         width: Platform.isWindows ? 300 : 200,
                                         child: TextFormField(
-                                          decoration:
-                                          InputDecoration(
+                                          decoration: InputDecoration(
                                             hintText:
-                                            Textos
-                                                .labelTextFieldCampo,
+                                                Textos.labelTextFieldCampo,
                                           ),
                                           controller: nomeControle,
                                           onFieldSubmitted: (value) {
@@ -425,7 +438,10 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                         onPressed: () {
                                           validarCampoEChamarCadastrar();
                                         },
-                                        child: Text(Textos.btnCadastrar,style: TextStyle(color: Colors.black),),
+                                        child: Text(
+                                          Textos.btnCadastrar,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -528,9 +544,9 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                           ),
                         ),
                       ),
-                      BarraNavegacao()
+                      BarraNavegacao(),
                     ],
-                  )
+                  ),
                 ),
               );
             }

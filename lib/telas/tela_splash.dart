@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
+import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import '../Uteis/paleta_cores.dart';
 import '../Widgets/tela_carregamento.dart';
 import '../uteis/constantes.dart';
@@ -14,13 +16,54 @@ class TelaSplashScreen extends StatefulWidget {
 }
 
 class _TelaSplashScreenState extends State<TelaSplashScreen> {
+  late StreamSubscription<User?> validacao;
+  int index = 0;
+
   @override
   void initState() {
     super.initState();
     chamarMetodoGravarDadosSharePreferences();
-    Timer(const Duration(seconds: 1), () {
-      Navigator.pushReplacementNamed(context, Constantes.rotaTelaInicial);
+    Timer(const Duration(seconds: 2), () {
+      validarUsuarioLogado();
     });
+  }
+
+  validarUsuarioLogado() async {
+    validacao = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      index++;
+      if (index == 2) {
+        index = 0;
+        if (user != null) {
+          debugPrint("Usuario Logado");
+          passarInformacoes(user.uid, user.email.toString());
+          redirecionarTelaInicial();
+        } else {
+          debugPrint("Sem Usuario Logado");
+          redirecionarTelaLoginCadastro();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    validacao.cancel();
+  }
+
+  redirecionarTelaLoginCadastro() {
+    Navigator.pushReplacementNamed(context, Constantes.rotaTelaLoginCadastro);
+  }
+
+  redirecionarTelaInicial() {
+    Navigator.pushReplacementNamed(context, Constantes.rotaTelaInicial);
+  }
+
+  passarInformacoes(String uid, String email) {
+    Map dados = {};
+    dados[Constantes.infoUsuarioUID] = uid;
+    dados[Constantes.infoUsuarioEmail] = email;
+    PassarPegarDados.passarInformacoesUsuario(dados);
   }
 
   chamarMetodoGravarDadosSharePreferences() {
@@ -56,11 +99,11 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // const Image(
-                //   image: AssetImage('assets/imagens/Logo.png'),
-                //   width: 200,
-                //   height: 200,
-                // ),
+                const Image(
+                  image: AssetImage('assets/imagens/Logo.png'),
+                  width: 200,
+                  height: 200,
+                ),
                 SizedBox(
                   width: larguraTela,
                   height: 300,

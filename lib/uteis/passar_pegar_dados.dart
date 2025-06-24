@@ -6,13 +6,14 @@ class PassarPegarDados {
   static List<String> listaCamposLinhaItem = [];
   static List<String> listaObservacoesPDF = [];
   static List<dynamic> listaItensAtualizar = [];
-  static List<Map> listaTeste = [];
   static Map itensCadastrarAtualizar = {};
   static String idItemAtualizarSelecionado = "";
   static String horarioFinalSemanaDefinido = "";
   static String horarioSemanaDefinido = "";
   static String dataComComplemento = "";
   static String confirmacaoCarregamentoConcluido = "";
+
+  static Map informacoesUsuario = {};
 
   static List<String> passarNomesLocaisTrabalho(List<String> locaisTrabalho) {
     listaNomesLocaisTrabalho = locaisTrabalho;
@@ -122,5 +123,14 @@ class PassarPegarDados {
 
   static List<String> recuperarObservacoesPDF() {
     return listaObservacoesPDF;
+  }
+
+  static Map passarInformacoesUsuario(Map infoUsuario) {
+    informacoesUsuario = infoUsuario;
+    return informacoesUsuario;
+  }
+
+  static Map recuperarInformacoesUsuario() {
+    return informacoesUsuario;
   }
 }

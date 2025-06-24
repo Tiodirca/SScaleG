@@ -30,15 +30,20 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   final validacaoFormulario = GlobalKey<FormState>();
   Estilo estilo = Estilo();
   String nomeCadastro = "";
+  String uidUsuario = "";
   TextEditingController nomeControle = TextEditingController(text: "");
   int indexTabela = 0;
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeVoluntarios;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeVoluntarios;
 
   @override
   void initState() {
     super.initState();
-    realizarBuscaDadosFireBase();
+    uidUsuario = PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    Timer(const Duration(seconds: 1), () {
+      realizarBuscaDadosFireBase();
+    });
   }
 
   validarQuantidadeVoluntarios() {
@@ -72,7 +77,10 @@ class _TelaCadastroSelecaoNomesVoluntariosState
             },
           ),
         ),
-        title: Text(checkBoxModel.texto.replaceAll("_", " "), style: const TextStyle(fontSize: 20)),
+        title: Text(
+          checkBoxModel.texto.replaceAll("_", " "),
+          style: const TextStyle(fontSize: 20),
+        ),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
@@ -109,6 +117,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
+          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
           .set({nomeDocumentoFireBase: nomeCadastro})
@@ -163,6 +173,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
       var db = FirebaseFirestore.instance;
       //instanciano variavel
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase)
           .get()
           .then(
@@ -203,6 +215,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   converterJsonParaObjeto(String id, int tamanhoEscala) async {
     var db = FirebaseFirestore.instance;
     final ref = db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
@@ -240,6 +254,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   chamarDeletar(CheckBoxModelo checkbox) async {
     var db = FirebaseFirestore.instance;
     await db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(checkbox.id)
         .delete()
@@ -277,7 +293,6 @@ class _TelaCadastroSelecaoNomesVoluntariosState
       });
     }
   }
-
 
   Future<void> alertaExclusao(
     BuildContext context,
@@ -330,8 +345,6 @@ class _TelaCadastroSelecaoNomesVoluntariosState
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -528,7 +541,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                           onPressed: () {
                             if (validarQuantidadeVoluntarios()) {
                               redirecionarProximaTela();
-                            } else if (validarQuantidadeVoluntarios() == false) {
+                            } else if (validarQuantidadeVoluntarios() ==
+                                false) {
                               MetodosAuxiliares.exibirMensagens(
                                 Constantes.tipoNotificacaoErro,
                                 Textos.erroQuantidadeSelecionadaInsuficiente +
@@ -550,9 +564,9 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                           ),
                         ),
                       ),
-                      BarraNavegacao()
+                      BarraNavegacao(),
                     ],
-                  )
+                  ),
                 ),
               );
             }

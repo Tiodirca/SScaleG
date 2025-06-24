@@ -12,6 +12,7 @@ import 'package:sscaleg/telas/tela_atualizar_item.dart';
 import 'package:sscaleg/telas/tela_cadastro_item.dart';
 import 'package:sscaleg/telas/tela_configurar_pdf_baixar.dart';
 import 'package:sscaleg/telas/tela_inicial.dart';
+import 'package:sscaleg/telas/tela_login_cadastro.dart';
 import 'package:sscaleg/telas/tela_observacao.dart';
 
 import '../telas/tela_splash.dart';
@@ -28,6 +29,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => const TelaSplashScreen());
       case Constantes.rotaTelaInicial:
         return MaterialPageRoute(builder: (_) => const TelaInicial());
+      case Constantes.rotaTelaLoginCadastro:
+        return MaterialPageRoute(builder: (_) => const TelaLoginCadastro());
       case Constantes.rotaTelaCadastroSelecaoLocalTrabalho:
         return MaterialPageRoute(
           builder: (_) => const TelaCadastroSelecaoLocalTrabalho(),

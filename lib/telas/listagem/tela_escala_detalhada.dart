@@ -46,13 +46,21 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   List<DataRow> linhasDataRow = [];
   String nomeReacar = "";
   final validacaoFormulario = GlobalKey<FormState>();
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
+  String nomeColecaoFireBase = Constantes.fireBaseColecaoEscalas;
+  String nomeDocumentoFireBase = Constantes.fireBaseDadosCadastrados;
   TextEditingController textoPesquisa = TextEditingController(text: "");
 
   @override
   void initState() {
     super.initState();
     listaObservacoesPDF = PassarPegarDados.recuperarObservacoesPDF();
-    realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    Timer(const Duration(seconds: 1), () {
+      realizarBuscaDadosFireBase(widget.idTabelaSelecionada);
+    });
   }
 
   limparVariaveis() {
@@ -73,9 +81,11 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     var db = FirebaseFirestore.instance;
     //instanciano variavel
     db
-        .collection(Constantes.fireBaseColecaoEscalas)
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
+        .collection(nomeColecaoFireBase)
         .doc(idDocumento)
-        .collection(Constantes.fireBaseDadosCadastrados)
+        .collection(nomeDocumentoFireBase)
         .get()
         .then(
           (querySnapshot) async {
@@ -331,9 +341,11 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     try {
       var db = FirebaseFirestore.instance;
       await db
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
           .doc(widget.idTabelaSelecionada)
-          .collection(Constantes.fireBaseDadosCadastrados)
+          .collection(nomeDocumentoFireBase)
           .doc(idDocumento)
           .delete()
           .then(

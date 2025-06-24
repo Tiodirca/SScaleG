@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
-import 'package:sscaleg/widgets/widget_ajustar_horario.dart';
+import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import '../uteis/textos.dart';
 
 class TelaInicial extends StatefulWidget {
@@ -16,7 +16,14 @@ class TelaInicial extends StatefulWidget {
 
 class _TelaInicialState extends State<TelaInicial> {
   Estilo estilo = Estilo();
-  String emailCadastrado = "jhonatansbestevao@gmail.com";
+  String uidUsuario = "";
+  String emailCadastrado = "";
+
+  @override
+  void initState() {
+    emailCadastrado = PassarPegarDados.recuperarInformacoesUsuario().entries.last.value;
+    super.initState();
+  }
 
   Widget botao(String nomeBtn) => Container(
     margin: const EdgeInsets.all(10),

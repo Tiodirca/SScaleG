@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,13 +42,21 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
   List<CheckBoxModelo> listaNomesCadastrados = [];
   int quantidadeNomes = 2;
   TextEditingController nomeAdicionarCampo = TextEditingController(text: "");
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
+  String nomeColecaoFireBase = Constantes.fireBaseColecaoEscalas;
+  String nomeDocumentoFireBase = Constantes.fireBaseDadosCadastrados;
 
   @override
   void initState() {
     super.initState();
-    realizarBuscaDadosFireBase(widget.idDocumento, "");
-    itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
-    idItemAtualizar = PassarPegarDados.recuperarIdAtualizarSelecionado();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    Timer(const Duration(seconds: 1), () {
+      realizarBuscaDadosFireBase(widget.idDocumento, "");
+      itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
+      idItemAtualizar = PassarPegarDados.recuperarIdAtualizarSelecionado();
+    });
   }
 
   @override
@@ -63,9 +72,11 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
       var db = FirebaseFirestore.instance;
       //instanciano variavel
       db
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
           .doc(idDocumento)
-          .collection(Constantes.fireBaseDadosCadastrados)
+          .collection(nomeDocumentoFireBase)
           .get()
           .then(
             (querySnapshot) async {
@@ -190,9 +201,11 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
     try {
       var db = FirebaseFirestore.instance;
       db
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
           .doc(idDocumentoFirebase)
-          .collection(Constantes.fireBaseDadosCadastrados)
+          .collection(nomeDocumentoFireBase)
           .doc(idItem)
           // passando o metodo que cria o map contendo os valores formatados
           .set(criarMapComTodosOsDados(escala))

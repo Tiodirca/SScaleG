@@ -45,10 +45,16 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   TimeOfDay? horarioTimePicker = const TimeOfDay(hour: 19, minute: 00);
   DateTime dataSelecionada = DateTime.now();
   final _formKeyFormulario = GlobalKey<FormState>();
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
+  String nomeColecaoFireBase = Constantes.fireBaseColecaoEscalas;
+  String nomeDocumentoFireBase = Constantes.fireBaseDadosCadastrados;
 
   @override
   void initState() {
     super.initState();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
     idItem = PassarPegarDados.recuperarIdAtualizarSelecionado();
     itensRecebidosCabecalhoLinha.removeWhere((key, value) {
@@ -205,9 +211,11 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     try {
       var db = FirebaseFirestore.instance;
       db
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
           .doc(idDocumentoFirebase)
-          .collection(Constantes.fireBaseDadosCadastrados)
+          .collection(nomeDocumentoFireBase)
           .doc(idItem)
           .set(criarMapCompativel(itemDigitado))
           .then((value) {

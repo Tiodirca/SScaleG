@@ -43,10 +43,16 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   TimeOfDay? horarioTimePicker = const TimeOfDay(hour: 19, minute: 00);
   DateTime dataSelecionada = DateTime.now();
   final _formKeyFormulario = GlobalKey<FormState>();
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
+  String nomeColecaoFireBase = Constantes.fireBaseColecaoEscalas;
+  String nomeDocumentoFireBase = Constantes.fireBaseDadosCadastrados;
 
   @override
   void initState() {
     super.initState();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     recuperarHorarioTroca();
     carregarCampos();
   }
@@ -196,9 +202,11 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     try {
       var db = FirebaseFirestore.instance;
       db
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
           .doc(idDocumentoFirebase)
-          .collection(Constantes.fireBaseDadosCadastrados)
+          .collection(nomeDocumentoFireBase)
           .doc()
           .set(criarMapCompativel(itemDigitado))
           .then((value) {
@@ -248,7 +256,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     return itemFinal;
   }
 
-  fecharTelaOpcoesData(){
+  fecharTelaOpcoesData() {
     setState(() {
       exibirTelaOpcoesData = false;
       exibirAcoesOpcaoData = false;

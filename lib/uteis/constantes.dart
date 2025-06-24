@@ -4,6 +4,7 @@ class Constantes {
   //ROTAS
   static const rotaTelaSplash = "telaSplash";
   static const rotaTelaInicial = "telaInicial";
+  static const rotaTelaLoginCadastro = "loginCadastro";
 
   //Rotas da GERACAO DE ESCALA
   static const rotaTelaCadastroSelecaoLocalTrabalho =
@@ -44,6 +45,9 @@ class Constantes {
   static const rotaArgumentoLinhasEscala = "linhasEscala";
   static const rotaArgumentoObservacaoEscala = "observacaoEscala";
 
+  static const infoUsuarioUID = "uid";
+  static const infoUsuarioEmail = "email";
+
   // datas da semana
   static const diaSegunda = "Segunda-feira";
   static const diaTerca = "Terça-feira";
@@ -70,6 +74,8 @@ class Constantes {
   static const iconeBarraPesquisar = Icons.send;
   static const iconeDataCulto = Icons.date_range_outlined;
   static const iconeMudarHorario = Icons.access_time_filled_outlined;
+  static const iconeEmail = Icons.email;
+  static const iconeSenha = Icons.password;
 
   // SHARE PREFERENCES
   static const sharePreferencesAjustarHorarioSemana = "ajustarHorarioSemana";
@@ -96,6 +102,9 @@ class Constantes {
 
   //FIRE BASE
   //LOCAIS TRABALHO
+
+  static const fireBaseColecaoUsuarios = "Usuarios";
+
   static const fireBaseColecaoNomeLocaisTrabalho = "locais_trabalho";
   static const fireBaseDocumentoNomeLocaisTrabalho = "nome";
 

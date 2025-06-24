@@ -29,20 +29,26 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       PassarPegarDados.recuperarIntervaloTrabalho();
   List<String> locaisSorteioVoluntarios =
       PassarPegarDados.recuperarNomesLocaisTrabalho();
+  List<String> nomeVoluntarios = PassarPegarDados.recuperarNomesVoluntarios();
   TextEditingController nomeEscala = TextEditingController(text: "");
   Random random = Random();
   List<int> listaNumeroAuxiliarRepeticao = [];
-
-  List<String> nomeVoluntarios = PassarPegarDados.recuperarNomesVoluntarios();
   List<Map> escalaSorteada = [];
   int index = 0;
   String horarioSemana = "";
   String nomeEscalaFormatada = "";
   String horarioFinalSemana = "";
+  Map dadosUsuario = {};
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
+  String nomeColecaoFireBase = Constantes.fireBaseColecaoEscalas;
+  String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeEscalas;
 
   @override
   void initState() {
     super.initState();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
   }
 
   recuperarHorarioDefinidoInicioTrabalho() {
@@ -126,10 +132,12 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     String idDocumentoFirebase = "";
     var db = FirebaseFirestore.instance;
     await db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
         // definindo a COLECAO no Firebase
-        .collection(Constantes.fireBaseColecaoEscalas)
+        .collection(nomeColecaoFireBase)
         // selecionar todos os itens que contem o parametro passado
-        .where(Constantes.fireBaseDocumentoNomeEscalas)
+        .where(nomeDocumentoFireBase)
         .get()
         .then((querySnapshot) {
           for (var docSnapshot in querySnapshot.docs) {
@@ -149,10 +157,12 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     try {
       var db = FirebaseFirestore.instance;
       db
+          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .doc(uidUsuario)
           // definindo a COLECAO no Firebase
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoFireBase)
           // definindo o nome do DOCUMENTO
-          .add({Constantes.fireBaseDocumentoNomeEscalas: nomeEscalaFormatada})
+          .add({nomeDocumentoFireBase: nomeEscalaFormatada})
           .then(
             (value) async {
               String idDocumentoFirebase = await buscarIDDocumentoFirebase();
@@ -192,7 +202,10 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     try {
       var db = FirebaseFirestore.instance;
       db
-          .collection(Constantes.fireBaseColecaoEscalas)
+          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .doc(uidUsuario)
+          // definindo a COLECAO no Firebase
+          .collection(nomeColecaoFireBase)
           .doc(idDocumentoFirebase)
           .collection(Constantes.fireBaseDadosCadastrados)
           .doc()
@@ -252,7 +265,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   }
 
   chamarFazerSorteio() {
-
     if (validacaoFormulario.currentState!.validate()) {
       setState(() {
         nomeEscalaFormatada =
@@ -339,7 +351,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                               ),
                             ),
                             WidgetAjustarHorario(),
-
                           ],
                         ),
                       ],
@@ -362,15 +373,13 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                           },
                           child: Text(
                             Textos.btnCriarEscala,
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
+                            style: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
-                      BarraNavegacao()
+                      BarraNavegacao(),
                     ],
-                  )
+                  ),
                 ),
               );
             }
