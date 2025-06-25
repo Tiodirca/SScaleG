@@ -32,8 +32,7 @@ class TelaAtualizarItem extends StatefulWidget {
 class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   Estilo estilo = Estilo();
   bool exibirTelaCarregamento = false;
-  bool exibirTelaOpcoesData = false;
-  bool exibirAcoesOpcaoData = false;
+  bool exibirTelaOpcaoData = false;
   String horarioTroca = "";
   bool exibirWidgetCarregamento = false;
   Map itensRecebidosCabecalhoLinha = {};
@@ -184,17 +183,24 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   }
 
   verificarCarregamentoDadosConcluido() {
-    String dados = PassarPegarDados.recuperarConfirmacaoCarregamentoConcluido();
+    String dados =
+        PassarPegarDados.recuperarConfirmacaoSelecaoDataComplemento();
+    //verificando se a string e vazia
     if (dados.isEmpty) {
+      //definindo um timer para chamar novamente o metodo a cada 1 segundo
       Timer(const Duration(seconds: 1), () {
         verificarCarregamentoDadosConcluido();
       });
-    } else if (dados.contains(
-      Constantes.confirmacaoCarregamentoConcluidoData,
-    )) {
-      setState(() {
-        exibirAcoesOpcaoData = true;
-      });
+    } else if (dados.contains(Constantes.confirmacaoSelecaoDataComplemento)) {
+      if (mounted) {
+        setState(() {
+          if (PassarPegarDados.recuperarDataComComplemento().isNotEmpty) {
+            dataFormatada = PassarPegarDados.recuperarDataComComplemento();
+          }
+          PassarPegarDados.passarConfirmacaoSelecaoDataComplemento("");
+          exibirTelaOpcaoData = false;
+        });
+      }
     }
   }
 
@@ -270,13 +276,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
           onPressed: () async {
-            if (icone == Constantes.iconeExclusao) {
-              setState(() {
-                exibirTelaOpcoesData = false;
-                exibirAcoesOpcaoData = false;
-                PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
-              });
-            } else if (icone == Constantes.iconeMudarHorario) {
+            if (icone == Constantes.iconeMudarHorario) {
               exibirTimePicker();
             } else if (icone == Constantes.iconeDataCulto) {
               exibirDataPicker();
@@ -309,8 +309,6 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     width: nomeBotao == Textos.btnOpcaoData ? 120 : 110,
     child: FloatingActionButton(
       heroTag: nomeBotao,
-      elevation: 0,
-      backgroundColor: Colors.white,
       onPressed: () async {
         // verificando o tipo do botao
         // para fazer acoes diferentes
@@ -323,26 +321,20 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
         } else if (nomeBotao == Textos.btnRemoverCampo) {
           redirecionarTelaRemoverCampos();
         } else if (nomeBotao == Textos.btnOpcaoData) {
-          PassarPegarDados.passarDataComComplemento("");
           setState(() {
-            exibirTelaOpcoesData = true;
+            exibirTelaOpcaoData = true;
+            PassarPegarDados.passarDataComComplemento("");
+            PassarPegarDados.passarConfirmacaoSelecaoDataComplemento("");
             verificarCarregamentoDadosConcluido();
-          });
-        } else if (nomeBotao == Textos.btnSalvarOpcaoData) {
-          setState(() {
-            if (PassarPegarDados.recuperarDataComComplemento().isNotEmpty) {
-              dataFormatada = PassarPegarDados.recuperarDataComComplemento();
-            }
-            PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
-            exibirAcoesOpcaoData = false;
-            exibirTelaOpcoesData = false;
           });
         }
       },
       child: Text(
         nomeBotao,
         textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 14, color: Colors.black),
+        style: TextStyle(
+          color: Colors.black,
+        ),
       ),
     ),
   );
@@ -430,27 +422,21 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
           builder: (context, constraints) {
             if (exibirWidgetCarregamento) {
               return const TelaCarregamento();
+            } else if (exibirTelaOpcaoData) {
+              return WidgetOpcoesData(dataSelecionada: dataFormatada);
             } else {
               return Scaffold(
                 appBar: AppBar(
                   //Colocando Visible negando o valor da variavel ou quando a variavel for verdadeira
                   // para que quando o usuario clicar para mostrar o widget de opcoes data
                   // estes campos sejam ocultados enquanto a  tela de carregamento aparece
-                  title: Visibility(
-                    visible:
-                        !exibirTelaOpcoesData || exibirAcoesOpcaoData == true,
-                    child: Text(Textos.telaAtualizarItemTitulo),
-                  ),
-                  leading: Visibility(
-                    visible:
-                        !exibirTelaOpcoesData || exibirAcoesOpcaoData == true,
-                    child: IconButton(
-                      color: Colors.white,
-                      onPressed: () {
-                        redirecionarTelaAnterior();
-                      },
-                      icon: const Icon(Icons.arrow_back_ios),
-                    ),
+                  title: Text(Textos.telaAtualizarItemTitulo),
+                  leading: IconButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      redirecionarTelaAnterior();
+                    },
+                    icon: const Icon(Icons.arrow_back_ios),
                   ),
                 ),
                 body: Container(
@@ -464,153 +450,111 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                         horizontal: 0,
                       ),
                       width: larguraTela,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          if (exibirTelaOpcoesData) {
-                            return Column(
-                              children: [
-                                WidgetOpcoesData(
-                                  dataSelecionada: dataFormatada,
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                            ),
+                            width: larguraTela,
+                            child: Text(
+                              Textos.descricaoTabelaSelecionada +
+                                  widget.nomeTabela,
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                          SizedBox(
+                            width: larguraTela,
+                            child: Text(
+                              Textos.telaAtualizarDescricao,
+                              style: const TextStyle(fontSize: 18),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              botoesIcones(
+                                Constantes.iconeDataCulto,
+                                40,
+                                PaletaCores.corCastanho,
+                              ),
+                              botoesAcoes(Textos.btnOpcaoData),
+                              botoesIcones(
+                                Constantes.iconeMudarHorario,
+                                40,
+                                PaletaCores.corCastanho,
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: 250,
+                                child: Text(
+                                  Textos.descricaoDataSelecionada +
+                                      dataFormatada,
+                                  textAlign: TextAlign.center,
                                 ),
-                                Visibility(
-                                  visible: exibirAcoesOpcaoData,
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      botoesAcoes(Textos.btnSalvarOpcaoData),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                        ),
-                                        child: botoesIcones(
-                                          Constantes.iconeExclusao,
-                                          30,
-                                          PaletaCores.corRosaAvermelhado,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                              ),
+                              SizedBox(
+                                width: 150,
+                                child: Text(
+                                  horarioTroca,
+                                  textAlign: TextAlign.center,
                                 ),
-                              ],
-                            );
-                          } else {
-                            return Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                  ),
-                                  width: larguraTela,
-                                  child: Text(
-                                    Textos.descricaoTabelaSelecionada +
-                                        widget.nomeTabela,
-                                    textAlign: TextAlign.end,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: larguraTela,
-                                  child: Text(
-                                    Textos.telaAtualizarDescricao,
-                                    style: const TextStyle(fontSize: 18),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    botoesIcones(
-                                      Constantes.iconeDataCulto,
-                                      40,
-                                      PaletaCores.corCastanho,
-                                    ),
-                                    botoesAcoes(Textos.btnOpcaoData),
-                                    botoesIcones(
-                                      Constantes.iconeMudarHorario,
-                                      40,
-                                      PaletaCores.corCastanho,
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  children: [
-                                    SizedBox(
-                                      width: 250,
-                                      child: Text(
-                                        Textos.descricaoDataSelecionada +
-                                            dataFormatada,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 150,
-                                      child: Text(
-                                        horarioTroca,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Form(
-                                  key: _formKeyFormulario,
-                                  child: Container(
-                                    padding: EdgeInsets.only(bottom: 10),
-                                    width: larguraTela,
-                                    height: alturaTela * 0.47,
-                                    child: GridView.builder(
-                                      gridDelegate:
-                                          SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount:
-                                                MetodosAuxiliares.quantidadeColunasGridView(
-                                                  larguraTela,
-                                                ),
-                                            mainAxisExtent: 70,
+                              ),
+                            ],
+                          ),
+                          Form(
+                            key: _formKeyFormulario,
+                            child: Container(
+                              padding: EdgeInsets.only(bottom: 10),
+                              width: larguraTela,
+                              height: alturaTela * 0.47,
+                              child: GridView.builder(
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount:
+                                          MetodosAuxiliares.quantidadeColunasGridView(
+                                            larguraTela,
                                           ),
-                                      itemCount: itemDigitado.length,
-                                      itemBuilder: (context, index) {
-                                        return camposFormulario(
-                                          larguraTela,
-                                          itemDigitado.keys.elementAt(index),
-                                        );
-                                      },
+                                      mainAxisExtent: 70,
                                     ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
-                        },
+                                itemCount: itemDigitado.length,
+                                itemBuilder: (context, index) {
+                                  return camposFormulario(
+                                    larguraTela,
+                                    itemDigitado.keys.elementAt(index),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                bottomNavigationBar: Visibility(
-                  visible: !exibirTelaOpcoesData,
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: larguraTela,
-                    color: Colors.white,
-                    height: 100,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Visibility(
-                          visible: !exibirTelaOpcoesData,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              botoesAcoes(Textos.btnAtualizar),
-                              botoesAcoes(Textos.btnAdicionarCampo),
-                              botoesAcoes(Textos.btnRemoverCampo),
-                            ],
-                          ),
-                        ),
-                        BarraNavegacao(),
-                      ],
-                    ),
+                bottomNavigationBar: Container(
+                  alignment: Alignment.center,
+                  width: larguraTela,
+                  color: Colors.white,
+                  height: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          botoesAcoes(Textos.btnAtualizar),
+                          botoesAcoes(Textos.btnAdicionarCampo),
+                          botoesAcoes(Textos.btnRemoverCampo),
+                        ],
+                      ),
+                      BarraNavegacao(),
+                    ],
                   ),
                 ),
               );

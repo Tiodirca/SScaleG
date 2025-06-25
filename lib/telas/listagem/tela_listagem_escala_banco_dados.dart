@@ -251,7 +251,7 @@ class _TelaListagemTabelasBancoDadosState
                 return Text(
                   nomeBotao,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 14, color: Colors.black),
+                  style: TextStyle(color: Colors.black),
                 );
               }
             },

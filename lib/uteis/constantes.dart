@@ -5,6 +5,7 @@ class Constantes {
   static const rotaTelaSplash = "telaSplash";
   static const rotaTelaInicial = "telaInicial";
   static const rotaTelaLoginCadastro = "loginCadastro";
+  static const rotaTelaDadosUsuario = "dadosUsuario";
 
   //Rotas da GERACAO DE ESCALA
   static const rotaTelaCadastroSelecaoLocalTrabalho =
@@ -89,10 +90,8 @@ class Constantes {
     minute: 50,
   );
 
-  static const confirmacaoCarregamentoConcluidoData =
-      "carregamentoConcluidoData";
-  static const confirmacaoCarregamentoConcluidoCampo =
-      "carregamentoConcluidoAdicionarCampo";
+  static const confirmacaoSelecaoDataComplemento =
+      "selecaoDataComplemento";
 
   static const tipoBuscaAdicionarCampo = "buscaAdicionarCampo";
 

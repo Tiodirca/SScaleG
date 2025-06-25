@@ -11,6 +11,7 @@ import 'package:sscaleg/telas/listagem/tela_listagem_escala_banco_dados.dart';
 import 'package:sscaleg/telas/tela_atualizar_item.dart';
 import 'package:sscaleg/telas/tela_cadastro_item.dart';
 import 'package:sscaleg/telas/tela_configurar_pdf_baixar.dart';
+import 'package:sscaleg/telas/tela_dados_usuario.dart';
 import 'package:sscaleg/telas/tela_inicial.dart';
 import 'package:sscaleg/telas/tela_login_cadastro.dart';
 import 'package:sscaleg/telas/tela_observacao.dart';
@@ -31,6 +32,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => const TelaInicial());
       case Constantes.rotaTelaLoginCadastro:
         return MaterialPageRoute(builder: (_) => const TelaLoginCadastro());
+      case Constantes.rotaTelaDadosUsuario:
+        return MaterialPageRoute(builder: (_) => const TelaDadosUsuario());
       case Constantes.rotaTelaCadastroSelecaoLocalTrabalho:
         return MaterialPageRoute(
           builder: (_) => const TelaCadastroSelecaoLocalTrabalho(),

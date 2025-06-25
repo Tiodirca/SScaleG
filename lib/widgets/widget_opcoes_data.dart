@@ -10,6 +10,7 @@ import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
+import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
 class WidgetOpcoesData extends StatefulWidget {
   const WidgetOpcoesData({super.key, required this.dataSelecionada});
@@ -29,6 +30,8 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   final validacaoFormulario = GlobalKey<FormState>();
   List<CheckBoxModelo> listaNomesCadastrados = [];
   int indexQuantidadeItensCadastrados = 0;
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeDepartamentosData;
   String nomeDocumentoFireBase =
       Constantes.fireBaseDocumentoNomeDepartamentosData;
@@ -36,8 +39,12 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   @override
   void initState() {
     super.initState();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     dataSelecionadaComDepartamento = widget.dataSelecionada;
-    realizarBuscaDadosFireBase();
+    Timer(const Duration(seconds: 1), () {
+      realizarBuscaDadosFireBase();
+    });
   }
 
   chamarExibirMensagemErro(String erro) {
@@ -64,7 +71,9 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   @override
   void dispose() {
     super.dispose();
-    PassarPegarDados.passarConfirmacaoCarregamentoConcluido("");
+    PassarPegarDados.passarConfirmacaoSelecaoDataComplemento(
+      Constantes.confirmacaoSelecaoDataComplemento,
+    );
   }
 
   realizarBuscaDadosFireBase() async {
@@ -75,6 +84,8 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
       var db = FirebaseFirestore.instance;
       //instanciano variavel
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase)
           .get()
           .then(
@@ -91,7 +102,11 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                 }
               } else {
                 setState(() {
-                  exibirWidgetTelaCarregamento = false;
+                  Timer(const Duration(milliseconds: 500), () {
+                    setState(() {
+                      exibirWidgetTelaCarregamento = false;
+                    });
+                  });
                 });
               }
             },
@@ -115,6 +130,8 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   converterJsonParaObjeto(String id, int quantidade) async {
     var db = FirebaseFirestore.instance;
     final ref = db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
@@ -143,6 +160,8 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     });
     var db = FirebaseFirestore.instance;
     await db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(checkbox.id)
         .delete()
@@ -169,6 +188,10 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   removerComplemetoExcluido(CheckBoxModelo checkbox) {
     dataSelecionadaComDepartamento =
         dataSelecionadaComDepartamento.split(checkbox.texto)[0];
+    dataSelecionadaComDepartamento = dataSelecionadaComDepartamento.replaceAll(
+      "(",
+      "",
+    );
     PassarPegarDados.passarDataComComplemento(dataSelecionadaComDepartamento);
   }
 
@@ -181,6 +204,8 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
           .set({nomeDocumentoFireBase: nomeControle.text})
@@ -227,9 +252,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
           element.checked = false;
         }
       }
-      PassarPegarDados.passarConfirmacaoCarregamentoConcluido(
-        Constantes.confirmacaoCarregamentoConcluidoData,
-      );
       Timer(const Duration(milliseconds: 500), () {
         setState(() {
           exibirWidgetTelaCarregamento = false;
@@ -260,7 +282,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
           removerDepartamentoAnteriorSelecaoCheckBox(widget.dataSelecionada);
       dataSelecionadaComDepartamento =
           "$dataSelecionadaComDepartamento$opcoesAdicionaisSelecionada";
-      PassarPegarDados.passarDataComComplemento(dataSelecionadaComDepartamento);
+      //PassarPegarDados.passarDataComComplemento(dataSelecionadaComDepartamento);
     });
   }
 
@@ -369,44 +391,36 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
         },
       );
 
-  Widget botoesAcoes(
-    String nomeBotao,
-    IconData icone,
-    double largura,
-    double altura,
-  ) => Container(
-    margin: const EdgeInsets.only(bottom: 10.0),
-    height: altura,
-    width: largura,
+  Widget botoesAcoes(String nomeBotao) => Container(
+    margin: EdgeInsets.symmetric(horizontal: 10),
+    height: 40,
+    width: 100,
     child: FloatingActionButton(
       heroTag: nomeBotao,
       elevation: 0,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(color: PaletaCores.corCastanho),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
       onPressed: () async {
         if (nomeBotao == Textos.btnSalvarOpcaoData) {
-          PassarPegarDados.passarDataComComplemento(
-            dataSelecionadaComDepartamento,
-          );
+          setState(() {
+            exibirWidgetTelaCarregamento = true;
+            PassarPegarDados.passarDataComComplemento(
+              dataSelecionadaComDepartamento,
+            );
+            PassarPegarDados.passarConfirmacaoSelecaoDataComplemento(
+              Constantes.confirmacaoSelecaoDataComplemento,
+            );
+          });
+        } else if (nomeBotao == Textos.btnCadastrar) {
+          validarCampoEChamarCadastrar();
         }
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icone, color: PaletaCores.corAzulEscuro, size: 30),
-          Text(
-            nomeBotao,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: PaletaCores.corAzulEscuro,
-            ),
-          ),
-        ],
+      child: Text(
+        nomeBotao,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.black,
+        ),
       ),
     ),
   );
@@ -415,162 +429,172 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
   Widget build(BuildContext context) {
     double larguraTela = MediaQuery.of(context).size.width;
     double alturaTela = MediaQuery.of(context).size.height;
-    double alturaBarraStatus = MediaQuery.of(context).padding.top;
-    double alturaAppBar = AppBar().preferredSize.height;
     return Theme(
       data: estilo.estiloGeral,
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (exibirWidgetTelaCarregamento) {
-            //Dentro de um SizezBox para ajustar a Exibicao da tela para nao aparecer barra rolagem
-            return SizedBox(
-              width: larguraTela,
-              height: alturaTela - alturaBarraStatus - alturaAppBar,
-              child: TelaCarregamento(),
-            );
+            return TelaCarregamento();
           } else {
-            return Column(
-              children: [
-                Text(
-                  Textos.descricaoSelecaoDepartamentos,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18),
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(Textos.selecaoDepartamentosTitulo),
+                leading: IconButton(
+                  color: Colors.white,
+                  onPressed: () {
+                    setState(() {
+                      exibirWidgetTelaCarregamento = true;
+                      PassarPegarDados.passarConfirmacaoSelecaoDataComplemento(
+                        Constantes.confirmacaoSelecaoDataComplemento,
+                      );
+                    });
+                  },
+                  icon: const Icon(Icons.arrow_back_ios),
                 ),
-                Text(
-                  dataSelecionadaComDepartamento,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  width: larguraTela,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(
-                            Textos.descricaoSelecaoDepartamentosCadastro,
-                            textAlign: TextAlign.justify,
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.start,
-                          alignment: WrapAlignment.center,
+              ),
+              body: Container(
+                color: Colors.white,
+                width: larguraTela,
+                height: alturaTela,
+                child: Column(
+                  children: [
+                    Text(
+                      Textos.descricaoSelecaoDepartamentos,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      dataSelecionadaComDepartamento,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      width: larguraTela,
+                      child: SingleChildScrollView(
+                        child: Column(
                           children: [
-                            Form(
-                              key: validacaoFormulario,
-                              child: SizedBox(
-                                width: Platform.isWindows ? 300 : 200,
-                                child: TextFormField(
-                                  decoration:
-                                  InputDecoration(
-                                    hintText:
-                                    Textos
-                                        .labelTextFieldCampo,
-                                  ),
-                                  controller: nomeControle,
-                                  onFieldSubmitted: (value) {
-                                    validarCampoEChamarCadastrar();
-                                  },
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return Textos.erroCampoVazio;
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ),
-                            ),
                             Container(
                               margin: const EdgeInsets.symmetric(
                                 horizontal: 10.0,
                               ),
-                              width: 100,
-                              height: 40,
-                              child: FloatingActionButton(
-                                heroTag: Textos.btnCadastrar,
-                                onPressed: () {
-                                  validarCampoEChamarCadastrar();
-                                },
-                                child: Text(Textos.btnCadastrar,style: TextStyle(color: Colors.black),),
+                              child: Text(
+                                Textos.descricaoSelecaoDepartamentosCadastro,
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(fontSize: 18),
                               ),
+                            ),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.start,
+                              alignment: WrapAlignment.center,
+                              children: [
+                                Form(
+                                  key: validacaoFormulario,
+                                  child: SizedBox(
+                                    width: Platform.isWindows ? 300 : 200,
+                                    child: TextFormField(
+                                      decoration: InputDecoration(
+                                        hintText: Textos.labelTextFieldCampo,
+                                      ),
+                                      controller: nomeControle,
+                                      onFieldSubmitted: (value) {
+                                        validarCampoEChamarCadastrar();
+                                      },
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return Textos.erroCampoVazio;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                botoesAcoes(Textos.btnCadastrar),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(
-                  width: larguraTela,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (listaNomesCadastrados.isNotEmpty) {
-                        // area de exibicao de descricao e listagem de nomes
-                        return SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                ),
-                                width: larguraTela,
-                                child: Text(
-                                  textAlign: TextAlign.center,
-                                  Textos.descricaoSelecaoDepartamentosSelecao,
-                                  style: const TextStyle(fontSize: 18),
-                                ),
-                              ),
-                              // Area de Exibicao da lista com os nomes dos voluntarios
-                              Card(
-                                color: Colors.white,
-                                shape: const OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20),
+                    SizedBox(
+                      width: larguraTela,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          if (listaNomesCadastrados.isNotEmpty) {
+                            // area de exibicao de descricao e listagem de nomes
+                            return SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    width: larguraTela,
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      Textos
+                                          .descricaoSelecaoDepartamentosSelecao,
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
                                   ),
-                                  borderSide: BorderSide(
-                                    width: 1,
-                                    color: PaletaCores.corCastanho,
-                                  ),
-                                ),
-                                child: SizedBox(
-                                  height: alturaTela * 0.4,
-                                  width:
-                                      Platform.isAndroid || Platform.isIOS
-                                          ? larguraTela
-                                          : larguraTela * 0.8,
-                                  child: ListView(
-                                    children: [
-                                      ...listaNomesCadastrados.map(
-                                        (e) => checkBoxPersonalizado(e),
+                                  // Area de Exibicao da lista com os nomes dos voluntarios
+                                  Card(
+
+                                    child: SizedBox(
+                                      height: alturaTela * 0.4,
+                                      width:
+                                          Platform.isAndroid || Platform.isIOS
+                                              ? larguraTela
+                                              : larguraTela * 0.8,
+                                      child: ListView(
+                                        children: [
+                                          ...listaNomesCadastrados.map(
+                                            (e) => checkBoxPersonalizado(e),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        // area caso nao tenha
-                        // nenhum voluntario cadastrado
-                        return Container(
-                          margin: const EdgeInsets.all(10.0),
-                          transformAlignment: Alignment.center,
-                          alignment: Alignment.center,
-                          child: Text(
-                            Textos.erroBaseDadosVazia,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                            );
+                          } else {
+                            // area caso nao tenha
+                            // nenhum voluntario cadastrado
+                            return Container(
+                              margin: const EdgeInsets.all(10.0),
+                              transformAlignment: Alignment.center,
+                              alignment: Alignment.center,
+                              child: Text(
+                                Textos.erroBaseDadosVazia,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+              bottomNavigationBar: Container(
+                width: larguraTela,
+                color: Colors.white,
+                height: 100,
+                child: Column(
+                  children: [
+                    Visibility(
+                      visible: listaNomesCadastrados.isNotEmpty ? true : false,
+                      child: botoesAcoes(Textos.btnSalvarOpcaoData),
+                    ),
+                    BarraNavegacao(),
+                  ],
+                ),
+              ),
             );
           }
         },

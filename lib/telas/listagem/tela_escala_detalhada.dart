@@ -551,8 +551,9 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         children: [
           Text(
             nomeBotao,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: Colors.black),
+            textAlign: TextAlign.center,  style: TextStyle(
+            color: Colors.black,
+          ),
           ),
         ],
       ),

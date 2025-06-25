@@ -19,8 +19,8 @@ class _TelaLoginCadastroState extends State<TelaLoginCadastro> {
   bool exibirWidgetCarregamento = false;
   bool exibirOcultarSenha = true;
   IconData iconeExibirSenha = Icons.visibility;
-  TextEditingController controleEmail = TextEditingController(text: "jhonatansbestevao@gmail.com");
-  TextEditingController controleSenha = TextEditingController(text: "agosto");
+  TextEditingController controleEmail = TextEditingController(text: "");
+  TextEditingController controleSenha = TextEditingController(text: "");
   final _formKeyFormulario = GlobalKey<FormState>();
 
   @override
@@ -49,8 +49,6 @@ class _TelaLoginCadastroState extends State<TelaLoginCadastro> {
         nomeBtn,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
           color: Colors.black,
         ),
       ),

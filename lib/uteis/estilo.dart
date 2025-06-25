@@ -15,13 +15,16 @@ class Estilo {
     ),
 
     floatingActionButtonTheme: FloatingActionButtonThemeData(
+
       backgroundColor: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
         side: const BorderSide(width: 1, color: PaletaCores.corCastanho),
         borderRadius: BorderRadius.circular(10),
       ),
+      extendedTextStyle: TextStyle(fontSize: 15, color: Colors.black,),
     ),
+
     cardTheme: const CardTheme(
       color: Colors.white,
       elevation: 0,
@@ -31,14 +34,10 @@ class Estilo {
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      errorStyle: const TextStyle(
-        fontSize: 13,
-        color: Colors.red,
-        fontWeight: FontWeight.bold,
-      ),
+      errorStyle: const TextStyle(fontSize: 13, color: Colors.red),
       hintStyle: const TextStyle(
         color: PaletaCores.corAzulEscuro,
-        fontWeight: FontWeight.bold,
+        fontSize: 16,
       ),
       focusedBorder: OutlineInputBorder(
         borderSide: const BorderSide(
@@ -74,8 +73,7 @@ class Estilo {
       ),
       labelStyle: const TextStyle(
         color: PaletaCores.corAzulEscuro,
-        fontWeight: FontWeight.bold,
-        fontSize: 18,
+        fontSize: 16,
       ),
     ),
   );

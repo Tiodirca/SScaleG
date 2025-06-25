@@ -11,7 +11,7 @@ class PassarPegarDados {
   static String horarioFinalSemanaDefinido = "";
   static String horarioSemanaDefinido = "";
   static String dataComComplemento = "";
-  static String confirmacaoCarregamentoConcluido = "";
+  static String confirmacaoSelecaoDataComplemento = "";
 
   static Map informacoesUsuario = {};
 
@@ -78,15 +78,15 @@ class PassarPegarDados {
     return dataComComplemento;
   }
 
-  static String passarConfirmacaoCarregamentoConcluido(
-    String carregamentoConcluido,
+  static String passarConfirmacaoSelecaoDataComplemento(
+    String dataComplemento,
   ) {
-    confirmacaoCarregamentoConcluido = carregamentoConcluido;
-    return confirmacaoCarregamentoConcluido;
+    confirmacaoSelecaoDataComplemento = dataComplemento;
+    return confirmacaoSelecaoDataComplemento;
   }
 
-  static String recuperarConfirmacaoCarregamentoConcluido() {
-    return confirmacaoCarregamentoConcluido;
+  static String recuperarConfirmacaoSelecaoDataComplemento() {
+    return confirmacaoSelecaoDataComplemento;
   }
 
   static List<String> passarCamposItem(List<String> campos) {

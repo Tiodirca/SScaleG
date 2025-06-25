@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdflib;
 
@@ -130,6 +129,7 @@ class GerarPDFEscala {
                 },
               ),
               pdflib.Container(
+                width: 1000,
                 margin: pdflib.EdgeInsets.all(10.0),
                 child: pdflib.ListView.builder(
                   itemCount: observacoes.length,

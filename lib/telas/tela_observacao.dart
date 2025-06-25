@@ -38,13 +38,19 @@ class _TelaObservacaoState extends State<TelaObservacao> {
   String nomeCadastro = "";
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeObservacao;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeObservacao;
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
   TextEditingController nomeControle = TextEditingController(text: "");
 
   @override
   void initState() {
     super.initState();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     listaObservacaoSelecionadas = PassarPegarDados.recuperarObservacoesPDF();
-    realizarBuscaDadosFireBase();
+    Timer(const Duration(seconds: 1), () {
+      realizarBuscaDadosFireBase();
+    });
   }
 
   Widget checkBoxPersonalizado(CheckBoxModelo checkBoxModel) =>
@@ -107,6 +113,8 @@ class _TelaObservacaoState extends State<TelaObservacao> {
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
           .set({nomeDocumentoFireBase: nomeCadastro})
@@ -159,6 +167,8 @@ class _TelaObservacaoState extends State<TelaObservacao> {
       var db = FirebaseFirestore.instance;
       //instanciano variavel
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase)
           .get()
           .then(
@@ -199,6 +209,8 @@ class _TelaObservacaoState extends State<TelaObservacao> {
   converterJsonParaObjeto(String id, int tamanhoTabela) async {
     var db = FirebaseFirestore.instance;
     final ref = db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
@@ -258,6 +270,8 @@ class _TelaObservacaoState extends State<TelaObservacao> {
     });
     var db = FirebaseFirestore.instance;
     await db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(checkbox.id)
         .delete()
@@ -437,7 +451,9 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                             validarCampoEChamarCadastrar();
                                           },
                                           decoration: InputDecoration(
-                                            hintText: Textos.telaObservacaoHintTextField
+                                            hintText:
+                                                Textos
+                                                    .telaObservacaoHintTextField,
                                           ),
                                           validator: (value) {
                                             if (value!.isEmpty) {
@@ -543,11 +559,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                   color: Colors.white,
                   width: larguraTela,
                   height: 70,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [BarraNavegacao()],
-                  ),
+                  child: BarraNavegacao()
                 ),
               );
             }

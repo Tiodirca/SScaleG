@@ -42,13 +42,17 @@ class _TelaInicialState extends State<TelaInicial> {
             context,
             Constantes.rotaTelaListagemEscalaBandoDados,
           );
+        }else if(nomeBtn == Textos.btnConfiguracao){
+          Navigator.pushReplacementNamed(
+            context,
+            Constantes.rotaTelaDadosUsuario,
+          );
         }
       },
       child: Text(
         nomeBtn,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontWeight: FontWeight.bold,
           fontSize: 18,
           color: Colors.black,
         ),

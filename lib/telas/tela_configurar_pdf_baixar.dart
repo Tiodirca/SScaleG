@@ -54,12 +54,16 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
   double indicadorPagina = 0.5;
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeCabecalhoPDF;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeCabecalhoPDF;
+  String uidUsuario = "";
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
   TextEditingController nomeControle = TextEditingController(text: "");
   XFile? imagemLogo;
 
   @override
   void initState() {
     super.initState();
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     for (var element in widget.linhasEscala) {
       linhasRecebidas.add(element);
     }
@@ -74,7 +78,9 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
         );
       }
     }
-    realizarBuscaDadosFireBase();
+    Timer(const Duration(seconds: 1), () {
+      realizarBuscaDadosFireBase();
+    });
   }
 
   Widget checkBoxPersonalizado(CheckBoxModelo checkBoxModel) =>
@@ -133,7 +139,10 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
       CheckboxListTile(
         activeColor: PaletaCores.corAzulEscuro,
         checkColor: PaletaCores.corRosaClaro,
-        title: Text(checkBoxModel.texto.replaceAll("_", " "), style: const TextStyle(fontSize: 20)),
+        title: Text(
+          checkBoxModel.texto.replaceAll("_", " "),
+          style: const TextStyle(fontSize: 20),
+        ),
         value: checkBoxModel.checked,
         onChanged: (value) {
           setState(() {
@@ -202,6 +211,8 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase) // passando a colecao
           .doc() //passando o documento
           .set({nomeDocumentoFireBase: nomeCadastro})
@@ -253,6 +264,8 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
       var db = FirebaseFirestore.instance;
       //instanciano variavel
       db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
           .collection(nomeColecaoFireBase)
           .get()
           .then(
@@ -291,6 +304,8 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
   converterJsonParaObjeto(String id, int tamanhoTabela) async {
     var db = FirebaseFirestore.instance;
     final ref = db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
@@ -337,6 +352,8 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
     });
     var db = FirebaseFirestore.instance;
     await db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(checkbox.id)
         .delete()
@@ -515,7 +532,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
       child: Text(
         nomeBotao,
         textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 14, color: Colors.black),
+        style: TextStyle(color: Colors.black),
       ),
     ),
   );
@@ -707,6 +724,11 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                                           : 200,
                                                   child: TextFormField(
                                                     controller: nomeControle,
+                                                    decoration: InputDecoration(
+                                                      hintText:
+                                                          Textos
+                                                              .labelTextFieldCampo,
+                                                    ),
                                                     onFieldSubmitted: (value) {
                                                       validarCampoEChamarCadastrar();
                                                     },
@@ -792,6 +814,57 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                                     ),
                                                   ),
                                                 ),
+                                                SizedBox(
+                                                  width:
+                                                      Platform.isAndroid ||
+                                                              Platform.isIOS
+                                                          ? larguraTela
+                                                          : larguraTela * 0.4,
+                                                  child: Card(
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          margin:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal:
+                                                                    10.0,
+                                                              ),
+                                                          child: Text(
+                                                            Textos
+                                                                .telaConfiguracaoPDFRadioButtonDescricao,
+                                                            textAlign:
+                                                                TextAlign
+                                                                    .center,
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontSize: 18,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        Wrap(
+                                                          crossAxisAlignment:
+                                                              WrapCrossAlignment
+                                                                  .center,
+                                                          alignment:
+                                                              WrapAlignment
+                                                                  .center,
+                                                          children: [
+                                                            radioButton(
+                                                              0,
+                                                              Textos
+                                                                  .telaConfiguracaoPDFRadioButtonHorizontalPDF,
+                                                            ),
+                                                            radioButton(
+                                                              1,
+                                                              Textos
+                                                                  .telaConfiguracaoPDFRadioButtonVerticalPDF,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           );
@@ -822,48 +895,6 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                       },
                                     ),
                                   ),
-                                  SizedBox(
-                                    width:
-                                        Platform.isAndroid || Platform.isIOS
-                                            ? larguraTela
-                                            : larguraTela * 0.4,
-                                    child: Card(
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            margin: const EdgeInsets.symmetric(
-                                              horizontal: 10.0,
-                                            ),
-                                            child: Text(
-                                              Textos
-                                                  .telaConfiguracaoPDFRadioButtonDescricao,
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                          ),
-                                          Wrap(
-                                            crossAxisAlignment:
-                                                WrapCrossAlignment.center,
-                                            alignment: WrapAlignment.center,
-                                            children: [
-                                              radioButton(
-                                                0,
-                                                Textos
-                                                    .telaConfiguracaoPDFRadioButtonHorizontalPDF,
-                                              ),
-                                              radioButton(
-                                                1,
-                                                Textos
-                                                    .telaConfiguracaoPDFRadioButtonVerticalPDF,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               );
                             }
@@ -882,28 +913,38 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 150,
-                        margin: EdgeInsets.all(20),
-                        child: LinearProgressIndicator(
-                          value: indicadorPagina,
-                          minHeight: 3,
-                          borderRadius: BorderRadius.circular(10),
-                          valueColor: AlwaysStoppedAnimation(
-                            PaletaCores.corAzulEscuro,
-                          ),
-                        ),
-                      ),
                       Visibility(
-                        visible: !exibirSelecaoCamposEscala,
-                        child: botoesAcoes(Textos.btnAvancar),
-                      ),
-                      Visibility(
-                        visible: exibirSelecaoCamposEscala,
-                        child: SizedBox(
-                          width: 120,
-                          height: 40,
-                          child: botoesAcoes(Textos.btnBaixarPDF),
+                        visible:
+                            listaNomeCabecalhoPDF.isNotEmpty ? true : false,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 150,
+                              margin: EdgeInsets.all(20),
+                              child: LinearProgressIndicator(
+                                value: indicadorPagina,
+                                minHeight: 3,
+                                borderRadius: BorderRadius.circular(10),
+                                valueColor: AlwaysStoppedAnimation(
+                                  PaletaCores.corAzulEscuro,
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: !exibirSelecaoCamposEscala,
+                              child: botoesAcoes(Textos.btnAvancar),
+                            ),
+                            Visibility(
+                              visible: exibirSelecaoCamposEscala,
+                              child: SizedBox(
+                                width: 120,
+                                height: 40,
+                                child: botoesAcoes(Textos.btnBaixarPDF),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       BarraNavegacao(),

@@ -26,6 +26,7 @@ class Textos {
   static String btnVerEscalaAtual = "Escala Atual";
   static String btnAdicionarLogoImagem = "Adicionar Logo/Imagem";
   static String btnUsarEscala = "Utilizar está escala";
+  static String btnSairConta = "Sair da conta";
 
   static String labelEmail = "E-mail";
   static String labelSenha = "Senha";
@@ -39,11 +40,18 @@ class Textos {
   //TELA LOGIN CADASTRO - CADASTRO
   static String telaCadastroUsuarioTitulo = "Cadastro de Usuario";
 
+  // TELA DADOS USUARIO
+  static String telaDadosUsuarioTitulo = "Informações de Usuario";
+  static String telaDadosUsuarioDescricao =
+      "Aqui você pode visualizar as informações da conta, "
+      "bem como fazer alterações no e-mail e senha";
+
   // TELA INICIAL
   static String telaInicialDescricao = "Selecione uma opção";
   static String telaInicialEmailCadastrado = "E-mail da conta : ";
 
   //WIDGET OPCOES DATA
+  static String selecaoDepartamentosTitulo = "Opções adicionais Data";
   static String descricaoSelecaoDepartamentos =
       "Selecione qual será o departamento responsável pelo culto da data: ";
   static String descricaoSelecaoDepartamentosCadastro =
@@ -177,6 +185,7 @@ class Textos {
   static String erroValidarUsuarioEmailNaoCadastrado = "E-mail não cadastrado";
   static String erroValidarUsuarioSenhaErrada = "Senha Incorreta";
   static String erroValidarUsuarioEmailErrado = "E-mail está incorreto";
+
   //GERAIS
   static String telaCarregamentoAguarde = "Aguarde Carregando";
   static String descricaoDataPicker = "Selecione uma data";
