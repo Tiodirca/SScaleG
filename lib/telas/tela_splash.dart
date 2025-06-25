@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,8 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
   validarUsuarioLogado() async {
     validacao = FirebaseAuth.instance.authStateChanges().listen((User? user) {
       index++;
-      if (index == 2) {
+      if (index == 2 && (!Platform.isIOS || !Platform.isAndroid) ||
+          index == 1 && (Platform.isIOS || Platform.isAndroid)) {
         index = 0;
         if (user != null) {
           debugPrint("Usuario Logado");
@@ -85,8 +87,14 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double alturaTela = MediaQuery.of(context).size.height;
-    double larguraTela = MediaQuery.of(context).size.width;
+    double alturaTela = MediaQuery
+        .of(context)
+        .size
+        .height;
+    double larguraTela = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Scaffold(
       body: Container(
         height: alturaTela,
