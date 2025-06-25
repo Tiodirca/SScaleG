@@ -3,7 +3,7 @@ class Textos {
   static String versaoAppNumero = "1.2";
   static String versaoAppDescricao = "Versão : ";
   static String btnCriarEscala = "Criar Escala";
-  static String btnConfiguracao = "Configurações";
+  static String btnDadosUsuario = "Dados do Usuario";
   static String btnCadastrar = "Cadastrar";
   static String btnLogin = "Fazer Login";
   static String btnAvancar = "Avançar";
@@ -27,15 +27,17 @@ class Textos {
   static String btnAdicionarLogoImagem = "Adicionar Logo/Imagem";
   static String btnUsarEscala = "Utilizar está escala";
   static String btnSairConta = "Sair da conta";
-
-  static String labelEmail = "E-mail";
-  static String labelSenha = "Senha";
-  static String labelEsqueciSenha = "Esqueci Senha";
+  static String btnExcluirConta = "Excluir conta";
 
   // TELA LOGIN CADASTRO - LOGIN
   static String telaLoginUsuarioDescricao =
       "Faça Login ou se cadastre "
       "para poder estar utilizando o programa";
+
+  // TELA LOGIN CADASTRO E TELA DADOS USUARIO
+  static String labelEmail = "E-mail";
+  static String labelSenha = "Senha";
+  static String labelEsqueciSenha = "Esqueci Senha";
 
   //TELA LOGIN CADASTRO - CADASTRO
   static String telaCadastroUsuarioTitulo = "Cadastro de Usuario";
@@ -182,9 +184,11 @@ class Textos {
       "Não foi possível encontrar nenhuma informação na base de dados, por favor "
       "verifique a conexão com internet ou cadastre uma informação";
 
+  //ERROS LOGIN E CADASTRO
   static String erroValidarUsuarioEmailNaoCadastrado = "E-mail não cadastrado";
   static String erroValidarUsuarioSenhaErrada = "Senha Incorreta";
   static String erroValidarUsuarioEmailErrado = "E-mail está incorreto";
+  static String erroValidarUsuarioEmailEmUso = "E-mail já está sendo utilizado";
 
   //GERAIS
   static String telaCarregamentoAguarde = "Aguarde Carregando";

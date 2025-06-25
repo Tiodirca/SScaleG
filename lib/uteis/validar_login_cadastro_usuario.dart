@@ -7,45 +7,57 @@ import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 
 class ValidarLoginCadastroUsuario {
-  static redirecionarTelaLoginCadastro(BuildContext context) {
-    Navigator.pushReplacementNamed(context, Constantes.rotaTelaLoginCadastro);
-  }
 
-  static redirecionarTelaInicial(BuildContext context) {
-    Navigator.pushReplacementNamed(context, Constantes.rotaTelaInicial);
-  }
-
-  static fazerLogin(String email, String senha, BuildContext context) async {
+  static Future<String> fazerLogin(
+    String email,
+    String senha,
+    BuildContext context,
+  ) async {
     try {
+      String retorno = "";
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: senha,
       );
       if (credential.user != null) {
-        passarInformacoes(credential.user!.uid, credential.user!.email.toString());
-        redirecionarTelaInicial(context);
+        passarInformacoes(
+          credential.user!.uid,
+          credential.user!.email.toString(),
+        );
+        retorno = Constantes.tipoNotificacaoSucesso;
       } else {
-        //print("USUARIO NÂO ENCONTRADO");
+        retorno = Constantes.tipoNotificacaoErro;
       }
+      return retorno;
     } on FirebaseAuthException catch (e) {
-      validarErro(e.code.toString(), context);
+      return e.code.toString();
     }
   }
-}
 
-validarErro(String erro, BuildContext context) {
-  if (erro == 'user-not-found') {
-    chamarExibirMensagemErro(
-      Textos.erroValidarUsuarioEmailNaoCadastrado,
-      context,
-    );
-  } else if (erro == 'wrong-password') {
-    chamarExibirMensagemErro(Textos.erroValidarUsuarioSenhaErrada, context);
-    chamarExibirMensagemErro(erro, context);
-  } else if (erro == "invalid-email") {
-    chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailErrado, context);
-  } else if (erro == "unknown-error") {
-    chamarExibirMensagemErro("Erro Desconhecido : $erro", context);
+  static Future<String> criarCadastro(
+      String email,
+      String senha,
+      BuildContext context,
+      ) async {
+    try {
+      String retorno = "";
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: senha,
+      );
+      if (credential.user != null) {
+        passarInformacoes(
+          credential.user!.uid,
+          credential.user!.email.toString(),
+        );
+        retorno = Constantes.tipoNotificacaoSucesso;
+      } else {
+        retorno = Constantes.tipoNotificacaoErro;
+      }
+      return retorno;
+    } on FirebaseAuthException catch (e) {
+      return e.code.toString();
+    }
   }
 }
 
@@ -54,12 +66,4 @@ passarInformacoes(String uid, String email) {
   dados[Constantes.infoUsuarioUID] = uid;
   dados[Constantes.infoUsuarioEmail] = email;
   PassarPegarDados.passarInformacoesUsuario(dados);
-}
-
-chamarExibirMensagemErro(String erro, BuildContext context) {
-  MetodosAuxiliares.exibirMensagens(
-    Constantes.tipoNotificacaoErro,
-    erro,
-    context,
-  );
 }

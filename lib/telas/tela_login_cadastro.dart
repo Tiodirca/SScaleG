@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
+import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/uteis/validar_login_cadastro_usuario.dart';
 
@@ -36,24 +37,105 @@ class _TelaLoginCadastroState extends State<TelaLoginCadastro> {
       heroTag: nomeBtn,
       onPressed: () {
         if (_formKeyFormulario.currentState!.validate()) {
+          setState(() {
+            exibirWidgetCarregamento = true;
+          });
           if (nomeBtn == Textos.btnLogin) {
-            ValidarLoginCadastroUsuario.fazerLogin(
-              controleEmail.text,
-              controleSenha.text,
-              context,
-            );
-          } else if (nomeBtn == Textos.btnCadastrar) {}
+            chamarValidarLogin();
+          } else if (nomeBtn == Textos.btnCadastrar) {
+            chamarValidarCriarCadastro();
+          }
         }
       },
       child: Text(
         nomeBtn,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.black,
-        ),
+        style: TextStyle(color: Colors.black),
       ),
     ),
   );
+
+  chamarValidarLogin() async {
+    String retorno = await ValidarLoginCadastroUsuario.fazerLogin(
+      controleEmail.text,
+      controleSenha.text,
+      context,
+    );
+    if (retorno == Constantes.tipoNotificacaoSucesso) {
+      redirecionarTelaInicial();
+    } else {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
+      validarErro(retorno);
+    }
+  }
+
+  chamarValidarCriarCadastro() async {
+    String retorno = await ValidarLoginCadastroUsuario.criarCadastro(
+      controleEmail.text,
+      controleSenha.text,
+      context,
+    );
+    if (retorno == Constantes.tipoNotificacaoSucesso) {
+      redirecionarTelaInicial();
+    } else {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
+      validarErro(retorno);
+    }
+  }
+
+  validarErro(String erro) {
+    if (erro == 'user-not-found') {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailNaoCadastrado);
+    } else if (erro == 'wrong-password') {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioSenhaErrada);
+      chamarExibirMensagemErro(erro);
+    } else if (erro == "invalid-email") {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailErrado);
+    } else if (erro == "unknown-error") {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioSenhaErrada);
+    } else if (erro == "email-already-in-use") {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailEmUso);
+    } else {
+      chamarExibirMensagemErro("Erro Desconhecido : $erro");
+    }
+  }
+
+  chamarExibirMensagemErro(String erro) {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoErro,
+      erro,
+      context,
+    );
+  }
+
+  redirecionarTelaInicial() {
+    Navigator.pushReplacementNamed(context, Constantes.rotaTelaInicial);
+  }
+
+  chamarExibicaoOcultarSenha() {
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          if (exibirOcultarSenha) {
+            setState(() {
+              exibirOcultarSenha = false;
+              iconeExibirSenha = Icons.visibility_off;
+            });
+          } else {
+            setState(() {
+              exibirOcultarSenha = true;
+              iconeExibirSenha = Icons.visibility;
+            });
+          }
+        });
+      },
+      icon: Icon(iconeExibirSenha),
+    );
+  }
 
   Widget camposFormulario(
     String label,
@@ -80,27 +162,6 @@ class _TelaLoginCadastroState extends State<TelaLoginCadastro> {
       ),
     ),
   );
-
-  chamarExibicaoOcultarSenha() {
-    return IconButton(
-      onPressed: () {
-        setState(() {
-          if (exibirOcultarSenha) {
-            setState(() {
-              exibirOcultarSenha = false;
-              iconeExibirSenha = Icons.visibility_off;
-            });
-          } else {
-            setState(() {
-              exibirOcultarSenha = true;
-              iconeExibirSenha = Icons.visibility;
-            });
-          }
-        });
-      },
-      icon: Icon(iconeExibirSenha),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

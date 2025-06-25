@@ -36,25 +36,6 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
     controleEmail.text = emailCadastrado;
   }
 
-  Widget botao(String nomeBtn, BuildContext context) => Container(
-    margin: const EdgeInsets.all(10),
-    width: 100,
-    height: 40,
-    child: FloatingActionButton(
-      heroTag: nomeBtn,
-      onPressed: () {
-        if (nomeBtn == Textos.btnSairConta) {
-          chamarSairConta();
-        } else if (nomeBtn == Textos.btnCadastrar) {}
-      },
-      child: Text(
-        nomeBtn,
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.black),
-      ),
-    ),
-  );
-
   chamarSairConta() async {
     await FirebaseAuth.instance.signOut();
     redirecionarTelaLoginCadastro();
@@ -62,6 +43,27 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
 
   redirecionarTelaLoginCadastro() {
     Navigator.pushReplacementNamed(context, Constantes.rotaTelaLoginCadastro);
+  }
+
+  chamarExibicaoOcultarSenha() {
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          if (exibirOcultarSenha) {
+            setState(() {
+              exibirOcultarSenha = false;
+              iconeExibirSenha = Icons.visibility_off;
+            });
+          } else {
+            setState(() {
+              exibirOcultarSenha = true;
+              iconeExibirSenha = Icons.visibility;
+            });
+          }
+        });
+      },
+      icon: Icon(iconeExibirSenha),
+    );
   }
 
   Widget camposFormulario(
@@ -91,26 +93,27 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
     ),
   );
 
-  chamarExibicaoOcultarSenha() {
-    return IconButton(
+  Widget botao(String nomeBtn, BuildContext context) => Container(
+    margin: const EdgeInsets.all(10),
+    width: 100,
+    height: 40,
+    child: FloatingActionButton(
+      heroTag: nomeBtn,
       onPressed: () {
-        setState(() {
-          if (exibirOcultarSenha) {
-            setState(() {
-              exibirOcultarSenha = false;
-              iconeExibirSenha = Icons.visibility_off;
-            });
-          } else {
-            setState(() {
-              exibirOcultarSenha = true;
-              iconeExibirSenha = Icons.visibility;
-            });
-          }
-        });
+        if (nomeBtn == Textos.btnSairConta) {
+          chamarSairConta();
+        } else if (nomeBtn == Textos.btnCadastrar) {
+        } else if (nomeBtn == Textos.btnExcluirConta) {
+
+        }
       },
-      icon: Icon(iconeExibirSenha),
-    );
-  }
+      child: Text(
+        nomeBtn,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.black),
+      ),
+    ),
+  );
 
   Widget botoesIcones(String label) => Container(
     margin: EdgeInsets.symmetric(horizontal: 10),
@@ -121,7 +124,7 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
       onPressed: () async {
         if (label == Textos.labelEmail) {
         } else if (label == Textos.labelSenha) {
-        } else if (label == Constantes.excluir) {
+        } else if (label == Textos.btnExcluir) {
           setState(() {
             edicaoAtiva = false;
           });
@@ -227,7 +230,7 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               botao(Textos.btnSalvar, context),
-                              botoesIcones(Constantes.excluir),
+                              botoesIcones(Textos.btnExcluir),
                             ],
                           ),
                         ),
@@ -241,7 +244,13 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                   height: 120,
                   child: Column(
                     children: [
-                      botao(Textos.btnSairConta, context),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          botao(Textos.btnSairConta, context),
+                          botao(Textos.btnExcluirConta, context),
+                        ],
+                      ),
                       BarraNavegacao(),
                     ],
                   ),

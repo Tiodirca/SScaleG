@@ -77,6 +77,7 @@ class Constantes {
   static const iconeMudarHorario = Icons.access_time_filled_outlined;
   static const iconeEmail = Icons.email;
   static const iconeSenha = Icons.password;
+  static const iconeConfiguracao = Icons.settings;
 
   // SHARE PREFERENCES
   static const sharePreferencesAjustarHorarioSemana = "ajustarHorarioSemana";
@@ -90,8 +91,7 @@ class Constantes {
     minute: 50,
   );
 
-  static const confirmacaoSelecaoDataComplemento =
-      "selecaoDataComplemento";
+  static const confirmacaoSelecaoDataComplemento = "selecaoDataComplemento";
 
   static const tipoBuscaAdicionarCampo = "buscaAdicionarCampo";
 
