@@ -47,6 +47,7 @@ class Textos {
   static String telaDadosUsuarioDescricao =
       "Aqui você pode visualizar as informações da conta, "
       "bem como fazer alterações no e-mail e senha";
+  static String alertaExclusaoUsuario = "Deseja realmente excluir este usuario";
 
   // TELA INICIAL
   static String telaInicialDescricao = "Selecione uma opção";

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
+import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/paleta_cores.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
@@ -140,6 +141,8 @@ class _TelaListagemTabelasBancoDadosState
     var db = FirebaseFirestore.instance;
     excluirDadosColecaoDocumento(retornoIdDocumentoFireBase);
     db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
         .collection(Constantes.fireBaseColecaoEscalas)
         .doc(retornoIdDocumentoFireBase)
         .delete()
@@ -150,10 +153,17 @@ class _TelaListagemTabelasBancoDadosState
             nomeTabelaSelecionada = "";
             exibirConfirmacaoTabelaSelecionada = false;
           });
-          // MetodosAuxiliares.exibirMensagens(Textos.sucessoMsgExcluirEscala,
-          //     Textos.tipoNotificacaoSucesso, context);
+          chamarExibirMensagemSucesso();
           chamarConsultarTabelas();
         }, onError: (e) {});
+  }
+
+  chamarExibirMensagemSucesso() {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoSucesso,
+      Textos.notificacaoSucesso,
+      context,
+    );
   }
 
   realizarConsultaDocumentoFirebase() async {
@@ -162,6 +172,8 @@ class _TelaListagemTabelasBancoDadosState
     var db = FirebaseFirestore.instance;
     //consultando id do documento no firebase para posteriormente excluir
     await db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
         .collection(Constantes.fireBaseColecaoEscalas)
         .where(Constantes.fireBaseDocumentoNomeEscalas)
         .get()
@@ -181,6 +193,8 @@ class _TelaListagemTabelasBancoDadosState
     var db = FirebaseFirestore.instance;
     //consultando id do documento no firebase para posteriormente excluir
     await db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
         .collection(Constantes.fireBaseColecaoEscalas)
         .doc(idDocumentoFirebase)
         .collection(Constantes.fireBaseDadosCadastrados)
@@ -190,6 +204,8 @@ class _TelaListagemTabelasBancoDadosState
           // item corresponde ao ID da iteracao
           for (var docSnapshot in querySnapshot.docs) {
             db
+                .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+                .doc(uidUsuario)
                 .collection(Constantes.fireBaseColecaoEscalas)
                 .doc(idDocumentoFirebase)
                 .collection(Constantes.fireBaseDadosCadastrados)

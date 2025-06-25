@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,7 @@ import 'package:sscaleg/Uteis/paleta_cores.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
+import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
@@ -26,13 +28,27 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
   TextEditingController controleEmail = TextEditingController(text: "");
   TextEditingController controleSenha = TextEditingController(text: "");
   final _formKeyFormulario = GlobalKey<FormState>();
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
+  String nomeColecaoFireBaseLocal =
+      Constantes.fireBaseColecaoNomeLocaisTrabalho;
+  String nomeColecaoFireBaseVoluntario =
+      Constantes.fireBaseColecaoNomeVoluntarios;
+  String nomeColecaoFireBaseObservacao =
+      Constantes.fireBaseColecaoNomeObservacao;
+  String nomeColecaoFireBaseCabecalhoPDF =
+      Constantes.fireBaseColecaoNomeCabecalhoPDF;
+  String nomeColecaoFireBaseEscalas = Constantes.fireBaseColecaoEscalas;
+  String nomeDocumentoFireBaseEscalas = Constantes.fireBaseDadosCadastrados;
   String emailCadastrado = "";
+  String uidUsuario = "";
 
   @override
   void initState() {
     super.initState();
     emailCadastrado =
         PassarPegarDados.recuperarInformacoesUsuario().entries.last.value;
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     controleEmail.text = emailCadastrado;
   }
 
@@ -63,6 +79,172 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
         });
       },
       icon: Icon(iconeExibirSenha),
+    );
+  }
+
+  chamarDeletar() async {
+    setState(() {
+      //exibirWidgetCarregamento = true;
+    });
+    bool retornoLocal = await chamarDeletarItemAItem(nomeColecaoFireBaseLocal);
+    bool retornoVoluntario = await chamarDeletarItemAItem(
+      nomeColecaoFireBaseVoluntario,
+    );
+    bool retornoObservacao = await chamarDeletarItemAItem(
+      nomeColecaoFireBaseObservacao,
+    );
+    bool retornoCabecalhoPDF = await chamarDeletarItemAItem(
+      nomeColecaoFireBaseCabecalhoPDF,
+    );
+    buscarDadosDentroEscala();
+
+    // if (retornoLocal &&
+    //     retornoVoluntario &&
+    //     retornoObservacao &&
+    //     retornoCabecalhoPDF) {
+    //   print("sfsdfsdf");
+    // } else {
+    //   print("xzczczxc");
+    // }
+  }
+
+  chamarExibirMensagemSucesso() {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoSucesso,
+      Textos.notificacaoSucesso,
+      context,
+    );
+  }
+
+  buscarDadosDentroEscala() async {
+    var db = FirebaseFirestore.instance;
+    await db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
+        .collection(nomeColecaoFireBaseEscalas)
+        .where(Constantes.fireBaseDocumentoNomeEscalas)
+        .get()
+        .then((querySnapshot) {
+          for (var docSnapshot in querySnapshot.docs) {
+            //deletando o CAMPO de CADA ID para poder excluir a colecao
+            db
+                .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+                .doc(uidUsuario)
+                .collection(nomeColecaoFireBaseEscalas)
+                .doc(docSnapshot.id)
+                .delete();
+            excluirDadosColecaoDocumentoDentroEscala(docSnapshot.id);
+          }
+        });
+  }
+
+  //metodo para percorrer cadas ESCALA EXCLUINDO CADA ELEMENTO DENTRO DELA
+  excluirDadosColecaoDocumentoDentroEscala(String idDocumentoFirebase) async {
+    var db = FirebaseFirestore.instance;
+    await db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
+        .collection(nomeColecaoFireBaseEscalas)
+        .doc(idDocumentoFirebase)
+        .collection(nomeDocumentoFireBaseEscalas)
+        .get()
+        .then((querySnapshot) {
+          // para cada iteracao do FOR excluir o
+          // item corresponde ao ID da iteracao
+          for (var docSnapshot in querySnapshot.docs) {
+            db
+                .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+                .doc(uidUsuario)
+                .collection(nomeColecaoFireBaseEscalas)
+                .doc(idDocumentoFirebase)
+                .collection(nomeDocumentoFireBaseEscalas)
+                .doc(docSnapshot.id)
+                .delete();
+          }
+        });
+  }
+
+  Future<bool> chamarDeletarItemAItem(String nomeColecao) async {
+    bool retorno = false;
+    var db = FirebaseFirestore.instance;
+    await db
+        .collection(nomeColecaoUsuariosFireBase)
+        .doc(uidUsuario)
+        .collection(nomeColecao)
+        .get()
+        .then(
+          (querySnapshot) {
+            //para cada iteracao do FOR excluir o
+            //item corresponde ao ID da iteracao
+            for (var docSnapshot in querySnapshot.docs) {
+              db
+                  .collection(nomeColecaoUsuariosFireBase)
+                  .doc(uidUsuario)
+                  .collection(nomeColecao)
+                  .doc(docSnapshot.id)
+                  .delete();
+            }
+            retorno = true;
+          },
+          onError: (e) {
+            retorno = false;
+          },
+        );
+    return retorno;
+  }
+
+  chamarExibirMensagemErro(String erro) {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoErro,
+      erro,
+      context,
+    );
+  }
+
+  Future<void> alertaExclusao(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            Textos.tituloAlertaExclusao,
+            style: const TextStyle(color: Colors.black),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  Textos.alertaExclusaoUsuario,
+                  style: const TextStyle(color: Colors.black),
+                ),
+                Text(
+                  emailCadastrado,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Não', style: TextStyle(color: Colors.black)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Sim', style: TextStyle(color: Colors.black)),
+              onPressed: () {
+                chamarDeletar();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -104,7 +286,7 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
           chamarSairConta();
         } else if (nomeBtn == Textos.btnCadastrar) {
         } else if (nomeBtn == Textos.btnExcluirConta) {
-
+          alertaExclusao(context);
         }
       },
       child: Text(
