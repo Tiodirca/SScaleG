@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Constantes {
-  //ROTAS
+  //ROTAS GERAIS
   static const rotaTelaSplash = "telaSplash";
   static const rotaTelaInicial = "telaInicial";
   static const rotaTelaLoginCadastro = "loginCadastro";
@@ -29,14 +29,14 @@ class Constantes {
   static const rotaTelaCadastroCampoNovo = "telaCadastroCampoNovo";
   static const rotaTelaRemoverCampos = "telaRemoverCampos";
 
+  //OBSERVACAO PDF E CONFIGURACAO DE PDF
   static const rotaTelaObservacao = "telaObservacao";
-
   static const rotaTelaConfigurarPDFBaixar = "telaConfigurarPDFBaixar";
 
   static const tipoTelaAnteriorCadastroItem = "telaAnteriorCadastroItem";
   static const tipoTelaAnteriorAtualizarItem = "telaAnteriorAtualizarItem";
 
-  //ARGUMENTOS
+  //ARGUMENTOS ROTAS
   static const rotaArgumentoNomeEscala = "nomeEscala";
   static const rotaArgumentoIDEscalaSelecionada = "IDEscalaSelecionada";
   static const rotaArgumentoIDItemSelecionado = "IDEscalaSelecionada";
@@ -46,8 +46,13 @@ class Constantes {
   static const rotaArgumentoLinhasEscala = "linhasEscala";
   static const rotaArgumentoObservacaoEscala = "observacaoEscala";
 
+  //INFORMACAO USUARIO
   static const infoUsuarioUID = "uid";
   static const infoUsuarioEmail = "email";
+
+  //TIPO AUTENTICACAO DADOS USUARIO
+  static const acaoAutenticarExcluirConta = "Excluir conta";
+  static const acaoAutenticarEditarConta = "Editar conta";
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";
@@ -91,19 +96,21 @@ class Constantes {
     minute: 50,
   );
 
+  //UTILIZADO NO WIDGET DE SELECAO DE OPCOES DE DATA
   static const confirmacaoSelecaoDataComplemento = "selecaoDataComplemento";
 
-  static const tipoBuscaAdicionarCampo = "buscaAdicionarCampo";
+  //UTILIZADO NA TELA ADICIONAR E REMOVER CAMPO
+  static const tipoBuscaAdicionarRemoverCampo = "buscaAdicionarRemoverCampo";
 
   //TIPO NOTIFICACAO
   static const tipoNotificacaoSucesso = "Sucesso";
   static const tipoNotificacaoErro = "Erro";
 
   //FIRE BASE
-  //LOCAIS TRABALHO
-
+  //USUARIOS
   static const fireBaseColecaoUsuarios = "Usuarios";
 
+  //LOCAIS TRABALHO
   static const fireBaseColecaoNomeLocaisTrabalho = "locais_trabalho";
   static const fireBaseDocumentoNomeLocaisTrabalho = "nome";
 

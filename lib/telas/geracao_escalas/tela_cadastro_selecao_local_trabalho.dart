@@ -365,7 +365,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
             } else {
               return Scaffold(
                 appBar: AppBar(
-                  title: Text(Textos.tituloTelaCadastroSelecaoLocalTrabalho),
+                  title: Text(Textos.telaCadastroTituloSelecaoLocal),
                   leading: IconButton(
                     color: Colors.white,
                     onPressed: () {
@@ -396,7 +396,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                     horizontal: 10.0,
                                   ),
                                   child: Text(
-                                    Textos.descricaoCadastroLocalTrabalho,
+                                    Textos.telaCadastroDescricaoCadastroLocal,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 20),
                                   ),
@@ -468,7 +468,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                         width: larguraTela,
                                         child: Text(
                                           textAlign: TextAlign.center,
-                                          Textos.descricaoSelecaoLocalTrabalho,
+                                          Textos.telaCadastroDescricaoSelecaoLocal,
                                           style: const TextStyle(fontSize: 20),
                                         ),
                                       ),

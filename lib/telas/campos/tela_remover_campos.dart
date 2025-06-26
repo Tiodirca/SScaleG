@@ -86,7 +86,7 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
                 validarTipoBusca(querySnapshot, tipoBusca);
               } else {
                 setState(() {
-                  if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+                  if (tipoBusca.contains(Constantes.tipoBuscaAdicionarRemoverCampo)) {
                     exibirWidgetTelaCarregamento = false;
                   }
                   chamarExibirMensagemErro(Textos.erroBaseDadosVazia);
@@ -113,7 +113,7 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
   carregarDados(var querySnapshot, String tipoBusca) {
     // for para percorrer todos os dados que a variavel recebeu
     for (var documentoFirebase in querySnapshot.docs) {
-      if (!tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+      if (!tipoBusca.contains(Constantes.tipoBuscaAdicionarRemoverCampo)) {
         Map idDocumentoData = {};
         idDocumentoData[Constantes.idDocumento] = documentoFirebase.id;
         escalaQuantidadeItensCadastrados.addAll([
@@ -128,7 +128,7 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
     List<String> listaCabecalho = [];
     // caso a busca contenha o seguinte parametro entrar no if
     // metodo para poder verificar se a busca e a primeira busca ao entrar na tela
-    if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+    if (tipoBusca.contains(Constantes.tipoBuscaAdicionarRemoverCampo)) {
       setState(() {
         // pegando as keys uma unica vez para adicionar no map
         listaCabecalho = querySnapshot.docs.first.data().keys.toList();
@@ -220,7 +220,7 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
                 index = 0;
                 realizarBuscaDadosFireBase(
                   widget.idDocumento,
-                  Constantes.tipoBuscaAdicionarCampo,
+                  Constantes.tipoBuscaAdicionarRemoverCampo,
                 );
                 chamarExibirMensagemSucesso();
               }

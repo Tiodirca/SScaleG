@@ -98,6 +98,13 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     chamarCadastroItens();
   }
 
+  //--------------------------------------
+  // Fazer para corrigir NOMES NAO ADICIONADOS
+  // PERCORRE A ESCALA SORTEADA
+  // VERIFICA SE ALGUM DOS NOMES SELECIONADOS NAO ESTA NA ESCALA
+  // CASO NAO ESTEJA SORTEAR UM INDEX QUALQUER E ADICIONAR
+  //PODENDO VERIFICAR SE O NOME ESTA PELO MENOS 2 VEZES AO LONGO DA ESCALA SORTEADA
+
   // metodo para chamar o sorteio de nomes sem repeticao
   sortearNomesSemRepeticao(int numeroRandomico) {
     listaNumeroAuxiliarRepeticao.clear(); //limpando lista
@@ -322,7 +329,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Text(
-                            Textos.descricaoGerarEscala,
+                            Textos.telaGerarEscalaDescricao,
                             textAlign: TextAlign.justify,
                             style: const TextStyle(fontSize: 20),
                           ),

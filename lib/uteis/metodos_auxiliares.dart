@@ -48,7 +48,18 @@ class MetodosAuxiliares {
     String valorRecuperado = prefs.getString(parametroSharePreferences) ?? '';
     return valorRecuperado;
   }
-  
+
+  //metodo para ajustar o tamanho do textField com base no tamanho da tela
+  static ajustarTamanhoTextField(double larguraTela) {
+    double tamanho = 150;
+    //verificando qual o tamanho da tela
+    if (larguraTela <= 600) {
+      tamanho = 150;
+    } else {
+      tamanho = 300;
+    }
+    return tamanho;
+  }
 
   static quantidadeColunasGridView(double larguraTela) {
     int tamanho = 5;

@@ -40,7 +40,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   @override
   void initState() {
     super.initState();
-    uidUsuario = PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    uidUsuario =
+        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     Timer(const Duration(seconds: 1), () {
       realizarBuscaDadosFireBase();
     });
@@ -369,7 +370,7 @@ class _TelaCadastroSelecaoNomesVoluntariosState
             } else {
               return Scaffold(
                 appBar: AppBar(
-                  title: Text(Textos.tituloTelaCadastroSelecaoVoluntarios),
+                  title: Text(Textos.telaCadastroTituloVoluntarios),
                   leading: IconButton(
                     color: Colors.white,
                     onPressed: () {
@@ -381,148 +382,195 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                     },
                     icon: const Icon(Icons.arrow_back_ios),
                   ),
+                  actions: [],
                 ),
                 body: Container(
                   color: Colors.white,
                   width: larguraTela,
                   height: alturaTela,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: alturaTela * 0.2,
-                          padding: const EdgeInsets.only(bottom: 20.0),
-                          width: larguraTela,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                  ),
-                                  child: Text(
-                                    Textos.descricaoCadastroVoluntario,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 20),
-                                  ),
-                                ),
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.start,
-                                  alignment: WrapAlignment.center,
-                                  children: [
-                                    Form(
-                                      key: validacaoFormulario,
-                                      child: SizedBox(
-                                        width: Platform.isWindows ? 300 : 200,
-                                        child: TextFormField(
-                                          decoration: InputDecoration(
-                                            hintText:
-                                                Textos.labelTextFieldCampo,
-                                          ),
-                                          controller: nomeControle,
-                                          onFieldSubmitted: (value) {
-                                            validarCampoEChamarCadastrar();
-                                          },
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return Textos.erroCampoVazio;
-                                            }
-                                            return null;
-                                          },
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (listaNomesCadastrados.isNotEmpty) {
+                        return Column(
+                          children: [
+                            Expanded(
+                              flex: 0,
+                              child: Container(
+                                padding: const EdgeInsets.only(bottom: 20.0),
+                                width: larguraTela,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        child: Text(
+                                          Textos
+                                              .telaCadastroDescricaoVoluntario,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(fontSize: 20),
                                         ),
                                       ),
-                                    ),
+                                      Wrap(
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.start,
+                                        alignment: WrapAlignment.center,
+                                        children: [
+                                          Form(
+                                            key: validacaoFormulario,
+                                            child: Container(
+                                              margin: EdgeInsets.only(
+                                                bottom: 10,
+                                              ),
+                                              width:
+                                                  MetodosAuxiliares.ajustarTamanhoTextField(
+                                                    larguraTela,
+                                                  ),
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                  hintText:
+                                                      Textos
+                                                          .labelTextFieldCampo,
+                                                ),
+                                                controller: nomeControle,
+                                                onFieldSubmitted: (value) {
+                                                  validarCampoEChamarCadastrar();
+                                                },
+                                                validator: (value) {
+                                                  if (value!.isEmpty) {
+                                                    return Textos
+                                                        .erroCampoVazio;
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: const EdgeInsets.symmetric(
+                                              horizontal: 10.0,
+                                            ),
+                                            width: 100,
+                                            height: 40,
+                                            child: FloatingActionButton(
+                                              heroTag: Textos.btnCadastrar,
+                                              onPressed: () {
+                                                validarCampoEChamarCadastrar();
+                                              },
+                                              child: Text(
+                                                Textos.btnCadastrar,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: Column(
+                                  children: [
                                     Container(
                                       margin: const EdgeInsets.symmetric(
                                         horizontal: 10.0,
                                       ),
-                                      width: 100,
-                                      height: 40,
-                                      child: FloatingActionButton(
-                                        heroTag: Textos.btnCadastrar,
-                                        onPressed: () {
-                                          validarCampoEChamarCadastrar();
-                                        },
-                                        child: Text(
-                                          Textos.btnCadastrar,
-                                          style: TextStyle(color: Colors.black),
+                                      width: larguraTela,
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        Textos
+                                            .telaCadastroDescricaoSelecaoVoluntarios,
+                                        style: const TextStyle(fontSize: 18),
+                                      ),
+                                    ),
+                                    // Area de Exibicao da lista com os nomes dos voluntarios
+                                    Card(
+                                      child: SizedBox(
+                                        height:
+                                            Platform.isAndroid || Platform.isIOS
+                                                ? listaNomesSelecionados
+                                                        .isNotEmpty
+                                                    ? alturaTela * 0.35
+                                                    : alturaTela * 0.45
+                                                : listaNomesSelecionados
+                                                    .isNotEmpty
+                                                ? alturaTela * 0.45
+                                                : alturaTela * 0.6,
+                                        width:
+                                            Platform.isAndroid || Platform.isIOS
+                                                ? larguraTela
+                                                : larguraTela * 0.8,
+                                        child: ListView(
+                                          children: [
+                                            ...listaNomesCadastrados.map(
+                                              (e) => checkBoxPersonalizado(e),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                        // area de listagem de nomes geral
-                        SizedBox(
-                          height: alturaTela * 0.55,
-                          width: larguraTela,
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              if (listaNomesCadastrados.isNotEmpty) {
-                                // area de exibicao de descricao e listagem de nomes
-                                return SizedBox(
-                                  width: larguraTela,
+                            Visibility(
+                              visible:
+                                  listaNomesSelecionados.isNotEmpty
+                                      ? true
+                                      : false,
+                              child: SizedBox(
+                                height: 100,
+                                width: Platform.isAndroid || Platform.isIOS
+                                    ? larguraTela
+                                    : larguraTela * 0.8,
+                                child: Card(
                                   child: SingleChildScrollView(
-                                    child: Column(
+                                    child: Wrap(
+                                      alignment: WrapAlignment.center,
                                       children: [
-                                        Container(
-                                          margin: const EdgeInsets.symmetric(
-                                            horizontal: 10.0,
-                                          ),
-                                          width: larguraTela,
-                                          child: Text(
-                                            textAlign: TextAlign.center,
-                                            Textos.descricaoSelecaoVoluntarios,
-                                            style: const TextStyle(
-                                              fontSize: 20,
-                                            ),
-                                          ),
+                                        Text(
+                                          textAlign: TextAlign.center,
+                                          Textos
+                                              .telaCadastroDescricaoVoluntarioNomesSelecionados,
+                                          style: const TextStyle(fontSize: 18),
                                         ),
-                                        // Area de Exibicao da lista com os nomes dos voluntarios
-                                        Card(
-                                          child: SizedBox(
-                                            height: alturaTela * 0.45,
-                                            width:
-                                                Platform.isAndroid ||
-                                                        Platform.isIOS
-                                                    ? larguraTela
-                                                    : larguraTela * 0.8,
-                                            child: ListView(
-                                              children: [
-                                                ...listaNomesCadastrados.map(
-                                                  (e) =>
-                                                      checkBoxPersonalizado(e),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                        Text(
+                                          textAlign: TextAlign.center,
+                                          listaNomesSelecionados
+                                              .toString()
+                                              .replaceAll("[", "")
+                                              .replaceAll("]", "").replaceAll("_", " "),
+                                          style: const TextStyle(fontSize: 18),
                                         ),
                                       ],
                                     ),
                                   ),
-                                );
-                              } else {
-                                // area caso nao tenha
-                                // nenhum voluntario cadastrado
-                                return Container(
-                                  margin: const EdgeInsets.all(10.0),
-                                  transformAlignment: Alignment.center,
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    Textos.erroBaseDadosVazia,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                );
-                              }
-                            },
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Container(
+                          margin: const EdgeInsets.all(10.0),
+                          transformAlignment: Alignment.center,
+                          alignment: Alignment.center,
+                          child: Text(
+                            Textos.erroBaseDadosVazia,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 18),
                           ),
-                        ),
-                      ],
-                    ),
+                        );
+                      }
+                    },
                   ),
                 ),
                 bottomNavigationBar: Container(

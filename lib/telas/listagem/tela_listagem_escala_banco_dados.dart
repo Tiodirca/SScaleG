@@ -300,7 +300,7 @@ class _TelaListagemTabelasBancoDadosState
             } else {
               return Scaffold(
                 appBar: AppBar(
-                  title: Text(Textos.btnListarEscalas),
+                  title: Text(Textos.telaSelecaoEscalaTitulo),
                   leading: IconButton(
                     color: Colors.white,
                     onPressed: () {
@@ -357,7 +357,8 @@ class _TelaListagemTabelasBancoDadosState
                               width: larguraTela,
                               child: Text(
                                 textAlign: TextAlign.center,
-                                Textos.descricaoDropDownTabelas,
+                                Textos
+                                    .telaSelecaoEscalaDescricaoDropDownTabelas,
                                 style: const TextStyle(fontSize: 18),
                               ),
                             ),
@@ -412,7 +413,8 @@ class _TelaListagemTabelasBancoDadosState
                                       children: [
                                         Text(
                                           textAlign: TextAlign.center,
-                                          Textos.descricaoTabelaSelecionada,
+                                          Textos
+                                              .descricaoTabelaSelecionada,
                                           style: const TextStyle(fontSize: 18),
                                         ),
                                         Text(

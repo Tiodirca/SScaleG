@@ -35,7 +35,6 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -99,7 +98,7 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(Textos.tituloTelaSelecaoDiasSemana),
+            title: Text(Textos.telaSelecaoDiasSemanaTitulo),
             leading: IconButton(
               color: Colors.white,
               onPressed: () {
@@ -122,7 +121,7 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
                   Container(
                     margin: const EdgeInsets.all(10.0),
                     child: Text(
-                      Textos.descricaoSelecaoDiasSemana,
+                      Textos.telaSelecaoDiasSemanaDescricao,
                       textAlign: TextAlign.justify,
                       style: const TextStyle(fontSize: 20),
                     ),

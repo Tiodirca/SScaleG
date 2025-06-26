@@ -23,11 +23,17 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
   Estilo estilo = Estilo();
   bool exibirWidgetCarregamento = false;
   bool exibirOcultarSenha = true;
+  bool exibirOcultarTelaAutenticarUsuario = false;
   bool edicaoAtiva = false;
+  String tipoAcaoAutenticar = "";
   IconData iconeExibirSenha = Icons.visibility;
   TextEditingController controleEmail = TextEditingController(text: "");
   TextEditingController controleSenha = TextEditingController(text: "");
+  TextEditingController controleSenhaAutenticacao = TextEditingController(
+    text: "",
+  );
   final _formKeyFormulario = GlobalKey<FormState>();
+  final formularioSenhaAutenticar = GlobalKey<FormState>();
   String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
   String nomeColecaoFireBaseLocal =
       Constantes.fireBaseColecaoNomeLocaisTrabalho;
@@ -38,6 +44,8 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
   String nomeColecaoFireBaseCabecalhoPDF =
       Constantes.fireBaseColecaoNomeCabecalhoPDF;
   String nomeColecaoFireBaseEscalas = Constantes.fireBaseColecaoEscalas;
+  String nomeColecaoFireBaseDepartamentoData =
+      Constantes.fireBaseColecaoNomeDepartamentosData;
   String nomeDocumentoFireBaseEscalas = Constantes.fireBaseDadosCadastrados;
   String emailCadastrado = "";
   String uidUsuario = "";
@@ -82,10 +90,56 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
     );
   }
 
-  chamarDeletar() async {
+  chamarExibirMensagemSucesso(String mensagem) {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoSucesso,
+      mensagem,
+      context,
+    );
+  }
+
+  chamarExibirMensagemErro(String erro) {
+    MetodosAuxiliares.exibirMensagens(
+      Constantes.tipoNotificacaoErro,
+      erro,
+      context,
+    );
+  }
+
+  chamarAutenticarUsuario() {
     setState(() {
-      //exibirWidgetCarregamento = true;
+      exibirWidgetCarregamento = true;
     });
+    AuthCredential credential = EmailAuthProvider.credential(
+      email: emailCadastrado,
+      password: controleSenhaAutenticacao.text,
+    );
+    FirebaseAuth.instance
+        .signInWithCredential(credential)
+        .then(
+          (value) {
+            setState(() {
+              exibirOcultarTelaAutenticarUsuario = false;
+              exibirOcultarSenha = true;
+              controleSenhaAutenticacao.clear();
+              if (tipoAcaoAutenticar == Constantes.acaoAutenticarExcluirConta) {
+                chamarDeletarDados();
+              } else if (tipoAcaoAutenticar ==
+                  Constantes.acaoAutenticarEditarConta) {}
+            });
+          },
+          onError: (e) {
+            setState(() {
+              exibirWidgetCarregamento = false;
+            });
+            chamarExibirMensagemErro(
+              "${Textos.notificacaoErro} : ${e.toString()}",
+            );
+          },
+        );
+  }
+
+  chamarDeletarDados() async {
     bool retornoLocal = await chamarDeletarItemAItem(nomeColecaoFireBaseLocal);
     bool retornoVoluntario = await chamarDeletarItemAItem(
       nomeColecaoFireBaseVoluntario,
@@ -96,72 +150,145 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
     bool retornoCabecalhoPDF = await chamarDeletarItemAItem(
       nomeColecaoFireBaseCabecalhoPDF,
     );
-    buscarDadosDentroEscala();
-
-    // if (retornoLocal &&
-    //     retornoVoluntario &&
-    //     retornoObservacao &&
-    //     retornoCabecalhoPDF) {
-    //   print("sfsdfsdf");
-    // } else {
-    //   print("xzczczxc");
-    // }
-  }
-
-  chamarExibirMensagemSucesso() {
-    MetodosAuxiliares.exibirMensagens(
-      Constantes.tipoNotificacaoSucesso,
-      Textos.notificacaoSucesso,
-      context,
+    bool retornoDepartamentoData = await chamarDeletarItemAItem(
+      nomeColecaoFireBaseDepartamentoData,
     );
+    bool retornoEscalas = await buscarDadosDentroEscala();
+    if (retornoLocal &&
+        retornoVoluntario &&
+        retornoObservacao &&
+        retornoCabecalhoPDF &&
+        retornoEscalas &&
+        retornoDepartamentoData) {
+      chamarDeletarUsuario();
+    } else {
+      chamarExibirMensagemErro(Textos.notificacaoErro);
+    }
   }
 
-  buscarDadosDentroEscala() async {
-    var db = FirebaseFirestore.instance;
-    await db
-        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
-        .doc(uidUsuario)
-        .collection(nomeColecaoFireBaseEscalas)
-        .where(Constantes.fireBaseDocumentoNomeEscalas)
-        .get()
-        .then((querySnapshot) {
-          for (var docSnapshot in querySnapshot.docs) {
-            //deletando o CAMPO de CADA ID para poder excluir a colecao
-            db
-                .collection(nomeColecaoUsuariosFireBase) // passando a colecao
-                .doc(uidUsuario)
-                .collection(nomeColecaoFireBaseEscalas)
-                .doc(docSnapshot.id)
-                .delete();
-            excluirDadosColecaoDocumentoDentroEscala(docSnapshot.id);
-          }
-        });
+  chamarDeletarUsuario() {
+    if (FirebaseAuth.instance.currentUser != null) {
+      //chama deletar usuario
+      FirebaseAuth.instance.currentUser?.delete().then(
+        (value) {
+          chamarExibirMensagemSucesso(Textos.notificacaoSucesso);
+          chamarSairConta();
+        },
+        onError: (e) {
+          setState(() {
+            chamarExibirMensagemErro(e.toString());
+            exibirWidgetCarregamento = false;
+          });
+        },
+      );
+    }
+  }
+
+  Future<bool> buscarDadosDentroEscala() async {
+    bool retorno = false;
+    try {
+      var db = FirebaseFirestore.instance;
+      await db
+          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBaseEscalas)
+          .where(Constantes.fireBaseDocumentoNomeEscalas)
+          .get()
+          .then(
+            (querySnapshot) async {
+              for (var docSnapshot in querySnapshot.docs) {
+                //deletando o CAMPO de CADA ID para poder excluir a colecao
+                db
+                    .collection(
+                      nomeColecaoUsuariosFireBase,
+                    ) // passando a colecao
+                    .doc(uidUsuario)
+                    .collection(nomeColecaoFireBaseEscalas)
+                    .doc(docSnapshot.id)
+                    .delete()
+                    .then(
+                      (value) {
+                        retorno = true;
+                      },
+                      onError: (e) {
+                        retorno = false;
+                        debugPrint("Erro Excluir: ${e.toString()}");
+                      },
+                    );
+                retorno = await excluirDadosColecaoDocumentoDentroEscala(
+                  docSnapshot.id,
+                );
+              }
+              retorno = true;
+            },
+            onError: (e) {
+              retorno = false;
+              debugPrint("Erro : ${e.toString()}");
+            },
+          );
+    } catch (e) {
+      retorno = false;
+      debugPrint("Erro : ${e.toString()}");
+    }
+    return retorno;
   }
 
   //metodo para percorrer cadas ESCALA EXCLUINDO CADA ELEMENTO DENTRO DELA
-  excluirDadosColecaoDocumentoDentroEscala(String idDocumentoFirebase) async {
-    var db = FirebaseFirestore.instance;
-    await db
-        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
-        .doc(uidUsuario)
-        .collection(nomeColecaoFireBaseEscalas)
-        .doc(idDocumentoFirebase)
-        .collection(nomeDocumentoFireBaseEscalas)
-        .get()
-        .then((querySnapshot) {
-          // para cada iteracao do FOR excluir o
-          // item corresponde ao ID da iteracao
-          for (var docSnapshot in querySnapshot.docs) {
-            db
-                .collection(nomeColecaoUsuariosFireBase) // passando a colecao
-                .doc(uidUsuario)
-                .collection(nomeColecaoFireBaseEscalas)
-                .doc(idDocumentoFirebase)
-                .collection(nomeDocumentoFireBaseEscalas)
-                .doc(docSnapshot.id)
-                .delete();
-          }
-        });
+  Future<bool> excluirDadosColecaoDocumentoDentroEscala(
+    String idDocumentoFirebase,
+  ) async {
+    int index = 0;
+    bool retornoFinalizacaoExclusao = false;
+    try {
+      var db = FirebaseFirestore.instance;
+      await db
+          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBaseEscalas)
+          .doc(idDocumentoFirebase)
+          .collection(nomeDocumentoFireBaseEscalas)
+          .get()
+          .then(
+            (querySnapshot) {
+              // para cada iteracao do FOR excluir o
+              // item corresponde ao ID da iteracao
+              for (var docSnapshot in querySnapshot.docs) {
+                db
+                    .collection(
+                      nomeColecaoUsuariosFireBase,
+                    ) // passando a colecao
+                    .doc(uidUsuario)
+                    .collection(nomeColecaoFireBaseEscalas)
+                    .doc(idDocumentoFirebase)
+                    .collection(nomeDocumentoFireBaseEscalas)
+                    .doc(docSnapshot.id)
+                    .delete()
+                    .then(
+                      (value) {
+                        index++;
+                        if (index == querySnapshot.size) {
+                          retornoFinalizacaoExclusao = true;
+                        }
+                      },
+                      onError: (e) {
+                        retornoFinalizacaoExclusao = false;
+                        debugPrint(
+                          "Erro Excluir Item a item Tabela : ${e.toString()}",
+                        );
+                      },
+                    );
+              }
+            },
+            onError: (e) {
+              retornoFinalizacaoExclusao = false;
+              debugPrint("Erro Excluir Item a item Tabela : ${e.toString()}");
+            },
+          );
+    } catch (e) {
+      retornoFinalizacaoExclusao = false;
+      debugPrint("Erro Excluir Item a item Tabela : ${e.toString()}");
+    }
+    return retornoFinalizacaoExclusao;
   }
 
   Future<bool> chamarDeletarItemAItem(String nomeColecao) async {
@@ -182,26 +309,27 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                   .doc(uidUsuario)
                   .collection(nomeColecao)
                   .doc(docSnapshot.id)
-                  .delete();
+                  .delete()
+                  .then(
+                    (value) {
+                      retorno = true;
+                    },
+                    onError: (e) {
+                      debugPrint("Erro Excluir Item a item : ${e.toString()}");
+                    },
+                  );
             }
             retorno = true;
           },
           onError: (e) {
+            debugPrint("Erro Excluir Item a item : ${e.toString()}");
             retorno = false;
           },
         );
     return retorno;
   }
 
-  chamarExibirMensagemErro(String erro) {
-    MetodosAuxiliares.exibirMensagens(
-      Constantes.tipoNotificacaoErro,
-      erro,
-      context,
-    );
-  }
-
-  Future<void> alertaExclusao(BuildContext context) async {
+  Future<void> alertaExclusao() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -218,12 +346,14 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                   Textos.alertaExclusaoUsuario,
                   style: const TextStyle(color: Colors.black),
                 ),
-                Text(
-                  emailCadastrado,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
+                const SizedBox(height: 10),
+                Wrap(
+                  children: [
+                    Text(
+                      emailCadastrado,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -238,7 +368,10 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
             TextButton(
               child: const Text('Sim', style: TextStyle(color: Colors.black)),
               onPressed: () {
-                chamarDeletar();
+                setState(() {
+                  tipoAcaoAutenticar = Constantes.acaoAutenticarExcluirConta;
+                  exibirOcultarTelaAutenticarUsuario = true;
+                });
                 Navigator.of(context).pop();
               },
             ),
@@ -275,7 +408,28 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
     ),
   );
 
-  Widget botao(String nomeBtn, BuildContext context) => Container(
+  Widget campoSenhaAutenticar() => SizedBox(
+    width: 300,
+    height: 70,
+    child: TextFormField(
+      controller: controleSenhaAutenticacao,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return Textos.erroCampoVazio;
+        }
+        return null;
+      },
+      keyboardType: TextInputType.text,
+      obscureText: exibirOcultarSenha,
+      decoration: InputDecoration(
+        prefixIcon: Icon(Constantes.iconeSenha),
+        label: Text(Textos.labelSenha),
+        suffixIcon: chamarExibicaoOcultarSenha(),
+      ),
+    ),
+  );
+
+  Widget botao(String nomeBtn) => Container(
     margin: const EdgeInsets.all(10),
     width: 100,
     height: 40,
@@ -284,9 +438,12 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
       onPressed: () {
         if (nomeBtn == Textos.btnSairConta) {
           chamarSairConta();
-        } else if (nomeBtn == Textos.btnCadastrar) {
+        } else if (nomeBtn == Textos.btnAutenticar) {
+          if (formularioSenhaAutenticar.currentState!.validate()) {
+            chamarAutenticarUsuario();
+          }
         } else if (nomeBtn == Textos.btnExcluirConta) {
-          alertaExclusao(context);
+          alertaExclusao();
         }
       },
       child: Text(
@@ -308,6 +465,10 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
         } else if (label == Textos.labelSenha) {
         } else if (label == Textos.btnExcluir) {
           setState(() {
+            tipoAcaoAutenticar = "";
+            exibirOcultarSenha = true;
+            controleSenhaAutenticacao.clear();
+            exibirOcultarTelaAutenticarUsuario = false;
             edicaoAtiva = false;
           });
         }
@@ -363,60 +524,102 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                   height: alturaTela,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.all(10),
-                          width: larguraTela,
-                          child: Text(
-                            Textos.telaDadosUsuarioDescricao,
-                            style: const TextStyle(fontSize: 18),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Form(
-                          key: _formKeyFormulario,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (exibirOcultarTelaAutenticarUsuario) {
+                          return SizedBox(
+                            width: larguraTela,
+                            height: 300,
+                            child: Card(
+                              child: Column(
                                 children: [
-                                  camposFormulario(
-                                    Textos.labelEmail,
-                                    controleEmail,
-                                    Constantes.iconeEmail,
+                                  Container(
+                                    margin: EdgeInsets.all(10),
+                                    width: larguraTela,
+                                    child: Text(
+                                      Textos
+                                          .telaDadosUsuarioAutenticarDescricao,
+                                      style: const TextStyle(fontSize: 18),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
-                                  botoesIcones(Textos.labelEmail),
+                                  Form(
+                                    key: formularioSenhaAutenticar,
+                                    child: campoSenhaAutenticar(),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      botao(Textos.btnAutenticar),
+                                      botoesIcones(Textos.btnExcluir),
+                                    ],
+                                  ),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  camposFormulario(
-                                    Textos.labelSenha,
-                                    controleSenha,
-                                    Constantes.iconeSenha,
-                                  ),
-                                  botoesIcones(Textos.labelSenha),
-                                ],
+                            ),
+                          );
+                        } else {
+                          return Column(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.all(10),
+                                width: larguraTela,
+                                child: Text(
+                                  Textos.telaDadosUsuarioDescricao,
+                                  style: const TextStyle(fontSize: 18),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Form(
+                                key: _formKeyFormulario,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        camposFormulario(
+                                          Textos.labelEmail,
+                                          controleEmail,
+                                          Constantes.iconeEmail,
+                                        ),
+                                        botoesIcones(Textos.labelEmail),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        camposFormulario(
+                                          Textos.labelSenha,
+                                          controleSenha,
+                                          Constantes.iconeSenha,
+                                        ),
+                                        botoesIcones(Textos.labelSenha),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Visibility(
+                                visible: edicaoAtiva,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    botao(Textos.btnSalvar),
+                                    botoesIcones(Textos.btnExcluir),
+                                  ],
+                                ),
                               ),
                             ],
-                          ),
-                        ),
-                        Visibility(
-                          visible: edicaoAtiva,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              botao(Textos.btnSalvar, context),
-                              botoesIcones(Textos.btnExcluir),
-                            ],
-                          ),
-                        ),
-                      ],
+                          );
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -425,13 +628,17 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                   color: Colors.white,
                   height: 120,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          botao(Textos.btnSairConta, context),
-                          botao(Textos.btnExcluirConta, context),
-                        ],
+                      Visibility(
+                        visible: !exibirOcultarTelaAutenticarUsuario,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            botao(Textos.btnSairConta),
+                            botao(Textos.btnExcluirConta),
+                          ],
+                        ),
                       ),
                       BarraNavegacao(),
                     ],

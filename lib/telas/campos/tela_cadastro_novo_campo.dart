@@ -82,7 +82,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
                 validarTipoBusca(querySnapshot, tipoBusca);
               } else {
                 setState(() {
-                  if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+                  if (tipoBusca.contains(Constantes.tipoBuscaAdicionarRemoverCampo)) {
                     exibirWidgetTelaCarregamento = false;
                   }
                   chamarExibirMensagemErro(Textos.erroBaseDadosVazia);
@@ -109,7 +109,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
   carregarDados(var querySnapshot, String tipoBusca) {
     // for para percorrer todos os dados que a variavel recebeu
     for (var documentoFirebase in querySnapshot.docs) {
-      if (!tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+      if (!tipoBusca.contains(Constantes.tipoBuscaAdicionarRemoverCampo)) {
         Map idDocumentoData = {};
         idDocumentoData[Constantes.idDocumento] = documentoFirebase.id;
         escalaQuantidadeItensCadastrados.addAll([
@@ -122,7 +122,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
 
   validarTipoBusca(var querySnapshot, String tipoBusca) {
     List<String> listaCabecalho = [];
-    if (tipoBusca.contains(Constantes.tipoBuscaAdicionarCampo)) {
+    if (tipoBusca.contains(Constantes.tipoBuscaAdicionarRemoverCampo)) {
       setState(() {
         listaCabecalho = querySnapshot.docs.first.data().keys.toList();
         for (var element in listaCabecalho) {
@@ -262,7 +262,7 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
                 index = 0;
                 realizarBuscaDadosFireBase(
                   widget.idDocumento,
-                  Constantes.tipoBuscaAdicionarCampo,
+                  Constantes.tipoBuscaAdicionarRemoverCampo,
                 );
                 chamarExibirMensagemSucesso();
               }

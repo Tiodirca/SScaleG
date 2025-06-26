@@ -26,8 +26,9 @@ class Textos {
   static String btnVerEscalaAtual = "Escala Atual";
   static String btnAdicionarLogoImagem = "Adicionar Logo/Imagem";
   static String btnUsarEscala = "Utilizar está escala";
-  static String btnSairConta = "Sair da conta";
-  static String btnExcluirConta = "Excluir conta";
+  static String btnSairConta = "Sair da Conta";
+  static String btnExcluirConta = "Excluir Conta";
+  static String btnAutenticar = "Autenticar Usuario";
 
   // TELA LOGIN CADASTRO - LOGIN
   static String telaLoginUsuarioDescricao =
@@ -47,7 +48,14 @@ class Textos {
   static String telaDadosUsuarioDescricao =
       "Aqui você pode visualizar as informações da conta, "
       "bem como fazer alterações no e-mail e senha";
+
   static String alertaExclusaoUsuario = "Deseja realmente excluir este usuario";
+  //TELA DADOS USUARIO CONFIRMACAO AUTENTICACAO
+  static String telaDadosUsuarioAutenticarDescricao =
+      "Faça a autenticação de usuario digitando novamente a senha antes de proceguir com a ação";
+  static String telaDadosUsuarioAutenticacaoSucesso =
+      "Autenticação feita com sucesso,"
+      "prossiga para a ação desejada";
 
   // TELA INICIAL
   static String telaInicialDescricao = "Selecione uma opção";
@@ -64,50 +72,51 @@ class Textos {
       "não é possível selecionar mais de uma opção";
 
   // TELA CADASTRO E SELECAO DE LOCAIS DE TRABALHO
-  static String tituloTelaCadastroSelecaoLocalTrabalho = "Locais de Trabalho";
-  static String descricaoCadastroLocalTrabalho =
+  static String telaCadastroTituloSelecaoLocal = "Locais de Trabalho";
+  static String telaCadastroDescricaoCadastroLocal =
       "Use o campo abaixo para "
       "cadastrar o nome do Local de trabalho que estará compondo a escala";
-  static String descricaoSelecaoLocalTrabalho =
+  static String telaCadastroDescricaoSelecaoLocal =
       "Selecione quais "
       "Locais cadastrados que você deseja que a escala tenha";
 
   // TELA CADASTRO E SELECAO DE VOLUNTARIOS
-  static String tituloTelaCadastroSelecaoVoluntarios = "Voluntários";
-  static String descricaoCadastroVoluntario =
+  static String telaCadastroTituloVoluntarios = "Voluntários";
+  static String telaCadastroDescricaoVoluntario =
       "Use o campo abaixo para "
       "cadastrar o nome do voluntario que estará compondo a escala de trabalho";
-  static String descricaoSelecaoVoluntarios =
+  static String telaCadastroDescricaoSelecaoVoluntarios =
       "Selecione quais "
       "voluntários que você deseja que a escala tenha";
+  static String telaCadastroDescricaoVoluntarioNomesSelecionados = "Voluntarios Selecionados : ";
 
   // TELA SELECAO DIAS SEMANA
-  static String descricaoSelecaoDiasSemana =
+  static String telaSelecaoDiasSemanaDescricao =
       "Selecione os dias da semana que irão compor a escala";
-  static String tituloTelaSelecaoDiasSemana = "Seleção dos dias da semana";
+  static String telaSelecaoDiasSemanaTitulo = "Seleção dos dias da semana";
 
   //TELA SELECAO INTERVALO
-  static String tituloTelaSelecaoInvervaloTrabalho = "Intervalo de trabalho";
-  static String descricaoSelecaoIntervaloTrabalho =
+  static String telaSelecaoInvervaloTrabalhoTitulo = "Intervalo de trabalho";
+  static String telaSelecaoInvervaloTrabalhoDescricao =
       "Selecione o intervalo de dias que irão compor sua escala";
-  static String labelPeriodoInicio = "Período de Início";
-  static String labelPeriodoFinal = "Período Final";
+  static String telaSelecaoInvervaloTrabalhoLabelPeriodoInicio =
+      "Período de Início";
+  static String telaSelecaoInvervaloTrabalhoLabelPeriodoFinal = "Período Final";
 
   // TELA GERAR ESCALA
-  static String descricaoGerarEscala = "Defina o nome que a escala irá receber";
+  static String telaGerarEscalaDescricao =
+      "Defina o nome que a escala irá receber";
 
   // TELA SELECAO TABELAS
-  static String tituloTelaSelecaoTabelas = "Seleção de Escalas";
-  static String descricaoDropDownTabelas =
+  static String telaSelecaoEscalaTitulo = "Seleção de Escalas";
+  static String telaSelecaoEscalaDescricaoDropDownTabelas =
       "Utilize o menu abaixo para selecionar uma "
       "Escalas para estar sendo utilizada.";
-  static String descricaoTabelaSelecionada = "A Escalas selecionada foi : ";
 
   // TELA ESCALA DETALHADA
   static String telaEscalaDetalhadaTitulo = "Escalas Detalhada";
   static String telaEscalaDetalhadaDescricaoItens =
       "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
-
   static String telaEscalaDetalhadaQuantiNomePesquisa =
       "Vezes que o nome se repete : ";
 
@@ -185,7 +194,7 @@ class Textos {
       "Não foi possível encontrar nenhuma informação na base de dados, por favor "
       "verifique a conexão com internet ou cadastre uma informação";
 
-  //ERROS LOGIN E CADASTRO
+  //ERROS LOGIN E CADASTRO E DADOS USUARIO
   static String erroValidarUsuarioEmailNaoCadastrado = "E-mail não cadastrado";
   static String erroValidarUsuarioSenhaErrada = "Senha Incorreta";
   static String erroValidarUsuarioEmailErrado = "E-mail está incorreto";
@@ -197,6 +206,7 @@ class Textos {
   static String descricaoDataSelecionada = "A data Selecionada foi : ";
   static String observacaoSem = "Sem Observações";
   static String observacaoTitulo = "Observações";
+  static String descricaoTabelaSelecionada = "A Escalas selecionada foi : ";
   static String labelTextFieldCampo = "Digite um nome";
 
   //ALERTA EXCLUSAO
@@ -207,9 +217,6 @@ class Textos {
   //MENSAGEM DE NOTIFICACOES
   static String notificacaoSucesso = "Sucesso ao realizar ação";
   static String notificacaoErro = "Erro ao realizar ação";
-
-  static String txtCabecalhoPDF =
-      "Escalas  voluntaria de cooperador(a) da ADTL Parque São Carlos";
 
   static String txtRodapePDF =
       "Quem sua mão ao arado já pois, constante precisa ser.";

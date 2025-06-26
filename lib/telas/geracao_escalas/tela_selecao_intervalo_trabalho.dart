@@ -31,7 +31,6 @@ class _TelaSelecaoIntervaloTrabalhoState
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     listaDiasSemanaAnteriormente = PassarPegarDados.recuperarDiasSemana();
   }
@@ -75,7 +74,9 @@ class _TelaSelecaoIntervaloTrabalhoState
 
             if (novaData == null) return;
             setState(() {
-              if (label.contains(Textos.labelPeriodoInicio)) {
+              if (label.contains(
+                Textos.telaSelecaoInvervaloTrabalhoLabelPeriodoInicio,
+              )) {
                 dataInicial = novaData;
               } else {
                 dataFinal = novaData;
@@ -161,7 +162,7 @@ class _TelaSelecaoIntervaloTrabalhoState
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(Textos.tituloTelaSelecaoInvervaloTrabalho),
+            title: Text(Textos.telaSelecaoInvervaloTrabalhoTitulo),
             leading: IconButton(
               color: Colors.white,
               onPressed: () {
@@ -184,7 +185,7 @@ class _TelaSelecaoIntervaloTrabalhoState
                   Container(
                     margin: const EdgeInsets.all(10),
                     child: Text(
-                      Textos.descricaoSelecaoIntervaloTrabalho,
+                      Textos.telaSelecaoInvervaloTrabalhoDescricao,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 20),
                     ),
@@ -194,11 +195,11 @@ class _TelaSelecaoIntervaloTrabalhoState
                     alignment: WrapAlignment.spaceAround,
                     children: [
                       selecaoPeriodoTrabalho(
-                        Textos.labelPeriodoInicio,
+                        Textos.telaSelecaoInvervaloTrabalhoLabelPeriodoInicio,
                         dataInicial,
                       ),
                       selecaoPeriodoTrabalho(
-                        Textos.labelPeriodoFinal,
+                        Textos.telaSelecaoInvervaloTrabalhoLabelPeriodoFinal,
                         dataFinal,
                       ),
                     ],
