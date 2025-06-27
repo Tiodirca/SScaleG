@@ -398,7 +398,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                   child: Text(
                                     Textos.telaCadastroDescricaoCadastroLocal,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 20),
+                                    style: TextTheme.of(context).bodySmall,
                                   ),
                                 ),
                                 Wrap(
@@ -469,7 +469,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                         child: Text(
                                           textAlign: TextAlign.center,
                                           Textos.telaCadastroDescricaoSelecaoLocal,
-                                          style: const TextStyle(fontSize: 20),
+                                          style: TextTheme.of(context).bodySmall,
                                         ),
                                       ),
                                       // Area de Exibicao da lista com os nomes dos voluntarios
@@ -503,7 +503,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                   child: Text(
                                     Textos.erroBaseDadosVazia,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 18),
+                                    style: TextTheme.of(context).bodySmall,
                                   ),
                                 );
                               }

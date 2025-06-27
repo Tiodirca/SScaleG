@@ -41,7 +41,11 @@ class _TelaCadastroSelecaoNomesVoluntariosState
   void initState() {
     super.initState();
     uidUsuario =
-        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+        PassarPegarDados
+            .recuperarInformacoesUsuario()
+            .entries
+            .first
+            .value;
     Timer(const Duration(seconds: 1), () {
       realizarBuscaDadosFireBase();
     });
@@ -125,17 +129,17 @@ class _TelaCadastroSelecaoNomesVoluntariosState
           .set({nomeDocumentoFireBase: nomeCadastro})
           .then(
             (value) {
-              chamarTelaCarregamento();
-              realizarBuscaDadosFireBase();
-              chamarExibirMensagemSucesso();
-            },
-            onError: (e) {
-              setState(() {
-                exibirWidgetCarregamento = false;
-              });
-              chamarExibirMensagemErro("Erro ao cadastrar : ${e.toString()}");
-            },
-          );
+          chamarTelaCarregamento();
+          realizarBuscaDadosFireBase();
+          chamarExibirMensagemSucesso();
+        },
+        onError: (e) {
+          setState(() {
+            exibirWidgetCarregamento = false;
+          });
+          chamarExibirMensagemErro("Erro ao cadastrar : ${e.toString()}");
+        },
+      );
     } catch (e) {
       setState(() {
         exibirWidgetCarregamento = false;
@@ -180,31 +184,31 @@ class _TelaCadastroSelecaoNomesVoluntariosState
           .get()
           .then(
             (querySnapshot) async {
-              // for para percorrer todos os dados que a variavel recebeu
-              if (querySnapshot.docs.isNotEmpty) {
-                for (var documentoFirebase in querySnapshot.docs) {
-                  // chamando metodo para converter json
-                  // recebido do firebase para objeto
-                  converterJsonParaObjeto(
-                    documentoFirebase.id,
-                    querySnapshot.size,
-                  );
-                }
-              } else {
-                setState(() {
-                  exibirWidgetCarregamento = false;
-                });
-              }
-            },
-            onError: (e) {
-              setState(() {
-                exibirWidgetCarregamento = false;
-              });
-              chamarExibirMensagemErro(
-                "Erro Buscar Voluntarios: ${e.toString()}",
+          // for para percorrer todos os dados que a variavel recebeu
+          if (querySnapshot.docs.isNotEmpty) {
+            for (var documentoFirebase in querySnapshot.docs) {
+              // chamando metodo para converter json
+              // recebido do firebase para objeto
+              converterJsonParaObjeto(
+                documentoFirebase.id,
+                querySnapshot.size,
               );
-            },
+            }
+          } else {
+            setState(() {
+              exibirWidgetCarregamento = false;
+            });
+          }
+        },
+        onError: (e) {
+          setState(() {
+            exibirWidgetCarregamento = false;
+          });
+          chamarExibirMensagemErro(
+            "Erro Buscar Voluntarios: ${e.toString()}",
           );
+        },
+      );
     } catch (e) {
       setState(() {
         exibirWidgetCarregamento = false;
@@ -221,10 +225,10 @@ class _TelaCadastroSelecaoNomesVoluntariosState
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
-          // chamando modelos para fazer conversao
-          fromFirestore: CheckBoxModelo.fromFirestore,
-          toFirestore: (CheckBoxModelo checkbox, _) => checkbox.toFirestore(),
-        );
+      // chamando modelos para fazer conversao
+      fromFirestore: CheckBoxModelo.fromFirestore,
+      toFirestore: (CheckBoxModelo checkbox, _) => checkbox.toFirestore(),
+    );
 
     final docSnap = await ref.get();
     final dados = docSnap.data(); // convertendo
@@ -262,19 +266,19 @@ class _TelaCadastroSelecaoNomesVoluntariosState
         .delete()
         .then(
           (doc) {
-            setState(() {
-              chamarTelaCarregamento();
-              realizarBuscaDadosFireBase();
-              chamarExibirMensagemSucesso();
-            });
-          },
-          onError: (e) {
-            setState(() {
-              exibirWidgetCarregamento = false;
-            });
-            chamarExibirMensagemErro("Erro Deletar: ${e.toString()}");
-          },
-        );
+        setState(() {
+          chamarTelaCarregamento();
+          realizarBuscaDadosFireBase();
+          chamarExibirMensagemSucesso();
+        });
+      },
+      onError: (e) {
+        setState(() {
+          exibirWidgetCarregamento = false;
+        });
+        chamarExibirMensagemErro("Erro Deletar: ${e.toString()}");
+      },
+    );
   }
 
   redirecionarProximaTela() {
@@ -295,10 +299,8 @@ class _TelaCadastroSelecaoNomesVoluntariosState
     }
   }
 
-  Future<void> alertaExclusao(
-    BuildContext context,
-    CheckBoxModelo checkbox,
-  ) async {
+  Future<void> alertaExclusao(BuildContext context,
+      CheckBoxModelo checkbox,) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -349,8 +351,14 @@ class _TelaCadastroSelecaoNomesVoluntariosState
 
   @override
   Widget build(BuildContext context) {
-    double larguraTela = MediaQuery.of(context).size.width;
-    double alturaTela = MediaQuery.of(context).size.height;
+    double larguraTela = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double alturaTela = MediaQuery
+        .of(context)
+        .size
+        .height;
     Timer(Duration(seconds: 2), () {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
@@ -388,237 +396,262 @@ class _TelaCadastroSelecaoNomesVoluntariosState
                   color: Colors.white,
                   width: larguraTela,
                   height: alturaTela,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (listaNomesCadastrados.isNotEmpty) {
-                        return Column(
+                  child: Column(
+                    children: [
+                    Expanded(
+                    flex: 0,
+                    child: Container(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      width: larguraTela,
+                      child: SingleChildScrollView(
+                        child: Column(
                           children: [
-                            Expanded(
-                              flex: 0,
-                              child: Container(
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                width: larguraTela,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 10.0,
-                                        ),
-                                        child: Text(
-                                          Textos
-                                              .telaCadastroDescricaoVoluntario,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(fontSize: 20),
-                                        ),
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 10.0,
+                              ),
+                              child: Text(
+                                Textos.telaCadastroDescricaoVoluntario,
+                                textAlign: TextAlign.center,
+                                style: TextTheme
+                                    .of(context)
+                                    .bodySmall,
+                              ),
+                            ),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.start,
+                              alignment: WrapAlignment.center,
+                              children: [
+                                Form(
+                                  key: validacaoFormulario,
+                                  child: Container(
+                                    margin: EdgeInsets.only(bottom: 10),
+                                    width:
+                                    MetodosAuxiliares.ajustarTamanhoTextField(
+                                      larguraTela,
+                                    ),
+                                    child: TextFormField(
+                                      decoration: InputDecoration(
+                                        hintText:
+                                        Textos.labelTextFieldCampo,
                                       ),
-                                      Wrap(
-                                        crossAxisAlignment:
-                                            WrapCrossAlignment.start,
-                                        alignment: WrapAlignment.center,
-                                        children: [
-                                          Form(
-                                            key: validacaoFormulario,
-                                            child: Container(
-                                              margin: EdgeInsets.only(
-                                                bottom: 10,
-                                              ),
-                                              width:
-                                                  MetodosAuxiliares.ajustarTamanhoTextField(
-                                                    larguraTela,
-                                                  ),
-                                              child: TextFormField(
-                                                decoration: InputDecoration(
-                                                  hintText:
-                                                      Textos
-                                                          .labelTextFieldCampo,
-                                                ),
-                                                controller: nomeControle,
-                                                onFieldSubmitted: (value) {
-                                                  validarCampoEChamarCadastrar();
-                                                },
-                                                validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return Textos
-                                                        .erroCampoVazio;
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.symmetric(
-                                              horizontal: 10.0,
-                                            ),
-                                            width: 100,
-                                            height: 40,
-                                            child: FloatingActionButton(
-                                              heroTag: Textos.btnCadastrar,
-                                              onPressed: () {
-                                                validarCampoEChamarCadastrar();
-                                              },
-                                              child: Text(
-                                                Textos.btnCadastrar,
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                      controller: nomeControle,
+                                      onFieldSubmitted: (value) {
+                                        validarCampoEChamarCadastrar();
+                                      },
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return Textos.erroCampoVazio;
+                                        }
+                                        return null;
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
-                                      ),
-                                      width: larguraTela,
-                                      child: Text(
-                                        textAlign: TextAlign.center,
-                                        Textos
-                                            .telaCadastroDescricaoSelecaoVoluntarios,
-                                        style: const TextStyle(fontSize: 18),
-                                      ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10.0,
+                                  ),
+                                  width: 100,
+                                  height: 40,
+                                  child: FloatingActionButton(
+                                    heroTag: Textos.btnCadastrar,
+                                    onPressed: () {
+                                      validarCampoEChamarCadastrar();
+                                    },
+                                    child: Text(
+                                      Textos.btnCadastrar,
+                                      style: TextStyle(color: Colors.black),
                                     ),
-                                    // Area de Exibicao da lista com os nomes dos voluntarios
-                                    Card(
-                                      child: SizedBox(
-                                        height:
-                                            Platform.isAndroid || Platform.isIOS
-                                                ? listaNomesSelecionados
-                                                        .isNotEmpty
-                                                    ? alturaTela * 0.35
-                                                    : alturaTela * 0.45
-                                                : listaNomesSelecionados
-                                                    .isNotEmpty
-                                                ? alturaTela * 0.45
-                                                : alturaTela * 0.6,
-                                        width:
-                                            Platform.isAndroid || Platform.isIOS
-                                                ? larguraTela
-                                                : larguraTela * 0.8,
-                                        child: ListView(
-                                          children: [
-                                            ...listaNomesCadastrados.map(
-                                              (e) => checkBoxPersonalizado(e),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                            Visibility(
-                              visible:
-                                  listaNomesSelecionados.isNotEmpty
-                                      ? true
-                                      : false,
-                              child: SizedBox(
-                                height: 100,
-                                width: Platform.isAndroid || Platform.isIOS
-                                    ? larguraTela
-                                    : larguraTela * 0.8,
-                                child: Card(
-                                  child: SingleChildScrollView(
-                                    child: Wrap(
-                                      alignment: WrapAlignment.center,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          if (listaNomesCadastrados.isEmpty) {
+                            return Container(
+                              margin: const EdgeInsets.all(10.0),
+                              transformAlignment: Alignment.center,
+                              alignment: Alignment.center,
+                              child: Text(
+                                Textos.erroBaseDadosVazia,
+                                textAlign: TextAlign.center,
+                                style: TextTheme
+                                    .of(context)
+                                    .bodySmall,
+                              ),
+                            );
+                          } else {
+                            return Column(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10.0,
+                                  ),
+                                  width: larguraTela,
+                                  child: Text(
+                                    textAlign: TextAlign.center,
+                                    Textos
+                                        .telaCadastroDescricaoSelecaoVoluntarios,
+                                    style: TextTheme
+                                        .of(context)
+                                        .bodySmall,
+                                  ),
+                                ),
+                                // Area de Exibicao da lista com os nomes dos voluntarios
+                                Card(
+                                  child: SizedBox(
+                                    height:
+                                    Platform.isAndroid || Platform.isIOS
+                                        ? listaNomesSelecionados
+                                        .isNotEmpty
+                                        ? alturaTela * 0.35
+                                        : alturaTela * 0.45
+                                        : listaNomesSelecionados
+                                        .isNotEmpty
+                                        ? alturaTela * 0.45
+                                        : alturaTela * 0.6,
+                                    width:
+                                    Platform.isAndroid || Platform.isIOS
+                                        ? larguraTela
+                                        : larguraTela * 0.8,
+                                    child: ListView(
                                       children: [
-                                        Text(
-                                          textAlign: TextAlign.center,
-                                          Textos
-                                              .telaCadastroDescricaoVoluntarioNomesSelecionados,
-                                          style: const TextStyle(fontSize: 18),
-                                        ),
-                                        Text(
-                                          textAlign: TextAlign.center,
-                                          listaNomesSelecionados
-                                              .toString()
-                                              .replaceAll("[", "")
-                                              .replaceAll("]", "").replaceAll("_", " "),
-                                          style: const TextStyle(fontSize: 18),
+                                        ...listaNomesCadastrados.map(
+                                              (e) => checkBoxPersonalizado(e),
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        );
-                      } else {
-                        return Container(
-                          margin: const EdgeInsets.all(10.0),
-                          transformAlignment: Alignment.center,
-                          alignment: Alignment.center,
-                          child: Text(
-                            Textos.erroBaseDadosVazia,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ),
-                bottomNavigationBar: Container(
-                  alignment: Alignment.center,
-                  color: Colors.white,
-                  width: larguraTela,
-                  height: 100,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: 100,
-                        height: 40,
-                        child: FloatingActionButton(
-                          heroTag: Textos.btnAvancar,
-                          onPressed: () {
-                            if (validarQuantidadeVoluntarios()) {
-                              redirecionarProximaTela();
-                            } else if (validarQuantidadeVoluntarios() ==
-                                false) {
-                              MetodosAuxiliares.exibirMensagens(
-                                Constantes.tipoNotificacaoErro,
-                                Textos.erroQuantidadeSelecionadaInsuficiente +
-                                    listaValidarQuantidadeVoluntarios.length
-                                        .toString(),
-                                context,
-                              );
-                            } else {
-                              MetodosAuxiliares.exibirMensagens(
-                                Constantes.tipoNotificacaoErro,
-                                Textos.erroListaVazia,
-                                context,
-                              );
-                            }
-                          },
-                          child: Text(
-                            Textos.btnAvancar,
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
+                              ],
+                            );
+                          }
+                        },
                       ),
-                      BarraNavegacao(),
-                    ],
+                    ),
+                  ),
+                  Visibility(
+                    visible:
+                    listaNomesSelecionados.isNotEmpty ? true : false,
+                    child: SizedBox(
+                      height: 100,
+                      width:
+                      Platform.isAndroid || Platform.isIOS
+                          ? larguraTela
+                          : larguraTela * 0.8,
+                      child: Card(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          Text(
+                          textAlign: TextAlign.center,
+                            Textos
+                                .telaCadastroDescricaoVoluntarioNomesSelecionadosQuantidade,
+                            style: TextTheme
+                                .of(context)
+                                .bodySmall,
+                          ),
+                          Text(
+                              textAlign: TextAlign.center,
+                              listaNomesSelecionados.length.toString(),
+                              style: TextTheme.of(context).bodySmall,
+                        ),
+                        ],
+                      ),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        children: [
+                          Text(
+                            textAlign: TextAlign.center,
+                            Textos
+                                .telaCadastroDescricaoVoluntarioNomesSelecionados,
+                            style: TextTheme
+                                .of(context)
+                                .bodySmall,
+                          ),
+                          Text(
+                            textAlign: TextAlign.center,
+                            listaNomesSelecionados
+                                .toString()
+                                .replaceAll("[", "")
+                                .replaceAll("]", "")
+                                .replaceAll("_", " "),
+                            style: TextTheme
+                                .of(context)
+                                .bodySmall,
+                          ),
+                        ],
+                      ),
+                      ],
+                    ),
                   ),
                 ),
-              );
+              ),
+            ),
+            ],
+            ),
+            ),
+            bottomNavigationBar: Container(
+            alignment: Alignment.center,
+            color: Colors.white,
+            width: larguraTela,
+            height: 100,
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+            SizedBox(
+            width: 100,
+            height: 40,
+            child: FloatingActionButton(
+            heroTag: Textos.btnAvancar,
+            onPressed: () {
+            if (validarQuantidadeVoluntarios()) {
+            redirecionarProximaTela();
+            } else if (validarQuantidadeVoluntarios() ==
+            false) {
+            MetodosAuxiliares.exibirMensagens(
+            Constantes.tipoNotificacaoErro,
+            Textos.erroQuantidadeSelecionadaInsuficiente +
+            listaValidarQuantidadeVoluntarios.length
+                .toString(),
+            context,
+            );
+            } else {
+            MetodosAuxiliares.exibirMensagens(
+            Constantes.tipoNotificacaoErro,
+            Textos.erroListaVazia,
+            context,
+            );
             }
-          },
+            },
+            child: Text(
+            Textos.btnAvancar,
+            style: TextStyle(color: Colors.black),
+            ),
+            ),
+            ),
+            BarraNavegacao(),
+            ],
+            ),
+            ),
+            );
+            }
+            },
         ),
       ),
     );

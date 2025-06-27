@@ -15,17 +15,24 @@ class Estilo {
     ),
 
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-
       backgroundColor: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
         side: const BorderSide(width: 1, color: PaletaCores.corCastanho),
         borderRadius: BorderRadius.circular(10),
       ),
-      extendedTextStyle: TextStyle(fontSize: 15, color: Colors.black,),
+      extendedTextStyle: TextStyle(fontSize: 15),
     ),
+    textTheme: TextTheme(
+      bodySmall: TextStyle(fontSize: 18, color: Colors.black),
+      titleSmall: TextStyle(
+        fontSize: 14,
+        color: Colors.black,
+        fontWeight: FontWeight.bold,
+      ),
 
-    cardTheme: const CardTheme(
+    ),
+    cardTheme: CardThemeData(
       color: Colors.white,
       elevation: 0,
       shape: OutlineInputBorder(

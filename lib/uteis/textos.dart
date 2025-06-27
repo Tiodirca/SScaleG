@@ -50,6 +50,7 @@ class Textos {
       "bem como fazer alterações no e-mail e senha";
 
   static String alertaExclusaoUsuario = "Deseja realmente excluir este usuario";
+
   //TELA DADOS USUARIO CONFIRMACAO AUTENTICACAO
   static String telaDadosUsuarioAutenticarDescricao =
       "Faça a autenticação de usuario digitando novamente a senha antes de proceguir com a ação";
@@ -88,7 +89,10 @@ class Textos {
   static String telaCadastroDescricaoSelecaoVoluntarios =
       "Selecione quais "
       "voluntários que você deseja que a escala tenha";
-  static String telaCadastroDescricaoVoluntarioNomesSelecionados = "Voluntarios Selecionados : ";
+  static String telaCadastroDescricaoVoluntarioNomesSelecionados =
+      "Voluntarios Selecionados : ";
+  static String telaCadastroDescricaoVoluntarioNomesSelecionadosQuantidade =
+      "Quantidade de voluntarios : ";
 
   // TELA SELECAO DIAS SEMANA
   static String telaSelecaoDiasSemanaDescricao =

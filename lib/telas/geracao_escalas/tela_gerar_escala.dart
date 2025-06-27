@@ -95,8 +95,27 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       escalaSorteada.add(linha);
       sortearNomesSemRepeticao(numeroRandomico);
     }
+    //verificarNomes();
     chamarCadastroItens();
   }
+
+  verificarNomes() {
+    print(escalaSorteada.toString());
+    print(nomeVoluntarios.toString());
+
+    nomeVoluntarios.forEach((nomes) {
+      escalaSorteada.forEach((element) {
+        if (element.values.contains(nomes)) {
+          print("Contem ${element.values} : $nomes");
+        } else {
+          print(nomes);
+          print("sfdsf");
+        }
+      });
+    });
+  }
+
+  percorrerItemMap() {}
 
   //--------------------------------------
   // Fazer para corrigir NOMES NAO ADICIONADOS
@@ -276,7 +295,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       setState(() {
         nomeEscalaFormatada =
             nomeEscala.text.trim().replaceAll(" ", "_").toLowerCase();
-        exibirWidgetCarregamento = true;
+        //exibirWidgetCarregamento = true;
       });
       recuperarHorarioDefinidoInicioTrabalho();
       fazerSorteio();
@@ -357,7 +376,22 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                 ),
                               ),
                             ),
+
                             WidgetAjustarHorario(),
+                            SizedBox(
+                              width: 100,
+                              height: 40,
+                              child: FloatingActionButton(
+                                heroTag: "Textos.btnCriarEscala",
+                                onPressed: () {
+                                  verificarNomes();
+                                },
+                                child: Text(
+                                  "Textos.btnCriarEscala",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],

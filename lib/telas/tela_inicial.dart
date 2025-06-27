@@ -54,9 +54,11 @@ class _TelaInicialState extends State<TelaInicial> {
         }
       },
       child: Text(
+
         nomeBtn,
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 18, color: Colors.black),
+       style: TextTheme.of(context).titleSmall,
+       // style: TextStyle(fontSize: 18, color: Colors.black),
       ),
     ),
   );
@@ -147,10 +149,7 @@ class _TelaInicialState extends State<TelaInicial> {
                                 ),
                                 Text(
                                   emailCadastrado,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: TextTheme.of(context).titleSmall,
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -160,7 +159,7 @@ class _TelaInicialState extends State<TelaInicial> {
                             width: larguraTela,
                             child: Text(
                               Textos.telaInicialDescricao,
-                              style: const TextStyle(fontSize: 18),
+                              style: TextTheme.of(context).bodySmall,
                               textAlign: TextAlign.center,
                             ),
                           ),

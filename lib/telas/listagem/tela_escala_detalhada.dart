@@ -169,7 +169,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
       return a.key.toString().compareTo(b.key.toString());
     });
     for (var element in escalaOrdenadaItemMap) {
-      escalaOrdenadaMap[element.key] = element.value;
+      escalaOrdenadaMap[element.key] = element.value.toString().replaceAll("_", " ");
     }
     return escalaOrdenadaMap;
   }
@@ -286,7 +286,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   //SET width
                   child: SingleChildScrollView(
                     child: Text(
-                      e.toString().replaceAll("_", " "),
+                      e.toString(),
                       textAlign: TextAlign.center,
                     ),
                   ),

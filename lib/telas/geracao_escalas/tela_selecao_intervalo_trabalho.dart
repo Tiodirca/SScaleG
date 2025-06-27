@@ -187,7 +187,7 @@ class _TelaSelecaoIntervaloTrabalhoState
                     child: Text(
                       Textos.telaSelecaoInvervaloTrabalhoDescricao,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 20),
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
                   Wrap(
