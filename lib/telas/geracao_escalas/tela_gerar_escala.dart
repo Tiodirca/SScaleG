@@ -33,6 +33,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   TextEditingController nomeEscala = TextEditingController(text: "");
   Random random = Random();
   List<int> listaNumeroAuxiliarRepeticao = [];
+  List<int> listaNumeroAuxiliarRepeticaoNomesNaoListados = [];
   List<Map> escalaSorteada = [];
   int index = 0;
   String horarioSemana = "";
@@ -95,34 +96,85 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       escalaSorteada.add(linha);
       sortearNomesSemRepeticao(numeroRandomico);
     }
-    //verificarNomes();
-    chamarCadastroItens();
+    verificarNomes();
   }
 
   verificarNomes() {
-    print(escalaSorteada.toString());
-    print(nomeVoluntarios.toString());
+    listaNumeroAuxiliarRepeticaoNomesNaoListados.clear();
+    List<String> nomes = [];
+    List<String> nomesNaoListados = [];
+    List<Map> escala = [];
+    for (var element in escalaSorteada) {
+      escala.add(element);
+    }
+    for (var element in nomeVoluntarios) {
+      nomesNaoListados.add(element);
+      nomes.add(element);
+    }
 
-    nomeVoluntarios.forEach((nomes) {
-      escalaSorteada.forEach((element) {
-        if (element.values.contains(nomes)) {
-          print("Contem ${element.values} : $nomes");
-        } else {
-          print(nomes);
-          print("sfdsf");
-        }
-      });
-    });
+    List<String> nomesJaAdicionados = verificarNomesAdicionadosEscala(
+      escala,
+      nomes,
+    );
+    nomesNaoListados = verificarNomesNaoAdicionados(nomesJaAdicionados);
+
+    Random random = Random();
+    for (int i = 0; i < nomesNaoListados.length; i++) {
+      int numeroRandomico = random.nextInt(locaisSorteioVoluntarios.length);
+      escala
+          .elementAt(listaNumeroAuxiliarRepeticaoNomesNaoListados.elementAt(i))
+          .update(locaisSorteioVoluntarios.elementAt(numeroRandomico), (value) {
+            return value = nomesNaoListados[i];
+          });
+    }
+    if (nomesNaoListados.isNotEmpty && escalaSorteada.length >= 7) {
+      verificarNomes();
+    } else {
+      escalaSorteada.clear();
+      for (var element in escala) {
+        escalaSorteada.add(element);
+      }
+      chamarCadastroItens();
+    }
   }
 
-  percorrerItemMap() {}
+  verificarNomesAdicionadosEscala(List<Map> escala, List<String> nomes) {
+    List<String> nomesJaAdicionados = [];
+    for (var element in escala) {
+      for (var nomeVoluntario in nomes) {
+        //verificando se na escala sorteada contem o nome do voluntario
+        if (element.values.toString().contains(nomeVoluntario)) {
+          //verificando se na lista de nomes nao contem o nome do voluntario ja
+          if (!nomesJaAdicionados.contains(nomeVoluntario)) {
+            //caso nao tenha adicionar na lista
+            nomesJaAdicionados.add(nomeVoluntario);
+          }
+        }
+      }
+    }
+    return nomesJaAdicionados;
+  }
 
-  //--------------------------------------
-  // Fazer para corrigir NOMES NAO ADICIONADOS
-  // PERCORRE A ESCALA SORTEADA
-  // VERIFICA SE ALGUM DOS NOMES SELECIONADOS NAO ESTA NA ESCALA
-  // CASO NAO ESTEJA SORTEAR UM INDEX QUALQUER E ADICIONAR
-  //PODENDO VERIFICAR SE O NOME ESTA PELO MENOS 2 VEZES AO LONGO DA ESCALA SORTEADA
+  verificarNomesNaoAdicionados(List<String> nomesJaAdicionados) {
+    List<String> nomesNaoListados = [];
+    //percorrendo os nomes ja adicionados
+    for (var element in nomesJaAdicionados) {
+      //removendo da lista nao adicionados os nomes que ja foram adicionados
+      nomesNaoListados.removeWhere((elemento) {
+        return elemento == element;
+      });
+    }
+    //percorrendo a lista de nomes nao listados
+    for (var element in nomesNaoListados) {
+      //para cada iteracao instanciar um rando,
+      Random random = Random();
+      // para cada iteracao gerar um numero entre  0 e o tamanho da escala sorteada
+      int numeroRandomico = random.nextInt(escalaSorteada.length);
+      // adicionar na lista de repeticoes
+      listaNumeroAuxiliarRepeticaoNomesNaoListados.add(numeroRandomico);
+    }
+    return nomesNaoListados;
+  }
 
   // metodo para chamar o sorteio de nomes sem repeticao
   sortearNomesSemRepeticao(int numeroRandomico) {
@@ -295,7 +347,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       setState(() {
         nomeEscalaFormatada =
             nomeEscala.text.trim().replaceAll(" ", "_").toLowerCase();
-        //exibirWidgetCarregamento = true;
+        exibirWidgetCarregamento = true;
       });
       recuperarHorarioDefinidoInicioTrabalho();
       fazerSorteio();
@@ -378,20 +430,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                             ),
 
                             WidgetAjustarHorario(),
-                            SizedBox(
-                              width: 100,
-                              height: 40,
-                              child: FloatingActionButton(
-                                heroTag: "Textos.btnCriarEscala",
-                                onPressed: () {
-                                  verificarNomes();
-                                },
-                                child: Text(
-                                  "Textos.btnCriarEscala",
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ],
