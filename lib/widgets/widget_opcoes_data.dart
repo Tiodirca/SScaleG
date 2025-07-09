@@ -185,6 +185,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
         );
   }
 
+  // metodo para remover das string o complemento caso o usuario faca a exclusao dele
   removerComplemetoExcluido(CheckBoxModelo checkbox) {
     dataSelecionadaComDepartamento =
         dataSelecionadaComDepartamento.split(checkbox.texto)[0];
@@ -240,6 +241,9 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     }
   }
 
+  //metodo para recuperar o nome selecionado e deixar a caixa
+  // do checkbox marcado quando o usuario volta na tela
+  // para fazer alguma alteracao apos ja ter selecionado uma opcao antes
   recuperarCheckBoxMarcado(String departamento, int quantidade) {
     indexQuantidadeItensCadastrados++;
     if (indexQuantidadeItensCadastrados == quantidade) {
@@ -260,6 +264,8 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     }
   }
 
+  //remover complemento caso o usuario faca alguma selecao direfente
+  // metodo necessario para que o nome anterior nao permanessa na string
   removerDepartamentoAnteriorSelecaoCheckBox(String dataComDepartamento) {
     for (var element in listaNomesCadastrados) {
       if (dataComDepartamento.contains(element.texto)) {
@@ -269,11 +275,15 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     return dataComDepartamento.replaceAll("(", "").replaceAll(")", "");
   }
 
-  //metodo para verificar
+  //metodo para alterar a opcao adicional da data confirme
+  // o usuario seleciona uma opcao nos checkbox
   alterarDataComDepartamento() {
     String opcoesAdicionaisSelecionada = "";
+    //percorrendo os nomes cadastrados
     for (var element in listaNomesCadastrados) {
+      // caso o elemento seja verdadeiro
       if (element.checked) {
+        //definir que a opcao adicional vai receber o valor do elemento
         opcoesAdicionaisSelecionada = "(${element.texto})";
       }
     }
@@ -282,7 +292,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
           removerDepartamentoAnteriorSelecaoCheckBox(widget.dataSelecionada);
       dataSelecionadaComDepartamento =
           "$dataSelecionadaComDepartamento$opcoesAdicionaisSelecionada";
-      //PassarPegarDados.passarDataComComplemento(dataSelecionadaComDepartamento);
     });
   }
 
@@ -417,10 +426,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
       child: Text(
         nomeBotao,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.black,
-        ),
+        style: TextStyle(fontSize: 14, color: Colors.black),
       ),
     ),
   );
@@ -542,7 +548,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                                   ),
                                   // Area de Exibicao da lista com os nomes dos voluntarios
                                   Card(
-
                                     child: SizedBox(
                                       height: alturaTela * 0.4,
                                       width:

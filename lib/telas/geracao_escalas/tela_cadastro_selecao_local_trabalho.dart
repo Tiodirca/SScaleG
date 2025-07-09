@@ -408,7 +408,9 @@ class _TelaCadastroSelecaoLocalTrabalhoState
                                     Form(
                                       key: validacaoFormulario,
                                       child: SizedBox(
-                                        width: Platform.isWindows ? 300 : 200,
+                                        width: MetodosAuxiliares.ajustarTamanhoTextField(
+                                          larguraTela,
+                                        ),
                                         child: TextFormField(
                                           decoration: InputDecoration(
                                             hintText:

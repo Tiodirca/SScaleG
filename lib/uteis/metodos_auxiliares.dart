@@ -27,6 +27,8 @@ class MetodosAuxiliares {
     }
   }
 
+  // metodo utilizado para formatar para string e deixar no formato de 19:00 por exemplo o horario
+  // selecionado pelo usuario com dois caracteres de cada lado
   static formatarHorarioAjuste(TimeOfDay horarioDefinido) {
     String horarioFormatado =
         "${Textos.widgetAjustarHorarioInicio}${horarioDefinido.hour.toString().padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(2, "0")}";
@@ -41,14 +43,6 @@ class MetodosAuxiliares {
     prefs.setString(parametroSharePreferences, horarioDefinido);
   }
 
-  static recuperarValoresSharePreferences(
-    String parametroSharePreferences,
-  ) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String valorRecuperado = prefs.getString(parametroSharePreferences) ?? '';
-    return valorRecuperado;
-  }
-
   //metodo para ajustar o tamanho do textField com base no tamanho da tela
   static ajustarTamanhoTextField(double larguraTela) {
     double tamanho = 150;
@@ -61,6 +55,8 @@ class MetodosAuxiliares {
     return tamanho;
   }
 
+  //metodo utilizado na tela de cadastro e atualizacao de itens
+  // conforme o tamanho da tela exibir determinda quantidade de colunas
   static quantidadeColunasGridView(double larguraTela) {
     int tamanho = 5;
     //verificando qual o tamanho da tela
@@ -74,4 +70,27 @@ class MetodosAuxiliares {
     return tamanho;
   }
 
+  static validarErro(String erro, BuildContext context) {
+    if (erro == 'user-not-found') {
+      chamarExibirMensagemErro(
+        Textos.erroValidarUsuarioEmailNaoCadastrado,
+        context,
+      );
+    } else if (erro == 'wrong-password') {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioSenhaErrada, context);
+      chamarExibirMensagemErro(erro, context);
+    } else if (erro == "invalid-email") {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailErrado, context);
+    } else if (erro == "unknown-error") {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioSenhaErrada, context);
+    } else if (erro == "email-already-in-use") {
+      chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailEmUso, context);
+    } else {
+      chamarExibirMensagemErro("Erro Desconhecido : $erro", context);
+    }
+  }
+
+  static chamarExibirMensagemErro(String erro, BuildContext context) {
+    exibirMensagens(Constantes.tipoNotificacaoErro, erro, context);
+  }
 }

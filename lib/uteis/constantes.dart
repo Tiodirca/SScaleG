@@ -51,8 +51,9 @@ class Constantes {
   static const infoUsuarioEmail = "email";
 
   //TIPO AUTENTICACAO DADOS USUARIO
-  static const acaoAutenticarExcluirConta = "Excluir conta";
-  static const acaoAutenticarEditarConta = "Editar conta";
+  static const acaoAutenticarExcluirConta = "ExcluirConta";
+  static const acaoAutenticarAlterarEmail = "AlterarEmail";
+  static const acaoAutenticarAlterarSenha = "AlterarSenha";
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";

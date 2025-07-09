@@ -28,6 +28,7 @@ class Textos {
   static String btnUsarEscala = "Utilizar está escala";
   static String btnSairConta = "Sair da Conta";
   static String btnExcluirConta = "Excluir Conta";
+  static String btnAlterarSenha = "Alterar Senha";
   static String btnAutenticar = "Autenticar Usuario";
 
   // TELA LOGIN CADASTRO - LOGIN
@@ -38,6 +39,8 @@ class Textos {
   // TELA LOGIN CADASTRO E TELA DADOS USUARIO
   static String labelEmail = "E-mail";
   static String labelSenha = "Senha";
+  static String labelSenhaAntiga = "Senha Antiga";
+  static String labelSenhaNova = "Senha Nova";
   static String labelEsqueciSenha = "Esqueci Senha";
 
   //TELA LOGIN CADASTRO - CADASTRO
@@ -53,7 +56,7 @@ class Textos {
 
   //TELA DADOS USUARIO CONFIRMACAO AUTENTICACAO
   static String telaDadosUsuarioAutenticarDescricao =
-      "Faça a autenticação de usuario digitando novamente a senha antes de proceguir com a ação";
+      "Digite sua senha atual para prosseguir com a ação.";
   static String telaDadosUsuarioAutenticacaoSucesso =
       "Autenticação feita com sucesso,"
       "prossiga para a ação desejada";
@@ -217,6 +220,14 @@ class Textos {
   static String tituloAlertaExclusao = "Excluir Item";
   static String descricaoAlertaExclusao =
       "Deseja realmente excluir este item ?";
+
+  static String tituloAlertaAlterarSenha = "Alterar Senha";
+  static String descricaoAlertaAlterarSenha =
+      "Deseja realmente alterar a senha desta conta ?";
+
+  static String tituloAlertaAlterarEmail = "Alterar E-mail";
+  static String descricaoAlertaAlterarEmail =
+      "Deseja realmente alterar para o seguinte e-mail ?";
 
   //MENSAGEM DE NOTIFICACOES
   static String notificacaoSucesso = "Sucesso ao realizar ação";

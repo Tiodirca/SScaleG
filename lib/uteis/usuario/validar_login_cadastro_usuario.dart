@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sscaleg/uteis/constantes.dart';
-import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:flutter/material.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
-import 'package:sscaleg/uteis/textos.dart';
 
 class ValidarLoginCadastroUsuario {
 

@@ -6,7 +6,7 @@ import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/textos.dart';
-import 'package:sscaleg/uteis/validar_login_cadastro_usuario.dart';
+import 'package:sscaleg/uteis/usuario/validar_login_cadastro_usuario.dart';
 
 class TelaLoginCadastro extends StatefulWidget {
   const TelaLoginCadastro({super.key});
@@ -23,11 +23,6 @@ class _TelaLoginCadastroState extends State<TelaLoginCadastro> {
   TextEditingController controleEmail = TextEditingController(text: "");
   TextEditingController controleSenha = TextEditingController(text: "");
   final _formKeyFormulario = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Widget botao(String nomeBtn, BuildContext context) => Container(
     margin: const EdgeInsets.all(10),
@@ -67,7 +62,7 @@ class _TelaLoginCadastroState extends State<TelaLoginCadastro> {
       setState(() {
         exibirWidgetCarregamento = false;
       });
-      validarErro(retorno);
+      chamarValidarErro(retorno);
     }
   }
 
@@ -82,34 +77,13 @@ class _TelaLoginCadastroState extends State<TelaLoginCadastro> {
     } else {
       setState(() {
         exibirWidgetCarregamento = false;
+        chamarValidarErro(retorno);
       });
-      validarErro(retorno);
     }
   }
 
-  validarErro(String erro) {
-    if (erro == 'user-not-found') {
-      chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailNaoCadastrado);
-    } else if (erro == 'wrong-password') {
-      chamarExibirMensagemErro(Textos.erroValidarUsuarioSenhaErrada);
-      chamarExibirMensagemErro(erro);
-    } else if (erro == "invalid-email") {
-      chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailErrado);
-    } else if (erro == "unknown-error") {
-      chamarExibirMensagemErro(Textos.erroValidarUsuarioSenhaErrada);
-    } else if (erro == "email-already-in-use") {
-      chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailEmUso);
-    } else {
-      chamarExibirMensagemErro("Erro Desconhecido : $erro");
-    }
-  }
-
-  chamarExibirMensagemErro(String erro) {
-    MetodosAuxiliares.exibirMensagens(
-      Constantes.tipoNotificacaoErro,
-      erro,
-      context,
-    );
+  chamarValidarErro(String erro){
+    MetodosAuxiliares.validarErro(erro,context);
   }
 
   redirecionarTelaInicial() {
