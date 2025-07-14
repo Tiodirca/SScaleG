@@ -30,6 +30,7 @@ class Textos {
   static String btnExcluirConta = "Excluir Conta";
   static String btnAlterarSenha = "Alterar Senha";
   static String btnAutenticar = "Autenticar Usuario";
+  static String btnReenviarEmail = "Reenviar E-mail";
 
   // TELA LOGIN CADASTRO - LOGIN
   static String telaLoginUsuarioDescricao =
@@ -51,6 +52,9 @@ class Textos {
   static String telaDadosUsuarioDescricao =
       "Aqui você pode visualizar as informações da conta, "
       "bem como fazer alterações no e-mail e senha";
+  static String telaDadosUsuarioEmailAlterado =
+      "Confira sua caixa de e-mail"
+      " para confirmar alteração de email,link enviado para o seguinte e-mail";
 
   static String alertaExclusaoUsuario = "Deseja realmente excluir este usuario";
 

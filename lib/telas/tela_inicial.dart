@@ -25,9 +25,11 @@ class _TelaInicialState extends State<TelaInicial> {
   @override
   void initState() {
     emailCadastrado =
-        PassarPegarDados.recuperarInformacoesUsuario().entries.last.value;
+        PassarPegarDados.recuperarInformacoesUsuario().values.elementAt(1);
     super.initState();
   }
+
+
 
   Widget botao(String nomeBtn) => Container(
     margin: const EdgeInsets.all(10),

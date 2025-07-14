@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,7 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
   bool edicaoEmailAtiva = false;
   bool edicaoSenhaAtiva = false;
   String tipoAcaoAutenticar = "";
+  String emailAlteracao = "";
   IconData iconeExibirSenha = Icons.visibility;
   TextEditingController controleEmail = TextEditingController(text: "");
   TextEditingController controleSenha = TextEditingController(text: "");
@@ -51,16 +53,42 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
       Constantes.fireBaseColecaoNomeDepartamentosData;
   String nomeDocumentoFireBaseEscalas = Constantes.fireBaseDadosCadastrados;
   String emailCadastrado = "";
+  String nomeCampoEmailAlterado = Constantes.fireBaseCampoUsuarioEmailAlterado;
   String uidUsuario = "";
+  String senhaUsuario = "";
 
   @override
   void initState() {
+    setState(() {
+      exibirWidgetCarregamento = true;
+    });
     super.initState();
     emailCadastrado =
         PassarPegarDados.recuperarInformacoesUsuario().entries.last.value;
     uidUsuario =
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    print(PassarPegarDados.recuperarInformacoesUsuario());
     controleEmail.text = emailCadastrado;
+    consultarEmailAlterado();
+  }
+
+  consultarEmailAlterado() async {
+    var db = FirebaseFirestore.instance;
+    await db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
+        .get()
+        .then((event) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+        emailAlteracao = event
+            .data()!
+            .values
+            .toString()
+            .replaceAll("(", "")
+            .replaceAll(")", "");
+      });
+    });
   }
 
   chamarSairConta() async {
@@ -70,6 +98,16 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
 
   redirecionarTelaLoginCadastro() {
     Navigator.pushReplacementNamed(context, Constantes.rotaTelaLoginCadastro);
+  }
+
+  redirecionarTelaSplash() {
+    Navigator.pushReplacementNamed(context, Constantes.rotaTelaSplash);
+  }
+
+  recarregarTela() {
+    Timer(const Duration(seconds: 1), () {
+      Navigator.pushReplacementNamed(context, Constantes.rotaTelaDadosUsuario);
+    });
   }
 
   chamarExibicaoOcultarSenha() {
@@ -141,7 +179,9 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
     } else if (tipoAcaoAutenticar == Constantes.acaoAutenticarAlterarSenha) {
       chamarAlterarSenha();
     } else if (tipoAcaoAutenticar == Constantes.acaoAutenticarAlterarEmail) {
-      //chamarAlterarSenha();
+      chamarAlterarEmail();
+    } else if (tipoAcaoAutenticar == Constantes.acaoAutenticarReenviarEmail) {
+      reenviarEmailAlteracao();
     }
   }
 
@@ -166,10 +206,70 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
     }
   }
 
-  recarregarTela() {
-    Timer(const Duration(seconds: 1), () {
-      Navigator.pushReplacementNamed(context, Constantes.rotaTelaDadosUsuario);
-    });
+  //metodo para alterar o email da conta do usuario
+  chamarAlterarEmail() {
+    if (FirebaseAuth.instance.currentUser != null) {
+      FirebaseAuth.instance.currentUser
+          ?.verifyBeforeUpdateEmail(controleEmail.text)
+          .then(
+            (value) {
+              gravarEmailAlteradoValidacao(uidUsuario);
+            },
+            onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+                chamarValidarErro(e.toString());
+              });
+              debugPrint("Email ${e.toString()}");
+            },
+          );
+    }
+  }
+
+  gravarEmailAlteradoValidacao(String uid) async {
+    try {
+      // instanciando Firebase
+      var db = FirebaseFirestore.instance;
+      db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uid)
+          .set({nomeCampoEmailAlterado: controleEmail.text})
+          .then(
+            (value) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
+              //redirecionarTelaSplash();
+              //chamarExibirMensagemSucesso(Textos.notificacaoSucesso);
+              //recarregarTela();
+            },
+            onError: (e) {
+              debugPrint(e.toString());
+            },
+          );
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  //metodo para reenviar o link de alteracao do email
+  reenviarEmailAlteracao() {
+    if (FirebaseAuth.instance.currentUser != null) {
+      FirebaseAuth.instance.currentUser
+          ?.verifyBeforeUpdateEmail(emailAlteracao)
+          .then(
+            (value) {
+              chamarExibirMensagemSucesso(Textos.notificacaoSucesso);
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
+            },
+            onError: (e) {
+              debugPrint("Reenvio de Email ${e.toString()}");
+              chamarValidarErro("Reenvio de Email : ${e.toString()}");
+            },
+          );
+    }
   }
 
   chamarDeletarDados() async {
@@ -251,7 +351,9 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                 Wrap(
                   children: [
                     Text(
-                      emailCadastrado,
+                      tipoAutenticacao == Constantes.acaoAutenticarAlterarSenha
+                          ? emailCadastrado
+                          : controleEmail.text,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -378,6 +480,11 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
           });
         } else if (nomeBtn == Textos.btnSalvar) {
           validarTipoSalvarAlteracaoDado();
+        } else if (nomeBtn == Textos.btnReenviarEmail) {
+          setState(() {
+            tipoAcaoAutenticar = Constantes.acaoAutenticarReenviarEmail;
+            exibirOcultarTelaAutenticarUsuario = true;
+          });
         }
       },
       child: Text(
@@ -428,6 +535,7 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
             exibirOcultarTelaAutenticarUsuario = false;
             edicaoEmailAtiva = false;
             edicaoSenhaAtiva = false;
+            controleEmail.text = emailCadastrado;
             controleSenha.clear();
           });
         }
@@ -534,18 +642,47 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                                   children: [
                                     Visibility(
                                       visible: !edicaoSenhaAtiva,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      child: Column(
                                         children: [
-                                          camposFormularioEmail(
-                                            Textos.labelEmail,
-                                            controleEmail,
-                                            Constantes.iconeEmail,
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              camposFormularioEmail(
+                                                Textos.labelEmail,
+                                                controleEmail,
+                                                Constantes.iconeEmail,
+                                              ),
+                                              botoesIcones(Textos.labelEmail),
+                                            ],
                                           ),
-                                          botoesIcones(Textos.labelEmail),
+                                          Visibility(
+                                            visible:
+                                                emailAlteracao.isNotEmpty &&
+                                                        edicaoEmailAtiva ==
+                                                            false
+                                                    ? true
+                                                    : false,
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  width: 400,
+                                                  child: Text(
+                                                    textAlign: TextAlign.center,
+                                                    Textos
+                                                        .telaDadosUsuarioEmailAlterado,
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(emailAlteracao),
+                                              ],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -582,6 +719,15 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                                                 MainAxisAlignment.center,
                                             children: [
                                               botao(Textos.btnAlterarSenha),
+                                              Visibility(
+                                                visible:
+                                                    emailAlteracao.isNotEmpty
+                                                        ? true
+                                                        : false,
+                                                child: botao(
+                                                  Textos.btnReenviarEmail,
+                                                ),
+                                              ),
                                             ],
                                           );
                                         }

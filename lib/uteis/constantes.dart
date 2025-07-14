@@ -49,11 +49,13 @@ class Constantes {
   //INFORMACAO USUARIO
   static const infoUsuarioUID = "uid";
   static const infoUsuarioEmail = "email";
+  static const infoUsuarioSenha = "senha";
 
   //TIPO AUTENTICACAO DADOS USUARIO
   static const acaoAutenticarExcluirConta = "ExcluirConta";
   static const acaoAutenticarAlterarEmail = "AlterarEmail";
   static const acaoAutenticarAlterarSenha = "AlterarSenha";
+  static const acaoAutenticarReenviarEmail = "reenviarEmail";
 
   // datas da semana
   static const diaSegunda = "Segunda-feira";
@@ -110,6 +112,7 @@ class Constantes {
   //FIRE BASE
   //USUARIOS
   static const fireBaseColecaoUsuarios = "Usuarios";
+  static const fireBaseCampoUsuarioEmailAlterado = "emailAlterado";
 
   //LOCAIS TRABALHO
   static const fireBaseColecaoNomeLocaisTrabalho = "locais_trabalho";
