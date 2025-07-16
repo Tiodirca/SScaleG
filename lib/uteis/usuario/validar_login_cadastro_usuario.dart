@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:flutter/material.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
@@ -70,9 +71,7 @@ criarCampoEmailAlterado(String uid) async {
         .doc(uid)
         .set({Constantes.fireBaseCampoUsuarioEmailAlterado: ""})
         .then(
-          (value) {
-            print("Sucesso");
-          },
+          (value) {},
           onError: (e) {
             debugPrint(e.toString());
           },
@@ -86,5 +85,11 @@ passarInformacoes(String uid, String email, senha) {
   Map dados = {};
   dados[Constantes.infoUsuarioUID] = uid;
   dados[Constantes.infoUsuarioEmail] = email;
+  gravarSenhaUsuario(senha);
   PassarPegarDados.passarInformacoesUsuario(dados);
+}
+
+gravarSenhaUsuario(String senha) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString(Constantes.infoUsuarioSenha, senha);
 }

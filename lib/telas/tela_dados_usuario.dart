@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sscaleg/Uteis/paleta_cores.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/constantes.dart';
@@ -63,11 +64,16 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
       exibirWidgetCarregamento = true;
     });
     super.initState();
-    emailCadastrado =
-        PassarPegarDados.recuperarInformacoesUsuario().entries.last.value;
     uidUsuario =
-        PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
-    print(PassarPegarDados.recuperarInformacoesUsuario());
+        PassarPegarDados.recuperarInformacoesUsuario().entries
+            .elementAt(0)
+            .value
+            .toString();
+    emailCadastrado =
+        PassarPegarDados.recuperarInformacoesUsuario().entries
+            .elementAt(1)
+            .value
+            .toString();
     controleEmail.text = emailCadastrado;
     consultarEmailAlterado();
   }
@@ -79,16 +85,16 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
         .doc(uidUsuario)
         .get()
         .then((event) {
-      setState(() {
-        exibirWidgetCarregamento = false;
-        emailAlteracao = event
-            .data()!
-            .values
-            .toString()
-            .replaceAll("(", "")
-            .replaceAll(")", "");
-      });
-    });
+          setState(() {
+            exibirWidgetCarregamento = false;
+            emailAlteracao = event
+                .data()!
+                .values
+                .toString()
+                .replaceAll("(", "")
+                .replaceAll(")", "");
+          });
+        });
   }
 
   chamarSairConta() async {
@@ -192,6 +198,7 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
           ?.updatePassword(controleSenha.text)
           .then(
             (value) {
+              gravarSenhaUsuario(controleSenha.text);
               chamarExibirMensagemSucesso(Textos.notificacaoSucesso);
               recarregarTela();
             },
@@ -204,6 +211,11 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
             },
           );
     }
+  }
+
+  gravarSenhaUsuario(String senha) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(Constantes.infoUsuarioSenha, senha);
   }
 
   //metodo para alterar o email da conta do usuario
@@ -236,12 +248,8 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
           .set({nomeCampoEmailAlterado: controleEmail.text})
           .then(
             (value) {
-              setState(() {
-                exibirWidgetCarregamento = false;
-              });
-              //redirecionarTelaSplash();
-              //chamarExibirMensagemSucesso(Textos.notificacaoSucesso);
-              //recarregarTela();
+              chamarExibirMensagemSucesso(Textos.notificacaoSucesso);
+              recarregarTela();
             },
             onError: (e) {
               debugPrint(e.toString());

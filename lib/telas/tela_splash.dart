@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import '../Uteis/paleta_cores.dart';
@@ -19,6 +21,11 @@ class TelaSplashScreen extends StatefulWidget {
 class _TelaSplashScreenState extends State<TelaSplashScreen> {
   late StreamSubscription<User?> validacao;
   int index = 0;
+  String emailAlteracao = "";
+  String usuarioEmail = "";
+  String usuarioUID = "";
+  String nomeCampoEmailAlterado = Constantes.fireBaseCampoUsuarioEmailAlterado;
+  String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
 
   @override
   void initState() {
@@ -30,21 +37,114 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
   }
 
   validarUsuarioLogado() async {
-    validacao = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    validacao = FirebaseAuth.instance.authStateChanges().listen((
+      User? user,
+    ) async {
       index++;
       if (index == 2 && (!Platform.isIOS || !Platform.isAndroid) ||
           index == 1 && (Platform.isIOS || Platform.isAndroid)) {
         index = 0;
         if (user != null) {
           debugPrint("Usuario Logado");
-          passarInformacoes(user.uid, user.email.toString());
-          redirecionarTelaInicial();
+          usuarioEmail = user.email.toString();
+          usuarioUID = user.uid.toString();
+          emailAlteracao = await consultarEmailAlterado(user.uid);
+          validarConfirmacaoAlteracaoEmail();
         } else {
           debugPrint("Sem Usuario Logado");
           redirecionarTelaLoginCadastro();
         }
       }
     });
+  }
+
+  validarConfirmacaoAlteracaoEmail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //recuperando senha do usuario gravada ao
+    // fazer login,cadastro ou alteracao da senha
+    String senhaUsuario = prefs.getString(Constantes.infoUsuarioSenha) ?? '';
+    //fazendo autenticacao do usuario usando o email puxado do banco de dados para verificar
+    // se houve confirmacao de alteracao de email
+    AuthCredential credencial = EmailAuthProvider.credential(
+      email: emailAlteracao,
+      password: senhaUsuario,
+    );
+    try {
+      //vazendo login utilizando as informacoes passadas no credencial
+      FirebaseAuth.instance
+          .signInWithCredential(credencial)
+          .then(
+            (value) {
+              // caso a autenticacao seja VERDADEIRA sera feito
+              // a atualizacao no banco de dados e redicionamento de tela
+              if (mounted) {
+                gravarEmailAlteradoBancoDados(usuarioUID);
+              }
+            },
+            onError: (e) {
+              // caso de erro quer dizer que o usuario ainda nao confirmou a alteracao de de email
+              // por isso redicionar a tela passando as seguintes informacoes
+              if (mounted) {
+                passarInformacoes(usuarioUID, usuarioEmail);
+                redirecionarTelaInicial();
+              }
+              debugPrint("permanece o mesmo");
+            },
+          );
+    } on FirebaseAuthException {
+      if (mounted) {
+        passarInformacoes(usuarioUID, usuarioEmail);
+        redirecionarTelaInicial();
+      }
+      debugPrint("Email permanece o mesmo");
+    }
+  }
+
+  //metodo para gravar no bando de dados caso o
+  // usuario tenha confirmado a alteracao de email
+  gravarEmailAlteradoBancoDados(String uid) async {
+    try {
+      // instanciando Firebase
+      var db = FirebaseFirestore.instance;
+      db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uid)
+          // sera setado vazio no banco de dados
+          .set({nomeCampoEmailAlterado: ""})
+          .then(
+            (value) {
+              //redirecionar tela passando as seguintes informacoes
+              passarInformacoes(usuarioUID, emailAlteracao);
+              redirecionarTelaInicial();
+            },
+            onError: (e) {
+              debugPrint(e.toString());
+            },
+          );
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  //Future para fazer a consulta no banco de
+  // dados para recuperar a informacao gravada
+  Future<String> consultarEmailAlterado(String uidUsuario) async {
+    String emailAlteracao = "";
+    var db = FirebaseFirestore.instance;
+    await db
+        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .doc(uidUsuario)
+        .get()
+        .then((event) {
+          //definindo que a variavel vai receber o seguinte valor
+          emailAlteracao = event
+              .data()!
+              .values
+              .toString()
+              .replaceAll("(", "")
+              .replaceAll(")", "");
+        });
+    return emailAlteracao;
   }
 
   @override
@@ -87,14 +187,8 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double alturaTela = MediaQuery
-        .of(context)
-        .size
-        .height;
-    double larguraTela = MediaQuery
-        .of(context)
-        .size
-        .width;
+    double alturaTela = MediaQuery.of(context).size.height;
+    double larguraTela = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
         height: alturaTela,
