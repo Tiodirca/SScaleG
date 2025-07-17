@@ -12,6 +12,7 @@ import 'package:sscaleg/uteis/usuario/exclusao_dados.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
+import 'package:sscaleg/uteis/usuario/validar_alteracao_email.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
 class TelaDadosUsuario extends StatefulWidget {
@@ -75,26 +76,97 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
             .value
             .toString();
     controleEmail.text = emailCadastrado;
-    consultarEmailAlterado();
+    chamarValidarConfirmacaoAlteracaoEmail(uidUsuario);
   }
 
-  consultarEmailAlterado() async {
-    var db = FirebaseFirestore.instance;
-    await db
-        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
-        .doc(uidUsuario)
-        .get()
-        .then((event) {
-          setState(() {
-            exibirWidgetCarregamento = false;
-            emailAlteracao = event
-                .data()!
-                .values
-                .toString()
-                .replaceAll("(", "")
-                .replaceAll(")", "");
-          });
-        });
+  chamarValidarConfirmacaoAlteracaoEmail(String uid) async {
+    emailAlteracao = await ValidarAlteracaoEmail.consultarEmailAlterado(uid);
+    setState(() {
+      exibirWidgetCarregamento = false;
+    });
+    validarConfirmacaoAlteracaoEmail(uid, emailAlteracao);
+  }
+
+  validarConfirmacaoAlteracaoEmail(String uid, String emailAlteracao) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //recuperando senha do usuario gravada ao
+    // fazer login,cadastro ou alteracao da senha
+    String senhaUsuario = prefs.getString(Constantes.infoUsuarioSenha) ?? '';
+    //fazendo autenticacao do usuario usando o email puxado do banco de dados para verificar
+    // se houve confirmacao de alteracao de email
+    AuthCredential credencial = EmailAuthProvider.credential(
+      email: emailAlteracao,
+      password: senhaUsuario,
+    );
+    try {
+      //vazendo login utilizando as informacoes passadas no credencial
+      FirebaseAuth.instance
+          .signInWithCredential(credencial)
+          .then(
+            (value) {
+              // caso a autenticacao seja VERDADEIRA sera feito
+              // a atualizacao no banco de dados e redicionamento de tela
+              if (mounted) {
+                gravarEmailAlteradoBancoDados(uid, emailAlteracao);
+              }
+            },
+            onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
+              debugPrint("o dsadadasd");
+            },
+          );
+    } on FirebaseAuthException {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
+      debugPrint("fsdfsdfs mesmo");
+    }
+  }
+
+  //metodo para gravar no bando de dados caso o
+  // usuario tenha confirmado a alteracao de email
+  gravarEmailAlteradoBancoDados(String uid, String emailAlterar) async {
+    try {
+      // instanciando Firebase
+      var db = FirebaseFirestore.instance;
+      db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uid)
+          // sera setado vazio no banco de dados
+          .set({nomeCampoEmailAlterado: ""})
+          .then(
+            (value) {
+              //redirecionar tela passando as seguintes informacoes
+              setState(() {
+                emailCadastrado = emailAlterar;
+                emailAlteracao = "";
+                controleEmail.text = emailCadastrado;
+                exibirWidgetCarregamento = false;
+              });
+              passarInformacoes(uid, emailAlterar);
+            },
+            onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
+              debugPrint(e.toString());
+            },
+          );
+    } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
+      debugPrint(e.toString());
+    }
+  }
+
+  passarInformacoes(String uid, String email) {
+    Map dados = {};
+    dados[Constantes.infoUsuarioUID] = uid;
+    dados[Constantes.infoUsuarioEmail] = email;
+    PassarPegarDados.passarInformacoesUsuario(dados);
   }
 
   chamarSairConta() async {
@@ -169,6 +241,7 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
           onError: (e) {
             setState(() {
               chamarValidarErro(e.toString());
+              debugPrint(e.toString());
               exibirWidgetCarregamento = false;
             });
           },

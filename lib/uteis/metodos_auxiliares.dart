@@ -5,6 +5,7 @@ import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/textos.dart';
 
 class MetodosAuxiliares {
+
   static exibirMensagens(String tipoAlerta, String msg, BuildContext context) {
     if (tipoAlerta == Constantes.tipoNotificacaoSucesso) {
       ElegantNotification.success(

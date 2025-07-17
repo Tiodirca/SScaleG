@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
+import 'package:sscaleg/uteis/usuario/validar_alteracao_email.dart';
 import '../Uteis/paleta_cores.dart';
 import '../Widgets/tela_carregamento.dart';
 import '../uteis/constantes.dart';
@@ -48,8 +49,13 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
           debugPrint("Usuario Logado");
           usuarioEmail = user.email.toString();
           usuarioUID = user.uid.toString();
-          emailAlteracao = await consultarEmailAlterado(user.uid);
-          validarConfirmacaoAlteracaoEmail();
+          emailAlteracao = await ValidarAlteracaoEmail.consultarEmailAlterado(
+            user.uid,
+          );
+          passarInformacoes(usuarioUID, usuarioEmail);
+          redirecionarTelaInicial();
+          //print(emailAlteracao);
+          //validarConfirmacaoAlteracaoEmail();
         } else {
           debugPrint("Sem Usuario Logado");
           redirecionarTelaLoginCadastro();
@@ -88,7 +94,7 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
                 passarInformacoes(usuarioUID, usuarioEmail);
                 redirecionarTelaInicial();
               }
-              debugPrint("permanece o mesmo");
+              //debugPrint("permanece o mesmo");
             },
           );
     } on FirebaseAuthException {
@@ -96,7 +102,6 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
         passarInformacoes(usuarioUID, usuarioEmail);
         redirecionarTelaInicial();
       }
-      debugPrint("Email permanece o mesmo");
     }
   }
 
@@ -124,27 +129,6 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
     } catch (e) {
       debugPrint(e.toString());
     }
-  }
-
-  //Future para fazer a consulta no banco de
-  // dados para recuperar a informacao gravada
-  Future<String> consultarEmailAlterado(String uidUsuario) async {
-    String emailAlteracao = "";
-    var db = FirebaseFirestore.instance;
-    await db
-        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
-        .doc(uidUsuario)
-        .get()
-        .then((event) {
-          //definindo que a variavel vai receber o seguinte valor
-          emailAlteracao = event
-              .data()!
-              .values
-              .toString()
-              .replaceAll("(", "")
-              .replaceAll(")", "");
-        });
-    return emailAlteracao;
   }
 
   @override
