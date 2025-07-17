@@ -103,6 +103,7 @@ class _TelaInicialState extends State<TelaInicial> {
               setState(() {
                 emailCadastrado = emailAlteracao;
                 exibirTelaCarregamento = false;
+                passarInformacoes(uid, emailAlteracao);
               });
             },
             onError: (e) {
@@ -239,7 +240,7 @@ class _TelaInicialState extends State<TelaInicial> {
                               alignment: WrapAlignment.center,
                               children: [
                                 Container(
-                                  margin: EdgeInsets.only(right: 10.0),
+                                  margin: EdgeInsets.only(right: 10.0,bottom: 20),
                                   width: larguraTela,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,

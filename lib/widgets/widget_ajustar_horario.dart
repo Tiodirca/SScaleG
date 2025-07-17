@@ -176,8 +176,8 @@ class _WidgetAjustarHorarioState extends State<WidgetAjustarHorario> {
         children: [
           Text(
             Textos.widgetAjustarHorarioDescricao,
-            textAlign: TextAlign.justify,
-            style: const TextStyle(fontSize: 20),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18),
           ),
           botoesAcoes(
             larguraTela,

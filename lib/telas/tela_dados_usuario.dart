@@ -81,9 +81,6 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
 
   chamarValidarConfirmacaoAlteracaoEmail(String uid) async {
     emailAlteracao = await ValidarAlteracaoEmail.consultarEmailAlterado(uid);
-    setState(() {
-      exibirWidgetCarregamento = false;
-    });
     validarConfirmacaoAlteracaoEmail(uid, emailAlteracao);
   }
 
@@ -677,6 +674,7 @@ class _TelaDadosUsuarioState extends State<TelaDadosUsuario> {
                         if (exibirOcultarTelaAutenticarUsuario) {
                           return SizedBox(
                             height: 300,
+                            width: larguraTela,
                             child: Card(
                               child: Column(
                                 children: [

@@ -401,8 +401,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                           margin: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Text(
                             Textos.telaGerarEscalaDescricao,
-                            textAlign: TextAlign.justify,
-                            style: const TextStyle(fontSize: 20),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 18),
                           ),
                         ),
                         Column(

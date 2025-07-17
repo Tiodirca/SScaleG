@@ -324,13 +324,13 @@ class _TelaListagemTabelasBancoDadosState
                             Container(
                               margin: const EdgeInsets.symmetric(
                                 vertical: 20,
-                                horizontal: 20,
+                                horizontal: 10,
                               ),
-                              width: larguraTela * 0.5,
+                              width: larguraTela,
                               child: Text(
                                 Textos.erroBaseDadosVazia,
                                 style: const TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,

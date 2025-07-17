@@ -341,8 +341,8 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
                         margin: EdgeInsets.all(10),
                         child: Text(
                           Textos.telaCadastroNovoCampoDescricao,
-                          textAlign: TextAlign.justify,
-                          style: const TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 18),
                         ),
                       ),
                       SizedBox(

@@ -42,7 +42,7 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
       CheckboxListTile(
         activeColor: PaletaCores.corAzulEscuro,
         checkColor: PaletaCores.corRosaClaro,
-        title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 20)),
+        title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 18)),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
@@ -122,8 +122,8 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
                     margin: const EdgeInsets.all(10.0),
                     child: Text(
                       Textos.telaSelecaoDiasSemanaDescricao,
-                      textAlign: TextAlign.justify,
-                      style: const TextStyle(fontSize: 20),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
                   Card(

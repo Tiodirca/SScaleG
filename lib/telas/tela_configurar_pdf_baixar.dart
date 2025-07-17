@@ -103,7 +103,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
             },
           ),
         ),
-        title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 20)),
+        title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 18)),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
@@ -141,7 +141,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
         checkColor: PaletaCores.corRosaClaro,
         title: Text(
           checkBoxModel.texto.replaceAll("_", " "),
-          style: const TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 18),
         ),
         value: checkBoxModel.checked,
         onChanged: (value) {
@@ -877,15 +877,12 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                                 Alignment.center,
                                             alignment: Alignment.center,
                                             child: SizedBox(
-                                              width: larguraTela * 0.5,
+                                              width: larguraTela,
                                               child: Text(
                                                 Textos.erroBaseDadosVazia,
                                                 textAlign: TextAlign.center,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color:
-                                                      PaletaCores
-                                                          .corRosaAvermelhado,
                                                   fontSize: 18,
                                                 ),
                                               ),

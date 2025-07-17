@@ -366,7 +366,7 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
         checkColor: PaletaCores.corRosaClaro,
         title: Text(
           checkBoxModel.texto.replaceAll("_", " "),
-          style: const TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 18),
         ),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
@@ -455,7 +455,7 @@ class _TelaRemoverCamposState extends State<TelaRemoverCampos> {
                                       child: Text(
                                         textAlign: TextAlign.center,
                                         Textos.telaRemoverCamposDescricao,
-                                        style: const TextStyle(fontSize: 20),
+                                        style: const TextStyle(fontSize: 18),
                                       ),
                                     ),
                                     // Area de Exibicao da lista com os nomes dos voluntarios

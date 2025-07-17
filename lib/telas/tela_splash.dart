@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
-import 'package:sscaleg/uteis/usuario/validar_alteracao_email.dart';
 import '../Uteis/paleta_cores.dart';
 import '../Widgets/tela_carregamento.dart';
 import '../uteis/constantes.dart';
@@ -49,86 +46,14 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
           debugPrint("Usuario Logado");
           usuarioEmail = user.email.toString();
           usuarioUID = user.uid.toString();
-          emailAlteracao = await ValidarAlteracaoEmail.consultarEmailAlterado(
-            user.uid,
-          );
           passarInformacoes(usuarioUID, usuarioEmail);
           redirecionarTelaInicial();
-          //print(emailAlteracao);
-          //validarConfirmacaoAlteracaoEmail();
         } else {
           debugPrint("Sem Usuario Logado");
           redirecionarTelaLoginCadastro();
         }
       }
     });
-  }
-
-  validarConfirmacaoAlteracaoEmail() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    //recuperando senha do usuario gravada ao
-    // fazer login,cadastro ou alteracao da senha
-    String senhaUsuario = prefs.getString(Constantes.infoUsuarioSenha) ?? '';
-    //fazendo autenticacao do usuario usando o email puxado do banco de dados para verificar
-    // se houve confirmacao de alteracao de email
-    AuthCredential credencial = EmailAuthProvider.credential(
-      email: emailAlteracao,
-      password: senhaUsuario,
-    );
-    try {
-      //vazendo login utilizando as informacoes passadas no credencial
-      FirebaseAuth.instance
-          .signInWithCredential(credencial)
-          .then(
-            (value) {
-              // caso a autenticacao seja VERDADEIRA sera feito
-              // a atualizacao no banco de dados e redicionamento de tela
-              if (mounted) {
-                gravarEmailAlteradoBancoDados(usuarioUID);
-              }
-            },
-            onError: (e) {
-              // caso de erro quer dizer que o usuario ainda nao confirmou a alteracao de de email
-              // por isso redicionar a tela passando as seguintes informacoes
-              if (mounted) {
-                passarInformacoes(usuarioUID, usuarioEmail);
-                redirecionarTelaInicial();
-              }
-              //debugPrint("permanece o mesmo");
-            },
-          );
-    } on FirebaseAuthException {
-      if (mounted) {
-        passarInformacoes(usuarioUID, usuarioEmail);
-        redirecionarTelaInicial();
-      }
-    }
-  }
-
-  //metodo para gravar no bando de dados caso o
-  // usuario tenha confirmado a alteracao de email
-  gravarEmailAlteradoBancoDados(String uid) async {
-    try {
-      // instanciando Firebase
-      var db = FirebaseFirestore.instance;
-      db
-          .collection(nomeColecaoUsuariosFireBase)
-          .doc(uid)
-          // sera setado vazio no banco de dados
-          .set({nomeCampoEmailAlterado: ""})
-          .then(
-            (value) {
-              //redirecionar tela passando as seguintes informacoes
-              passarInformacoes(usuarioUID, emailAlteracao);
-              redirecionarTelaInicial();
-            },
-            onError: (e) {
-              debugPrint(e.toString());
-            },
-          );
-    } catch (e) {
-      debugPrint(e.toString());
-    }
   }
 
   @override
@@ -192,7 +117,7 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
                 ),
                 SizedBox(
                   width: larguraTela,
-                  height: 300,
+                  height: 200,
                   child: const TelaCarregamento(),
                 ),
               ],

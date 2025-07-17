@@ -3,7 +3,7 @@ class Textos {
   static String versaoAppNumero = "1.1.3";
   static String versaoAppDescricao = "Versão : ";
   static String btnCriarEscala = "Criar Escala";
-  static String btnDadosUsuario = "Dados do Usuario";
+  static String btnDadosUsuario = "Dados do usuário";
   static String btnCadastrar = "Cadastrar";
   static String btnLogin = "Fazer Login";
   static String btnAvancar = "Avançar";
@@ -29,7 +29,7 @@ class Textos {
   static String btnSairConta = "Sair da Conta";
   static String btnExcluirConta = "Excluir Conta";
   static String btnAlterarSenha = "Alterar Senha";
-  static String btnAutenticar = "Autenticar Usuario";
+  static String btnAutenticar = "Autenticar usuário";
   static String btnReenviarEmail = "Reenviar E-mail";
 
   // TELA LOGIN CADASTRO - LOGIN
@@ -45,18 +45,18 @@ class Textos {
   static String labelEsqueciSenha = "Esqueci Senha";
 
   //TELA LOGIN CADASTRO - CADASTRO
-  static String telaCadastroUsuarioTitulo = "Cadastro de Usuario";
+  static String telaCadastroUsuarioTitulo = "Cadastro de usuário";
 
   // TELA DADOS USUARIO
-  static String telaDadosUsuarioTitulo = "Informações de Usuario";
+  static String telaDadosUsuarioTitulo = "Informações de Usuário";
   static String telaDadosUsuarioDescricao =
       "Aqui você pode visualizar as informações da conta, "
       "bem como fazer alterações no e-mail e senha";
   static String telaDadosUsuarioEmailAlterado =
       "Confira sua caixa de e-mail"
-      " para confirmar alteração de email,link enviado para o seguinte e-mail";
+      " para confirmar alteração de Email, link enviado para o seguinte e-mail";
 
-  static String alertaExclusaoUsuario = "Deseja realmente excluir este usuario";
+  static String alertaExclusaoUsuario = "Deseja realmente excluir este usuário";
 
   //TELA DADOS USUARIO CONFIRMACAO AUTENTICACAO
   static String telaDadosUsuarioAutenticarDescricao =
@@ -99,7 +99,7 @@ class Textos {
   static String telaCadastroDescricaoVoluntarioNomesSelecionados =
       "Voluntarios Selecionados : ";
   static String telaCadastroDescricaoVoluntarioNomesSelecionadosQuantidade =
-      "Quantidade de voluntarios : ";
+      "Quantidade de voluntários : ";
 
   // TELA SELECAO DIAS SEMANA
   static String telaSelecaoDiasSemanaDescricao =
@@ -151,7 +151,7 @@ class Textos {
   // TELA REMOVER CAMPO
   static String telaRemoverCamposTitulo = "Remover Campos";
   static String telaRemoverCamposDescricao =
-      "Marque Quais campos voce deseja remover";
+      "Marque quais campos você deseja remover";
   static String telaRemoverCamposDescricaoAlerta =
       "Lembrando que ao remover os campos você estará removendo"
       " o campo selecionado de todos os itens que estão nesta escala, tenha certeza desta ação";
@@ -182,7 +182,7 @@ class Textos {
   static String telaConfiguracaoPDFDescricaoCadastroTitulo =
       "Digite o cabeçalho que o PDF irá ter";
   static String telaConfiguracaoPDFDescricaoSelecaoTitulo =
-      "Selecione qual cabeçalho o PDF irá ter,permitido selecionar apenas um";
+      "Selecione qual cabeçalho o PDF irá ter, permitido selecionar apenas um";
 
   // TELA CONFIGURACAO PDF ORIENTACAO PAGINA
   static String telaConfiguracaoPDFRadioButtonDescricao =
@@ -198,12 +198,14 @@ class Textos {
   static String erroSemLogo = "Selecione uma imagem/logo para prosseguir";
   static String erroCampoVazio = "Preencha este campo";
   static String erroListaVazia =
-      "Impossivel prosseguir,pois nenhum item foi selecionado";
+      "Impossível prosseguir, pois nenhum item foi selecionado";
   static String erroQuantidadeSelecionadaInsuficiente =
       "Selecione uma quantidade de itens igual ou superior a : ";
   static String erroBaseDadosVazia =
       "Não foi possível encontrar nenhuma informação na base de dados, por favor "
       "verifique a conexão com internet ou cadastre uma informação";
+  static String erroAcaoBloqueada =
+      "Ação bloqueada pelo FireBase, tente novamente mais tarde";
 
   //ERROS LOGIN E CADASTRO E DADOS USUARIO
   static String erroValidarUsuarioEmailNaoCadastrado = "E-mail não cadastrado";

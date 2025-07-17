@@ -68,10 +68,9 @@ class _TelaCadastroSelecaoLocalTrabalhoState
         ),
         title: Text(
           checkBoxModel.texto.replaceAll("_", " "),
-          style: const TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 18),
         ),
         value: checkBoxModel.checked,
-        side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
           setState(() {
             // verificando se o balor

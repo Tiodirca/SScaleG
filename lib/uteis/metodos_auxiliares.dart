@@ -5,7 +5,6 @@ import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/textos.dart';
 
 class MetodosAuxiliares {
-
   static exibirMensagens(String tipoAlerta, String msg, BuildContext context) {
     if (tipoAlerta == Constantes.tipoNotificacaoSucesso) {
       ElegantNotification.success(
@@ -86,6 +85,10 @@ class MetodosAuxiliares {
       chamarExibirMensagemErro(Textos.erroValidarUsuarioSenhaErrada, context);
     } else if (erro == "email-already-in-use") {
       chamarExibirMensagemErro(Textos.erroValidarUsuarioEmailEmUso, context);
+    } else if (erro.contains(
+      "We have blocked all requests from this device due to unusual activity. Try again later.",
+    )) {
+      chamarExibirMensagemErro(Textos.erroAcaoBloqueada, context);
     } else {
       chamarExibirMensagemErro("Erro Desconhecido : $erro", context);
     }
