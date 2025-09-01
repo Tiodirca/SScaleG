@@ -78,19 +78,41 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
   }
 
   chamarMetodoGravarDadosSharePreferences() {
+    definirHorarioInicioTrabalho();
+    definirHorarioTrocaTurnoTrabalho();
+  }
+
+  definirHorarioInicioTrabalho() {
     String horarioSemana = MetodosAuxiliares.formatarHorarioAjuste(
-      Constantes.horarioPadraoSemana,
+      Constantes.horarioPadraoSemana,false
     );
     MetodosAuxiliares.gravarHorarioInicioTrabalhoDefinido(
       Constantes.sharePreferencesAjustarHorarioSemana,
       horarioSemana,
     );
     String horarioFinalSemana = MetodosAuxiliares.formatarHorarioAjuste(
-      Constantes.horarioPadraoFinalSemana,
+      Constantes.horarioPadraoFinalSemana,false
     );
     MetodosAuxiliares.gravarHorarioInicioTrabalhoDefinido(
       Constantes.sharePreferencesAjustarHorarioFinalSemana,
       horarioFinalSemana,
+    );
+  }
+
+  definirHorarioTrocaTurnoTrabalho() {
+    String horarioTrocaSemana = MetodosAuxiliares.formatarHorarioAjuste(
+      Constantes.horarioPadraoTrocaSemana,true
+    );
+    MetodosAuxiliares.gravarHorarioInicioTrabalhoDefinido(
+      Constantes.sharePreferencesTrocaHorarioSemana,
+      horarioTrocaSemana,
+    );
+    String horarioTrocaFinalSemana = MetodosAuxiliares.formatarHorarioAjuste(
+      Constantes.horarioPadraoTrocaFinalSemana,true
+    );
+    MetodosAuxiliares.gravarHorarioInicioTrabalhoDefinido(
+      Constantes.sharePreferencesTrocaHorarioFinalSemana,
+      horarioTrocaFinalSemana,
     );
   }
 

@@ -95,11 +95,24 @@ class Constantes {
   static const sharePreferencesAjustarHorarioFinalSemana =
       "ajustarHorarioFinalSemana";
 
+  static const sharePreferencesTrocaHorarioSemana = "trocaHorarioSemana";
+  static const sharePreferencesTrocaHorarioFinalSemana =
+      "trocaHorarioFinalSemana";
+
   //Horarios padrao
-  static const TimeOfDay horarioPadraoSemana = TimeOfDay(hour: 19, minute: 20);
+  static const TimeOfDay horarioPadraoSemana = TimeOfDay(hour: 19, minute: 00);
   static const TimeOfDay horarioPadraoFinalSemana = TimeOfDay(
     hour: 17,
-    minute: 50,
+    minute: 30,
+  );
+
+  static const TimeOfDay horarioPadraoTrocaSemana = TimeOfDay(
+    hour: 20,
+    minute: 00,
+  );
+  static const TimeOfDay horarioPadraoTrocaFinalSemana = TimeOfDay(
+    hour: 19,
+    minute: 00,
   );
 
   //UTILIZADO NO WIDGET DE SELECAO DE OPCOES DE DATA

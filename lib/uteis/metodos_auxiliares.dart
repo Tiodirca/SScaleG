@@ -29,10 +29,16 @@ class MetodosAuxiliares {
 
   // metodo utilizado para formatar para string e deixar no formato de 19:00 por exemplo o horario
   // selecionado pelo usuario com dois caracteres de cada lado
-  static formatarHorarioAjuste(TimeOfDay horarioDefinido) {
-    String horarioFormatado =
-        "${Textos.widgetAjustarHorarioInicio}${horarioDefinido.hour.toString().padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(2, "0")}";
-    return horarioFormatado;
+  static formatarHorarioAjuste(TimeOfDay horarioDefinido, bool trocaTurno) {
+    if (trocaTurno) {
+      String horarioFormatado =
+          "${Textos.widgetAjustarTrocaHorario}${horarioDefinido.hour.toString().padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(2, "0")}";
+      return horarioFormatado;
+    } else {
+      String horarioFormatado =
+          "${Textos.widgetAjustarHorarioInicio}${horarioDefinido.hour.toString().padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(2, "0")}";
+      return horarioFormatado;
+    }
   }
 
   static gravarHorarioInicioTrabalhoDefinido(

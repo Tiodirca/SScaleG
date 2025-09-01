@@ -34,6 +34,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   bool exibirTelaCarregamento = false;
   bool exibirTelaOpcaoData = false;
   String horarioTroca = "";
+  bool exibirTrocaTurno = false;
   bool exibirWidgetCarregamento = false;
   Map itensRecebidosCabecalhoLinha = {};
   String nomeDigitado = "";
@@ -136,15 +137,28 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     String horarioFinalSemana =
         prefs.getString(Constantes.sharePreferencesAjustarHorarioFinalSemana) ??
         '';
+    String horarioTrocaTurnoSemana =
+        prefs.getString(Constantes.sharePreferencesTrocaHorarioSemana) ?? '';
+    String horarioTrocaTurnoFinalSemana =
+        prefs.getString(Constantes.sharePreferencesTrocaHorarioFinalSemana) ??
+        '';
     // verificando se a data corresponde a um dia do fim de semana
     if (dataFormatada.contains(Constantes.diaSabado.toLowerCase()) ||
         dataFormatada.contains(Constantes.diaDomingo.toLowerCase())) {
       setState(() {
-        horarioTroca = horarioFinalSemana;
+        if (exibirTrocaTurno) {
+          horarioTroca = "$horarioFinalSemana $horarioTrocaTurnoFinalSemana";
+        } else {
+          horarioTroca = horarioFinalSemana;
+        }
       });
     } else {
       setState(() {
-        horarioTroca = horarioSemana;
+        if (exibirTrocaTurno) {
+          horarioTroca = "$horarioSemana $horarioTrocaTurnoSemana";
+        } else {
+          horarioTroca = horarioFinalSemana;
+        }
       });
     }
     formatarHorario(horarioTroca);
@@ -263,6 +277,26 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     return itemFinal;
   }
 
+  Widget botoesSwitch(String label, bool valorBotao) => SizedBox(
+    width: 180,
+    child: Row(
+      children: [
+        Text(label),
+        Switch(
+          inactiveThumbColor: PaletaCores.corAzulEscuro,
+          value: valorBotao,
+          activeColor: PaletaCores.corAzulEscuro,
+          onChanged: (bool valor) {
+            setState(() {
+              exibirTrocaTurno = !exibirTrocaTurno;
+              recuperarHorarioTroca();
+            });
+          },
+        ),
+      ],
+    ),
+  );
+
   Widget botoesIcones(IconData icone, double tamanhoBotao, Color corBotao) =>
       SizedBox(
         height: tamanhoBotao,
@@ -332,9 +366,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
       child: Text(
         nomeBotao,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.black,
-        ),
+        style: TextStyle(color: Colors.black),
       ),
     ),
   );
@@ -362,6 +394,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
         horarioTimePicker = novoHorario;
         horarioTroca = MetodosAuxiliares.formatarHorarioAjuste(
           horarioTimePicker!,
+          exibirTrocaTurno,
         );
       });
     }
@@ -480,10 +513,20 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                                 PaletaCores.corCastanho,
                               ),
                               botoesAcoes(Textos.btnOpcaoData),
-                              botoesIcones(
-                                Constantes.iconeMudarHorario,
-                                40,
-                                PaletaCores.corCastanho,
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  botoesSwitch(
+                                    Textos.trocaTurno,
+                                    exibirTrocaTurno,
+                                  ),
+                                  botoesIcones(
+                                    Constantes.iconeMudarHorario,
+                                    40,
+                                    PaletaCores.corCastanho,
+                                  ),
+                                ],
                               ),
                             ],
                           ),

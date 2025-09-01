@@ -15,7 +15,7 @@ class Textos {
   static String btnTelaInicial = "Tela Inicial";
   static String btnBaixarPDF = "Baixar PDF";
   static String btnObservacaoAdicionar = "Adicionar Observações";
-  static String btnOpcaoData = "Opções Adicional da data";
+  static String btnOpcaoData = "Opções adicional da data";
   static String btnData = "Data";
   static String btnVerObservacao = "Ver Observação";
   static String btnSalvar = "Salvar";
@@ -168,11 +168,21 @@ class Textos {
   //WIDGET DEFINIR HORARIO DE INICIO SEMANA E FINAL DE SEMANA
   static String widgetAjustarHorarioDescricao =
       "Selecione qual o horário"
-      " do início da jornada de trabalho";
+      " do início da jornada de trabalho,caso seja necessario defina um horario de troca de turno";
   static String widgetAjustarHorarioSemana = "Horário durante semana";
   static String widgetAjustarHorarioFinalSemana =
       "Horario durante final de semana";
+
+  static String widgetAjustarTrocaHorarioSemana = "Troca durante a semana";
+  static String widgetAjustarTrocaHorarioFinalSemana =
+      "Troca durante final de semana";
+
   static String widgetAjustarHorarioInicio = "Iniciar às : ";
+  static String widgetAjustarTrocaHorario = "Trocar às : ";
+
+  static String trocaTurno = "Troca de turno";
+  static String switchSim = "Sim ";
+  static String switchNao = "Nao";
 
   //Tela CONFIGURACAO PDF
   static String telaConfiguracaoPDFTitulo = "Configurações do PDF";

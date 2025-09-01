@@ -10,6 +10,8 @@ class PassarPegarDados {
   static String idItemAtualizarSelecionado = "";
   static String horarioFinalSemanaDefinido = "";
   static String horarioSemanaDefinido = "";
+  static String horarioTrocaTurnoFinalSemanaDefinido = "";
+  static String horarioTrocaTurnoSemanaDefinido = "";
   static String dataComComplemento = "";
   static String confirmacaoSelecaoDataComplemento = "";
 
@@ -67,6 +69,28 @@ class PassarPegarDados {
 
   static String recuperarHorarioFinalSemanaDefinido() {
     return horarioFinalSemanaDefinido;
+  }
+
+  static String passarHorarioTrocaTurnoSemanaDefinido(
+    String horarioTrocaSemana,
+  ) {
+    horarioTrocaTurnoSemanaDefinido = horarioTrocaSemana;
+    return horarioTrocaTurnoSemanaDefinido;
+  }
+
+  static String recuperarHorarioTrocaTurnoSemanaDefinido() {
+    return horarioTrocaTurnoSemanaDefinido;
+  }
+
+  static String passarHorarioTrocaTurnoFinalSemanaDefinido(
+    String horarioTrocaSemana,
+  ) {
+    horarioTrocaTurnoFinalSemanaDefinido = horarioTrocaSemana;
+    return horarioTrocaTurnoFinalSemanaDefinido;
+  }
+
+  static String recuperarHorarioTrocaTurnoFinalSemanaDefinido() {
+    return horarioTrocaTurnoFinalSemanaDefinido;
   }
 
   static String passarDataComComplemento(String dataComplemento) {

@@ -34,6 +34,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   bool exibirTelaCarregamento = false;
   bool exibirTelaOpcaoData = false;
   String horarioTroca = "";
+  bool exibirTrocaTurno = false;
   bool exibirWidgetCarregamento = false;
   String nomeDigitado = "";
   String dataFormatada = "";
@@ -77,6 +78,26 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
       });
     });
   }
+
+  Widget botoesSwitch(String label, bool valorBotao) => SizedBox(
+    width: 180,
+    child: Row(
+      children: [
+        Text(label),
+        Switch(
+          inactiveThumbColor: PaletaCores.corAzulEscuro,
+          value: valorBotao,
+          activeColor: PaletaCores.corAzulEscuro,
+          onChanged: (bool valor) {
+            setState(() {
+              exibirTrocaTurno = !exibirTrocaTurno;
+              recuperarHorarioTroca();
+            });
+          },
+        ),
+      ],
+    ),
+  );
 
   @override
   void dispose() {
@@ -127,15 +148,28 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     String horarioFinalSemana =
         prefs.getString(Constantes.sharePreferencesAjustarHorarioFinalSemana) ??
         '';
+    String horarioTrocaTurnoSemana =
+        prefs.getString(Constantes.sharePreferencesTrocaHorarioSemana) ?? '';
+    String horarioTrocaTurnoFinalSemana =
+        prefs.getString(Constantes.sharePreferencesTrocaHorarioFinalSemana) ??
+        '';
     // verificando se a data corresponde a um dia do fim de semana
     if (dataFormatada.contains(Constantes.diaSabado.toLowerCase()) ||
         dataFormatada.contains(Constantes.diaDomingo.toLowerCase())) {
       setState(() {
-        horarioTroca = horarioFinalSemana;
+        if (exibirTrocaTurno) {
+          horarioTroca = "$horarioFinalSemana $horarioTrocaTurnoFinalSemana";
+        } else {
+          horarioTroca = horarioFinalSemana;
+        }
       });
     } else {
       setState(() {
-        horarioTroca = horarioSemana;
+        if (exibirTrocaTurno) {
+          horarioTroca = "$horarioSemana $horarioTrocaTurnoSemana";
+        } else {
+          horarioTroca = horarioFinalSemana;
+        }
       });
     }
     formatarHorario(horarioTroca);
@@ -327,9 +361,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
       child: Text(
         nomeBotao,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.black,
-        ),
+        style: TextStyle(color: Colors.black),
       ),
     ),
   );
@@ -357,6 +389,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
         horarioTimePicker = novoHorario;
         horarioTroca = MetodosAuxiliares.formatarHorarioAjuste(
           horarioTimePicker!,
+          exibirTrocaTurno,
         );
       });
     }
@@ -475,10 +508,21 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                 PaletaCores.corCastanho,
                               ),
                               botoesAcoes(Textos.btnOpcaoData),
-                              botoesIcones(
-                                Constantes.iconeMudarHorario,
-                                40,
-                                PaletaCores.corCastanho,
+
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  botoesSwitch(
+                                    Textos.trocaTurno,
+                                    exibirTrocaTurno,
+                                  ),
+                                  botoesIcones(
+                                    Constantes.iconeMudarHorario,
+                                    40,
+                                    PaletaCores.corCastanho,
+                                  ),
+                                ],
                               ),
                             ],
                           ),

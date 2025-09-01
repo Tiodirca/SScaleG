@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 
 class ValidarLoginCadastroUsuario {
+
   static Future<String> fazerLogin(
     String email,
     String senha,
