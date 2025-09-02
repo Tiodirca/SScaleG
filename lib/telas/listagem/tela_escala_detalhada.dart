@@ -309,7 +309,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                 .replaceAll("01_", "")
                 .replaceAll("02_", "")
                 .replaceAll("_", " ")
-                .replaceAll(RegExp(r'[0-9]'), '')
                 .toUpperCase(),
           ),
         ),

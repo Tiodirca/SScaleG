@@ -35,6 +35,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   bool exibirTelaOpcaoData = false;
   String horarioTroca = "";
   bool exibirTrocaTurno = false;
+  int contadorTimerPicker = 0;
   bool exibirWidgetCarregamento = false;
   Map itensRecebidosCabecalhoLinha = {};
   String nomeDigitado = "";
@@ -66,7 +67,12 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     String data = itensRecebidosCabecalhoLinha.values.elementAt(0);
     dataSelecionada = DateFormat("dd/MM/yyyy EEEE", "pt_BR").parse(data);
 
-    recuperarHorarioTroca();
+    dataFormatada = "${formatarData(dataSelecionada)} ";
+    horarioTroca = itensRecebidosCabecalhoLinha.values.elementAt(1);
+    if(horarioTroca.contains(Textos.widgetAjustarTrocaHorario)){
+      exibirTrocaTurno = true;
+    }
+
     if (data.contains("(")) {
       departamentoData = data.split("(")[1];
       dataFormatada = "$dataFormatada($departamentoData";
@@ -128,9 +134,11 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   // // metodo para recuperar os horarios definidos
   // // e gravados no share preferences
   recuperarHorarioTroca() async {
-    //Definindo que a variavel vai receber o valor do metodo mais um pequeno espaco no final
+    //Definindo que a variavel vai receber o valor do
+    // metodo mais um pequeno espaco no final
     // espaco esse utilizado para o complemento de data para nao ficar grudado
     dataFormatada = "${formatarData(dataSelecionada)} ";
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String horarioSemana =
         prefs.getString(Constantes.sharePreferencesAjustarHorarioSemana) ?? '';
@@ -161,6 +169,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
         }
       });
     }
+
     formatarHorario(horarioTroca);
   }
 
@@ -374,6 +383,10 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   exibirTimePicker() async {
     TimeOfDay? novoHorario = await showTimePicker(
       context: context,
+      helpText:
+          contadorTimerPicker == 1
+              ? Textos.descricaoTimePickerHorarioTroca
+              : Textos.descricaoTimePickerHorarioInicial,
       initialTime: horarioTimePicker!,
       builder: (context, child) {
         return Theme(
@@ -392,11 +405,33 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     if (novoHorario != null) {
       setState(() {
         horarioTimePicker = novoHorario;
-        horarioTroca = MetodosAuxiliares.formatarHorarioAjuste(
-          horarioTimePicker!,
-          exibirTrocaTurno,
-        );
+        if (exibirTrocaTurno) {
+          acaoTimerPickerTrocaTurno();
+        } else {
+          horarioTroca = MetodosAuxiliares.formatarHorarioAjuste(
+            horarioTimePicker!,
+            exibirTrocaTurno,
+          );
+        }
       });
+    }
+  }
+
+  acaoTimerPickerTrocaTurno() {
+    contadorTimerPicker++;
+    if (contadorTimerPicker == 1) {
+      horarioTroca = MetodosAuxiliares.formatarHorarioAjuste(
+        horarioTimePicker!,
+        false,
+      );
+      exibirTimePicker();
+    } else {
+      String horarioTrocaFormatado = MetodosAuxiliares.formatarHorarioAjuste(
+        horarioTimePicker!,
+        true,
+      );
+      horarioTroca = "$horarioTroca $horarioTrocaFormatado";
+      contadorTimerPicker = 0;
     }
   }
 

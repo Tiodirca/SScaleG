@@ -280,7 +280,6 @@ class _TelaCadastroSelecaoLocalTrabalhoState
             nomeControle.text
                 .trim()
                 .replaceAll("-", "")
-                .replaceAll(RegExp(r'[0-9]'), "")
                 .replaceAll(" ", "_")
                 .replaceAll(RegExp(r'[^\w\s]+'), "")
                 .toLowerCase();

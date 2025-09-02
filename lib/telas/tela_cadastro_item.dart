@@ -38,6 +38,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   bool exibirWidgetCarregamento = false;
   String nomeDigitado = "";
   String dataFormatada = "";
+  int contadorTimerPicker = 0;
   Map itensRecebidosCabecalhoLinha = {};
   Map<dynamic, dynamic> itemDigitado = {};
   TimeOfDay? horarioTimePicker = const TimeOfDay(hour: 19, minute: 00);
@@ -369,6 +370,10 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   exibirTimePicker() async {
     TimeOfDay? novoHorario = await showTimePicker(
       context: context,
+      helpText:
+          contadorTimerPicker == 1
+              ? Textos.descricaoTimePickerHorarioTroca
+              : Textos.descricaoTimePickerHorarioInicial,
       initialTime: horarioTimePicker!,
       builder: (context, child) {
         return Theme(
@@ -387,11 +392,33 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     if (novoHorario != null) {
       setState(() {
         horarioTimePicker = novoHorario;
-        horarioTroca = MetodosAuxiliares.formatarHorarioAjuste(
-          horarioTimePicker!,
-          exibirTrocaTurno,
-        );
+        if (exibirTrocaTurno) {
+          acaoTimerPickerTrocaTurno();
+        } else {
+          horarioTroca = MetodosAuxiliares.formatarHorarioAjuste(
+            horarioTimePicker!,
+            exibirTrocaTurno,
+          );
+        }
       });
+    }
+  }
+
+  acaoTimerPickerTrocaTurno() {
+    contadorTimerPicker++;
+    if (contadorTimerPicker == 1) {
+      horarioTroca = MetodosAuxiliares.formatarHorarioAjuste(
+        horarioTimePicker!,
+        false,
+      );
+      exibirTimePicker();
+    } else {
+      String horarioTrocaFormatado = MetodosAuxiliares.formatarHorarioAjuste(
+        horarioTimePicker!,
+        true,
+      );
+      horarioTroca = "$horarioTroca $horarioTrocaFormatado";
+      contadorTimerPicker = 0;
     }
   }
 

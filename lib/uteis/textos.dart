@@ -178,11 +178,16 @@ class Textos {
       "Troca durante final de semana";
 
   static String widgetAjustarHorarioInicio = "Iniciar às : ";
-  static String widgetAjustarTrocaHorario = "Trocar às : ";
+  static String widgetAjustarTrocaHorario = "trocar às : ";
 
   static String trocaTurno = "Troca de turno";
   static String switchSim = "Sim ";
   static String switchNao = "Nao";
+
+  static String descricaoTimePickerHorarioInicial =
+      "Defina o Horário de inicio";
+  static String descricaoTimePickerHorarioTroca =
+      "Defina o Horário que ocorrerá a troca";
 
   //Tela CONFIGURACAO PDF
   static String telaConfiguracaoPDFTitulo = "Configurações do PDF";

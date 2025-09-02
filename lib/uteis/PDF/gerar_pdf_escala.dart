@@ -33,8 +33,8 @@ class GerarPDFEscala {
         element
             .toString()
             .replaceAll("_", " ")
-            .replaceAll("01", "")
-            .replaceAll("02", "")
+            .replaceAll("01 data", "data")
+            .replaceAll("02 horario de Trabalho", "HORARIO DE TRABALHO")
             .toUpperCase(),
       );
     }
@@ -63,7 +63,7 @@ class GerarPDFEscala {
                 pdflib.Container(
                   alignment: pdflib.Alignment.centerRight,
                   child: pdflib.Column(
-                    children: [pdflib.Image(image, width: 60, height: 60)],
+                    children: [pdflib.Image(image, width: 40, height: 40)],
                   ),
                 ),
                 pdflib.SizedBox(height: 5),
@@ -91,11 +91,11 @@ class GerarPDFEscala {
               pdflib.TableHelper.fromTextArray(
                 cellPadding: pdflib.EdgeInsets.symmetric(
                   horizontal: 0.0,
-                  vertical: 2.0,
+                  vertical: 1.0,
                 ),
                 headerPadding: pdflib.EdgeInsets.symmetric(
                   horizontal: 1.0,
-                  vertical: 3.0,
+                  vertical: 1.0,
                 ),
                 columnWidths: {
                   0: pdflib.IntrinsicColumnWidth(),
@@ -103,7 +103,7 @@ class GerarPDFEscala {
                 },
                 headerStyle: pdflib.TextStyle(
                   fontWeight: pdflib.FontWeight.bold,
-                  fontSize: 11,
+                  fontSize: 10,
                 ),
 
                 cellAlignment: pdflib.Alignment.center,
@@ -117,7 +117,7 @@ class GerarPDFEscala {
                       child: pdflib.Text(
                         Textos.observacaoTitulo,
                         style: pdflib.TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           fontWeight: pdflib.FontWeight.bold,
                         ),
                         textAlign: pdflib.TextAlign.center,
@@ -138,6 +138,7 @@ class GerarPDFEscala {
                       observacoes.elementAt(index),
                       textAlign: pdflib.TextAlign.center,
                       style: pdflib.TextStyle(
+                        fontSize: 11,
                         fontWeight: pdflib.FontWeight.bold,
                       ),
                     );
