@@ -54,6 +54,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     super.initState();
     uidUsuario =
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+    dataFormatada = "${formatarData(dataSelecionada)} ";
     recuperarHorarioTroca();
     carregarCampos();
   }
@@ -80,24 +81,21 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     });
   }
 
-  Widget botoesSwitch(String label, bool valorBotao) => SizedBox(
-    width: 180,
-    child: Row(
-      children: [
-        Text(label),
-        Switch(
-          inactiveThumbColor: PaletaCores.corAzulEscuro,
-          value: valorBotao,
-          activeColor: PaletaCores.corAzulEscuro,
-          onChanged: (bool valor) {
-            setState(() {
-              exibirTrocaTurno = !exibirTrocaTurno;
-              recuperarHorarioTroca();
-            });
-          },
-        ),
-      ],
-    ),
+  Widget botoesSwitch(String label, bool valorBotao) => Row(
+    children: [
+      Text(label),
+      Switch(
+        inactiveThumbColor: PaletaCores.corAzulEscuro,
+        value: valorBotao,
+        activeColor: PaletaCores.corAzulEscuro,
+        onChanged: (bool valor) {
+          setState(() {
+            exibirTrocaTurno = !exibirTrocaTurno;
+            recuperarHorarioTroca();
+          });
+        },
+      ),
+    ],
   );
 
   @override
@@ -140,9 +138,6 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
   // // metodo para recuperar os horarios definidos
   // // e gravados no share preferences
   recuperarHorarioTroca() async {
-    //Definindo que a variavel vai receber o valor do metodo mais um pequeno espaco no final
-    // espaco esse utilizado para o complemento de data para nao ficar grudado
-    dataFormatada = "${formatarData(dataSelecionada)} ";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String horarioSemana =
         prefs.getString(Constantes.sharePreferencesAjustarHorarioSemana) ?? '';
@@ -452,7 +447,11 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
           dataSelecionada = date;
         }
       });
-      dataFormatada = formatarData(dataSelecionada);
+      //Definindo que a variavel vai receber
+      // o valor do metodo mais um pequeno espaco no final
+      // espaco esse utilizado para o complemento de data para nao ficar grudado
+      dataFormatada = "${formatarData(dataSelecionada)} ";
+      //chamando metodo para recuperar o horario de trabalho
       recuperarHorarioTroca();
     });
   }
@@ -535,7 +534,6 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                 PaletaCores.corCastanho,
                               ),
                               botoesAcoes(Textos.btnOpcaoData),
-
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,

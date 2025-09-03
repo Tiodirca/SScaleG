@@ -134,11 +134,6 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   // // metodo para recuperar os horarios definidos
   // // e gravados no share preferences
   recuperarHorarioTroca() async {
-    //Definindo que a variavel vai receber o valor do
-    // metodo mais um pequeno espaco no final
-    // espaco esse utilizado para o complemento de data para nao ficar grudado
-    dataFormatada = "${formatarData(dataSelecionada)} ";
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String horarioSemana =
         prefs.getString(Constantes.sharePreferencesAjustarHorarioSemana) ?? '';
@@ -165,7 +160,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
         if (exibirTrocaTurno) {
           horarioTroca = "$horarioSemana $horarioTrocaTurnoSemana";
         } else {
-          horarioTroca = horarioFinalSemana;
+          horarioTroca = horarioSemana;
         }
       });
     }
@@ -465,7 +460,11 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
           dataSelecionada = date;
         }
       });
-      dataFormatada = formatarData(dataSelecionada);
+      //Definindo que a variavel vai receber
+      // o valor do metodo mais um pequeno espaco no final
+      // espaco esse utilizado para o complemento de data para nao ficar grudado
+      dataFormatada = "${formatarData(dataSelecionada)} ";
+      //chamando metodo para recuperar o horario de trabalho
       recuperarHorarioTroca();
     });
   }

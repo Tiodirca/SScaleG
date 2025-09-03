@@ -1,6 +1,6 @@
 class Textos {
   static String nomeApp = "SScaleG";
-  static String versaoAppNumero = "1.1.3";
+  static String versaoAppNumero = "1.2.3";
   static String versaoAppDescricao = "Versão : ";
   static String btnCriarEscala = "Criar Escala";
   static String btnDadosUsuario = "Dados do usuário";
@@ -169,25 +169,22 @@ class Textos {
   static String widgetAjustarHorarioDescricao =
       "Selecione qual o horário"
       " do início da jornada de trabalho,caso seja necessario defina um horario de troca de turno";
-  static String widgetAjustarHorarioSemana = "Horário durante semana";
+  static String widgetAjustarHorarioSemana = "Inicio trabalho durante semana";
   static String widgetAjustarHorarioFinalSemana =
-      "Horario durante final de semana";
+      "Inicio trabalho durante final de semana";
 
-  static String widgetAjustarTrocaHorarioSemana = "Troca durante a semana";
+  //WIDGET troca de turno
+  static String widgetAjustarTrocaHorarioSemana = "Troca de turno durante a semana";
   static String widgetAjustarTrocaHorarioFinalSemana =
-      "Troca durante final de semana";
+      "Troca de turno durante final de semana";
 
   static String widgetAjustarHorarioInicio = "Iniciar às : ";
   static String widgetAjustarTrocaHorario = "trocar às : ";
-
   static String trocaTurno = "Troca de turno";
-  static String switchSim = "Sim ";
-  static String switchNao = "Nao";
-
   static String descricaoTimePickerHorarioInicial =
-      "Defina o Horário de inicio";
+      "Defina o horário de inicio do trabalho";
   static String descricaoTimePickerHorarioTroca =
-      "Defina o Horário que ocorrerá a troca";
+      "Defina o horário que ocorrerá a troca de turno";
 
   //Tela CONFIGURACAO PDF
   static String telaConfiguracaoPDFTitulo = "Configurações do PDF";
