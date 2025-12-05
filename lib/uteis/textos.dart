@@ -1,6 +1,6 @@
 class Textos {
   static String nomeApp = "SScaleG";
-  static String versaoAppNumero = "1.2.3";
+  static String versaoAppNumero = "1.2.6";
   static String versaoAppDescricao = "Versão : ";
   static String btnCriarEscala = "Criar Escala";
   static String btnDadosUsuario = "Dados do usuário";

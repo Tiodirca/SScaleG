@@ -50,8 +50,11 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     Timer(const Duration(seconds: 1), () {
       realizarBuscaDadosFireBase(widget.idDocumento, "");
-      itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
-      idItemAtualizar = PassarPegarDados.recuperarIdAtualizarSelecionado();
+
+      setState(() {
+        itensRecebidosCabecalhoLinha = PassarPegarDados.recuperarItens();
+        idItemAtualizar = PassarPegarDados.recuperarIdAtualizarSelecionado();
+      });
     });
   }
 
@@ -220,9 +223,9 @@ class _TelaCadastroCampoNovoState extends State<TelaCadastroCampoNovo> {
     dados[Constantes.rotaArgumentoNomeEscala] = widget.nomeEscala;
     dados[Constantes.rotaArgumentoIDEscalaSelecionada] = widget.idDocumento;
     Navigator.pushReplacementNamed(
-      context,
-      Constantes.rotaTelaAtualizarItem,
-      arguments: dados,
+        context,
+        Constantes.rotaTelaAtualizarItem,
+        arguments: dados,
     );
   }
 

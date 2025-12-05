@@ -94,8 +94,8 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
   @override
   void dispose() {
     super.dispose();
-    PassarPegarDados.passarItens({});
-    PassarPegarDados.passarIdAtualizarSelecionado("");
+    //PassarPegarDados.passarItens({});
+    //PassarPegarDados.passarIdAtualizarSelecionado("");
     PassarPegarDados.passarDataComComplemento("");
   }
 

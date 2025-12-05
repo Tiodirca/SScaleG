@@ -53,7 +53,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   }
 
   recuperarHorarioDefinidoInicioTrabalho() {
-
     setState(() {
      String horarioInicioSemana = PassarPegarDados.recuperarHorarioSemanaDefinido();
       String horarioInicioFinalSemana =
