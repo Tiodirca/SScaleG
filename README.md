@@ -4,7 +4,7 @@ O SScaleG é uma solução completa desenvolvida para simplificar a organizaçã
 <img width="1920" height="1021" alt="01 Tela Inicial" src="https://github.com/user-attachments/assets/0ea746a2-58c7-45a6-b01a-b2cb3fb070dd" />
 Tela Incial
 <img width="1920" height="1021" alt="02 Tela Cadastro e Selecao Local Trabalho" src="https://github.com/user-attachments/assets/3518d6a0-b17c-4a61-9abf-6c5d95fd4724" />
-ela Cadastro e Selecao Local Trabalho
+Tela Cadastro e Selecao Local Trabalho
 <img width="1920" height="1017" alt="03 Tela Cadastro e Selecao Voluntarios" src="https://github.com/user-attachments/assets/1d4461c3-ddf6-4558-b2ab-4c21e7e33bda" />
 Tela Cadastro e Selecao Voluntarios
 <img width="1920" height="1021" alt="04 Tela Selecao Dias da Semana" src="https://github.com/user-attachments/assets/c4c0a435-a1db-45f1-86b1-372036afd425" />
