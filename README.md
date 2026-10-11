@@ -37,4 +37,4 @@ Atualizar Item
  Remover Campo ou Coluna
 <img width="1920" height="1021" alt="13 Adicionar novo  Campo ou Coluna" src="https://github.com/user-attachments/assets/00ce0cd7-cbca-414b-a8e6-dba50dadbe79" />
 Adicionar novo  Campo ou Coluna
-# sscaleg
+
