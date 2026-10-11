@@ -41,48 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDpMgXbES84pJ8ew4Z9Yeq08k01sGFa0UI',
-    appId: '1:259654711735:web:8ed917d3b5bd06983a9032',
-    messagingSenderId: '259654711735',
-    projectId: 'sscaleg',
-    authDomain: 'sscaleg.firebaseapp.com',
-    storageBucket: 'sscaleg.firebasestorage.app',
-    measurementId: 'G-JPY5T76C66',
+    apiKey: 'AIzaSyDt2OxOS6A9aull6je9-dZaWvuRM26Z1Sk',
+    appId: '1:190496658314:web:eaaeee781869efe6d72e73',
+    messagingSenderId: '190496658314',
+    projectId: 'sscaleg-15400',
+    authDomain: 'sscaleg-15400.firebaseapp.com',
+    storageBucket: 'sscaleg-15400.firebasestorage.app',
+    measurementId: 'G-99FDFWZ8VW',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBd594Xl9bHpEZNR0YCAob_HdLiwszW38s',
-    appId: '1:259654711735:android:cffcd916bc4046b43a9032',
-    messagingSenderId: '259654711735',
-    projectId: 'sscaleg',
-    storageBucket: 'sscaleg.firebasestorage.app',
+    apiKey: 'AIzaSyB-PAhocZW4ORNbQZsw5KLozDcUSUnEA_Y',
+    appId: '1:190496658314:android:b701bea8aded8b6bd72e73',
+    messagingSenderId: '190496658314',
+    projectId: 'sscaleg-15400',
+    storageBucket: 'sscaleg-15400.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBGvdOkCelE_d6OLaex3oL8hTkEMQ9plG0',
-    appId: '1:259654711735:ios:571d33afaaa7bffb3a9032',
-    messagingSenderId: '259654711735',
-    projectId: 'sscaleg',
-    storageBucket: 'sscaleg.firebasestorage.app',
+    apiKey: 'AIzaSyAth2UqZJlF-4gsjo_4PLpmgtN5g0t2gsI',
+    appId: '1:190496658314:ios:802b0dd0f6338635d72e73',
+    messagingSenderId: '190496658314',
+    projectId: 'sscaleg-15400',
+    storageBucket: 'sscaleg-15400.firebasestorage.app',
     iosBundleId: 'com.example.sscaleg',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBGvdOkCelE_d6OLaex3oL8hTkEMQ9plG0',
-    appId: '1:259654711735:ios:571d33afaaa7bffb3a9032',
-    messagingSenderId: '259654711735',
-    projectId: 'sscaleg',
-    storageBucket: 'sscaleg.firebasestorage.app',
+    apiKey: 'AIzaSyAth2UqZJlF-4gsjo_4PLpmgtN5g0t2gsI',
+    appId: '1:190496658314:ios:802b0dd0f6338635d72e73',
+    messagingSenderId: '190496658314',
+    projectId: 'sscaleg-15400',
+    storageBucket: 'sscaleg-15400.firebasestorage.app',
     iosBundleId: 'com.example.sscaleg',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDpMgXbES84pJ8ew4Z9Yeq08k01sGFa0UI',
-    appId: '1:259654711735:web:e499ee56bec7265b3a9032',
-    messagingSenderId: '259654711735',
-    projectId: 'sscaleg',
-    authDomain: 'sscaleg.firebaseapp.com',
-    storageBucket: 'sscaleg.firebasestorage.app',
-    measurementId: 'G-K6FCY4L5V0',
+    apiKey: 'AIzaSyDt2OxOS6A9aull6je9-dZaWvuRM26Z1Sk',
+    appId: '1:190496658314:web:54b533151c625ed7d72e73',
+    messagingSenderId: '190496658314',
+    projectId: 'sscaleg-15400',
+    authDomain: 'sscaleg-15400.firebaseapp.com',
+    storageBucket: 'sscaleg-15400.firebasestorage.app',
+    measurementId: 'G-WHT82V0EN5',
   );
 }

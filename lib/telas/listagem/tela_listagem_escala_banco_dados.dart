@@ -61,25 +61,29 @@ class _TelaListagemTabelasBancoDadosState
   Future consultarTabelas() async {
     List<TabelaModelo> tabelasBancoDados = [];
     var db = FirebaseFirestore.instance;
-    await db
-        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
-        .doc(uidUsuario)
-        .collection(Constantes.fireBaseColecaoEscalas)
-        .get()
-        .then((event) {
-          for (var doc in event.docs) {
-            var nomeTabela = doc
-                .data()
-                .values
-                .toString()
-                .replaceAll("(", "")
-                .replaceAll(")", "");
-            tabelasBancoDados.add(
-              TabelaModelo(nomeTabela: nomeTabela, idTabela: doc.id),
-            );
-          }
-        });
-    return tabelasBancoDados;
+    try{
+      await db
+          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .doc(uidUsuario)
+          .collection(Constantes.fireBaseColecaoEscalas)
+          .get()
+          .then((event) {
+        for (var doc in event.docs) {
+          var nomeTabela = doc
+              .data()
+              .values
+              .toString()
+              .replaceAll("(", "")
+              .replaceAll(")", "");
+          tabelasBancoDados.add(
+            TabelaModelo(nomeTabela: nomeTabela, idTabela: doc.id),
+          );
+        }
+      });
+      return tabelasBancoDados;
+    }catch(e){
+      return tabelasBancoDados;
+    }
   }
 
   Future<void> alertaExclusao(BuildContext context) async {

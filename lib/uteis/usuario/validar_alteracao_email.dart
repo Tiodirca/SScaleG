@@ -15,21 +15,26 @@ class ValidarAlteracaoEmail {
   static Future<String> consultarEmailAlterado(String uidUsuario) async {
     String emailAlteracao = "";
     var db = FirebaseFirestore.instance;
-    await db
-        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
-        .doc(uidUsuario)
-        .get()
-        .then((event) {
-          //definindo que a variavel
-          // vai receber o seguinte valor
-          emailAlteracao = event
-              .data()!
-              .values
-              .toString()
-              .replaceAll("(", "")
-              .replaceAll(")", "");
-        });
-    return emailAlteracao;
+    try{
+      await db
+          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .doc(uidUsuario)
+          .get()
+          .then((event) {
+        print(event.toString());
+        //definindo que a variavel
+        // vai receber o seguinte valor
+        emailAlteracao = event
+            .data()!
+            .values
+            .toString()
+            .replaceAll("(", "")
+            .replaceAll(")", "");
+      });
+      return emailAlteracao;
+    }catch(e){
+      return emailAlteracao;
+    }
   }
 
   // static Future<String> validarConfirmacaoAlteracaoEmail(

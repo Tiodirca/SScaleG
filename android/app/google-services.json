@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "259654711735",
-    "project_id": "sscaleg",
-    "storage_bucket": "sscaleg.firebasestorage.app"
+    "project_number": "190496658314",
+    "project_id": "sscaleg-15400",
+    "storage_bucket": "sscaleg-15400.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:259654711735:android:cffcd916bc4046b43a9032",
+        "mobilesdk_app_id": "1:190496658314:android:b701bea8aded8b6bd72e73",
         "android_client_info": {
           "package_name": "com.example.sscaleg"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBd594Xl9bHpEZNR0YCAob_HdLiwszW38s"
+          "current_key": "AIzaSyB-PAhocZW4ORNbQZsw5KLozDcUSUnEA_Y"
         }
       ],
       "services": {
