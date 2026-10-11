@@ -1,5 +1,13 @@
+O SScaleG representa a evolução de soluções anteriores focadas no planejamento e organização ministerial. Desenvolvido para gerar escalas de voluntários de forma automatizada e randomizada, esta nova versão traz aprimoramentos significativos em flexibilidade e personalização, adaptando-se com precisão às necessidades e particularidades de cada igreja.
 
-O SScaleG é uma solução completa desenvolvida para simplificar a organização, o planejamento e a gestão de voluntários e equipes ministeriais em Igrejas Evangélicas. Com um fluxo de trabalho passo a passo, o aplicativo permite estruturar escalas personalizadas de forma rápida, intuitiva e altamente configurável.
+- Criação de novas escalas e consulta de listas existentes, identificação da conta de utilizador. Cadastro e Seleção de Locais de Trabalho: Módulo para registo e seleção flexível de postos de atuação específicos (como entrada do templo, púlpitos, mesa de som, computadores, multimídia e equipe de vídeo). Gestão de Voluntários: Registo e seleção dos voluntários disponíveis para compor as diferentes funções da escala.
+
+- Definição de Dias da Semana e Períodos: Seleção específica dos dias da semana em que ocorrem os cultos ou eventos e escolha do intervalo de datas mensal através de um calendário integrado.
+
+- Atribuição de um nome personalizado a cada escala. Definição de horários de início de jornada diferenciados para dias úteis e fins de semana. Ativação opcional de Troca de Turno, permitindo configurar horários específicos para a rotação de equipe em até dois períodos distintos
+- Visualização de todas as datas, horários, locais e voluntários alocados, Capacidade de atualizar registos individuais, alterar horários , modificar datas e remover itens. Complementos de Data (Departamentos): Adição de especificações ou subtítulos às datas (ex: Campanha, Ensaio de Louvor, Culto das irmãs ).
+- Gestão Dinâmica de Colunas: Liberdade para adicionar novos campos/colunas (novas funções) ou remover campos existentes diretamente na escala em curso.
+Inclusão de notas operacionais e diretrizes para a equipe diretamente no PDF gerado (recomendações de atendimento, avisos prévios, cuidados técnicos) que acompanham o documento. Definição de cabeçalhos institucionais personalizados (ex: Escala voluntários de Mídia/ Cooperadoras) e escolha da orientação da página entre Horizontal e Vertical para assegurar uma apresentação perfeita e profissional na impressão ou partilha digital.
 
 <img width="1920" height="1021" alt="01 Tela Inicial" src="https://github.com/user-attachments/assets/0ea746a2-58c7-45a6-b01a-b2cb3fb070dd" />
 Tela Incial
