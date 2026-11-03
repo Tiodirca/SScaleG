@@ -105,7 +105,7 @@ class _TelaSelecaoDiasSemanaState extends State<TelaSelecaoDiasSemana> {
                 PassarPegarDados.passarNomesVoluntarios([]);
                 Navigator.pushReplacementNamed(
                   context,
-                  Constantes.rotaTelaCadastroSelecaoVoluntarios,
+                  Constantes.rotaTelaSelecaoNomesVoluntarios,
                 );
               },
               icon: const Icon(Icons.arrow_back_ios),

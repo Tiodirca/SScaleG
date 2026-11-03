@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sscaleg/telas/campos/tela_cadastro_novo_campo.dart';
 import 'package:sscaleg/telas/campos/tela_remover_campos.dart';
+import 'package:sscaleg/telas/geracao_escalas/tela_atualizar_dados_voluntario.dart';
+import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_dados_voluntarios.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_local_trabalho.dart';
-import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_nomes_voluntarios.dart';
+import 'package:sscaleg/telas/geracao_escalas/tela_selecao_nomes_voluntarios.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_gerar_escala.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_dias_semana.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_intervalo_trabalho.dart';
@@ -38,9 +40,13 @@ class Rotas {
         return MaterialPageRoute(
           builder: (_) => const TelaCadastroSelecaoLocalTrabalho(),
         );
-      case Constantes.rotaTelaCadastroSelecaoVoluntarios:
+      case Constantes.rotaTelaSelecaoNomesVoluntarios:
         return MaterialPageRoute(
-          builder: (_) => const TelaCadastroSelecaoNomesVoluntarios(),
+          builder: (_) => const TelaSelecaoNomesVoluntarios(),
+        );
+      case Constantes.rotaTelaCadastroDadosVoluntarios:
+        return MaterialPageRoute(
+          builder: (_) => const TelaCadastroDadosVoluntarios(),
         );
       case Constantes.rotaTelaSelecaoDiasSemana:
         return MaterialPageRoute(builder: (_) => const TelaSelecaoDiasSemana());
@@ -75,6 +81,17 @@ class Rotas {
                   nomeTabela: args[Constantes.rotaArgumentoNomeEscala],
                   idTabelaSelecionada:
                       args[Constantes.rotaArgumentoIDEscalaSelecionada],
+                ),
+          );
+        } else {
+          return erroRota(settings);
+        }
+      case Constantes.rotaTelaAtualizarDadosVoluntario:
+        if (args is Map) {
+          return MaterialPageRoute(
+            builder:
+                (_) => TelaAtualizarDadosVoluntario(
+                dadosVoluntario:  args[Constantes.rotaArgumentoAtualizarDadosVoluntario],
                 ),
           );
         } else {

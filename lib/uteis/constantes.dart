@@ -7,14 +7,20 @@ class Constantes {
   static const rotaTelaLoginCadastro = "loginCadastro";
   static const rotaTelaDadosUsuario = "dadosUsuario";
 
+
+
   //Rotas da GERACAO DE ESCALA
   static const rotaTelaCadastroSelecaoLocalTrabalho =
       "telaCadSelecaoLocalTrabalho";
-  static const rotaTelaCadastroSelecaoVoluntarios = "telaCadSelecaoVoluntarios";
   static const rotaTelaSelecaoDiasSemana = "telaSelecaoDiasSemana";
   static const rotaTelaSelecaoIntervaloTrabalho =
       "telaSelecaoIntervaloTrabalho";
   static const rotaTelaGerarEscala = "telaGerarEscala";
+
+
+  static const rotaTelaCadastroDadosVoluntarios = "telaCadastroDadosVoluntarios";
+  static const rotaTelaSelecaoNomesVoluntarios = "telaSelecaoNomeVoluntarios";
+  static const rotaTelaAtualizarDadosVoluntario = "rotaTelaAtualizarDadosVoluntario";
 
   //ROTAS LISTAGEM ESCALAS
   static const rotaTelaListagemEscalaBandoDados =
@@ -45,6 +51,7 @@ class Constantes {
   static const rotaArgumentoCabecalhoEscala = "cabecalhoEscala";
   static const rotaArgumentoLinhasEscala = "linhasEscala";
   static const rotaArgumentoObservacaoEscala = "observacaoEscala";
+  static const rotaArgumentoAtualizarDadosVoluntario = "atualizarDadosVoluntario";
 
   //INFORMACAO USUARIO
   static const infoUsuarioUID = "uid";
@@ -140,7 +147,11 @@ class Constantes {
 
   //VOLUNTARIOS
   static const fireBaseColecaoNomeVoluntarios = "nome_voluntarios";
-  static const fireBaseDocumentoNomeVoluntarios = "nome";
+  static const fireBaseDocumentoNomeVoluntarios = "nomeVoluntario";
+  static const fireBaseDocumentoCategoriaVoluntario = "categoriaVoluntario";
+  static const fireBaseDocumentoNomeVoluntariosDiasDisponiveis =
+      "diasDisponiveis";
+  static const fireBaseVoluntariosDiasDisponiveisTodoDia = "Disponivel Todos os Dias";
 
   //OBSERVACOES
   static const fireBaseColecaoNomeObservacao = "Observacoes";

@@ -269,7 +269,7 @@ class _TelaCadastroSelecaoLocalTrabalhoState
     PassarPegarDados.passarNomesLocaisTrabalho(listaNomesSelecionados);
     Navigator.pushReplacementNamed(
       context,
-      Constantes.rotaTelaCadastroSelecaoVoluntarios,
+      Constantes.rotaTelaSelecaoNomesVoluntarios,
     );
   }
 

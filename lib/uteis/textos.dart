@@ -7,6 +7,7 @@ class Textos {
   static String btnCadastrar = "Cadastrar";
   static String btnLogin = "Fazer Login";
   static String btnAvancar = "Avançar";
+  static String btnCadastrarVoluntarios = "Cadastrar Voluntario";
   static String btnListarEscalas = "Ver lista de Escalas";
   static String btnAdicionar = "Adicionar Item";
   static String btnRecarregar = "Recarregar";
@@ -88,18 +89,33 @@ class Textos {
       "Selecione quais "
       "Locais cadastrados que você deseja que a escala tenha";
 
-  // TELA CADASTRO E SELECAO DE VOLUNTARIOS
-  static String telaCadastroTituloVoluntarios = "Voluntários";
-  static String telaCadastroDescricaoVoluntario =
+  //TELA CADASTRO VOLUNTARIOS
+  static String telaCadastroVoluntarios = "Cadastro de Voluntarios";
+  static String telaCadatroVoluntariosDescricaoDiasSemana =
+      "Caso o seu voluntario não consiga cumprir a escala em um dia especifico, selecione o dia para que "
+      "ao gerar a escala ele não seja colocado no dia da semana a qual ele não esteja disponivel";
+  static String labelTextFieldNomeVoluntario = "Nome do Voluntario";
+  static String labelTextFieldCategoriaVoluntario = "Categoria Voluntario";
+  static String labelHintCategoriaVoluntario = "Cooperador,Cooperadora,Midia";
+  static String telaSCadastroVoluntariosDescricao=
       "Use o campo abaixo para "
       "cadastrar o nome do voluntario que estará compondo a escala de trabalho";
-  static String telaCadastroDescricaoSelecaoVoluntarios =
+
+  //TELA CADASTRO VOLUNTARIOS
+  static String telaAtualizarDadosVoluntarios = "Atualizar dados Voluntario";
+
+  // SELECAO VOLUNTARIOS
+  static String telaSelecaoVoluntariosTitulo = "Seleção Voluntários";
+  static String telaSelecaoDescricaoSelecaoVoluntarios =
       "Selecione quais "
       "voluntários que você deseja que a escala tenha";
-  static String telaCadastroDescricaoVoluntarioNomesSelecionados =
+  static String telaSelecaoDescricaoVoluntarioNomesSelecionados =
       "Voluntarios Selecionados : ";
-  static String telaCadastroDescricaoVoluntarioNomesSelecionadosQuantidade =
+  static String telaSelecaoDescricaoVoluntarioNomesSelecionadosQuantidade =
       "Quantidade de voluntários : ";
+  static String telaSelecaoVoluntariosCategoria = "Categoria : ";
+  static String telaSelecaoVoluntariosDiasDisponiveis = "Disponibilidade : ";
+  static String telaSelecaoVoluntariosFiltroDescricao = "Filtre as categorias";
 
   // TELA SELECAO DIAS SEMANA
   static String telaSelecaoDiasSemanaDescricao =
@@ -174,7 +190,8 @@ class Textos {
       "Inicio trabalho durante final de semana";
 
   //WIDGET troca de turno
-  static String widgetAjustarTrocaHorarioSemana = "Troca de turno durante a semana";
+  static String widgetAjustarTrocaHorarioSemana =
+      "Troca de turno durante a semana";
   static String widgetAjustarTrocaHorarioFinalSemana =
       "Troca de turno durante final de semana";
 

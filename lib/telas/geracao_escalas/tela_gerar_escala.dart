@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
+import 'package:sscaleg/modelo/check_box_modelo_voluntario.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
@@ -29,7 +30,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       PassarPegarDados.recuperarIntervaloTrabalho();
   List<String> locaisSorteioVoluntarios =
       PassarPegarDados.recuperarNomesLocaisTrabalho();
-  List<String> nomeVoluntarios = PassarPegarDados.recuperarNomesVoluntarios();
+  List<CheckBoxModeloVoluntario> nomeVoluntarios = PassarPegarDados.recuperarNomesVoluntarios();
   TextEditingController nomeEscala = TextEditingController(text: "");
   Random random = Random();
   List<int> listaNumeroAuxiliarRepeticao = [];
@@ -122,8 +123,9 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       escala.add(element);
     }
     for (var element in nomeVoluntarios) {
-      nomesNaoListados.add(element);
-      nomes.add(element);
+
+      //nomesNaoListados.add(element);
+      //nomes.add(element);
     }
 
     List<String> nomesJaAdicionados = verificarNomesAdicionadosEscala(

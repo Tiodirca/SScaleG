@@ -1,6 +1,8 @@
+import 'package:sscaleg/modelo/check_box_modelo_voluntario.dart';
+
 class PassarPegarDados {
   static List<String> listaNomesLocaisTrabalho = [];
-  static List<String> listaNomesVoluntarios = [];
+  static List<CheckBoxModeloVoluntario> listaNomesVoluntarios = [];
   static List<String> listaDiasSemana = [];
   static List<String> listaIntervaloTrabalho = [];
   static List<String> listaCamposLinhaItem = [];
@@ -26,12 +28,12 @@ class PassarPegarDados {
     return listaNomesLocaisTrabalho;
   }
 
-  static List<String> passarNomesVoluntarios(List<String> voluntarios) {
+  static List<CheckBoxModeloVoluntario> passarNomesVoluntarios(List<CheckBoxModeloVoluntario> voluntarios) {
     listaNomesVoluntarios = voluntarios;
     return listaNomesVoluntarios;
   }
 
-  static List<String> recuperarNomesVoluntarios() {
+  static List<CheckBoxModeloVoluntario> recuperarNomesVoluntarios() {
     return listaNomesVoluntarios;
   }
 
