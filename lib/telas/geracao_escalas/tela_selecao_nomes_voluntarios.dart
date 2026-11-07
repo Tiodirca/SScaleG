@@ -23,7 +23,9 @@ class TelaSelecaoNomesVoluntarios extends StatefulWidget {
 
 class _TelaSelecaoNomesVoluntariosState
     extends State<TelaSelecaoNomesVoluntarios> {
-  List<CheckBoxModeloVoluntario> listaNomesCadastrados = [];
+  List<CheckBoxModeloVoluntario> listaNomesVoluntariosListaReferencia = [];
+  List<CheckBoxModeloVoluntario> listaNomesExibicaoFiltragram = [];
+  Map<String, int> listaNomeCategoriasVoluntario = {};
   List<CheckBoxModeloVoluntario> listaNomesSelecionados = [];
   List<String> listaNomesSelecionadosExibicao = [];
   List<String> listaValidarQuantidadeVoluntarios = [];
@@ -31,6 +33,9 @@ class _TelaSelecaoNomesVoluntariosState
   Estilo estilo = Estilo();
   String uidUsuario = "";
   int indexTabela = 0;
+  int indexRadioButton = 0;
+  String filtroDesativado = Textos.telaSelecaoVoluntariosFiltrarTodos;
+  bool exibirTelaFiltro = false;
   String nomeColecaoUsuariosFireBase = Constantes.fireBaseColecaoUsuarios;
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeVoluntarios;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeVoluntarios;
@@ -38,6 +43,9 @@ class _TelaSelecaoNomesVoluntariosState
   @override
   void initState() {
     super.initState();
+    Map<String, int> dados = {};
+    dados[Textos.telaSelecaoVoluntariosFiltrarTodos] = 0;
+    listaNomeCategoriasVoluntario.addAll(dados);
     uidUsuario =
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
     Timer(const Duration(seconds: 1), () {
@@ -56,7 +64,20 @@ class _TelaSelecaoNomesVoluntariosState
     }
   }
 
-  Widget checkBoxPersonalizado(CheckBoxModeloVoluntario checkBoxModel) => Card(
+  Widget checkBoxPersonalizado(
+    CheckBoxModeloVoluntario checkBoxModel,
+    double largura,
+  ) => Card(
+    shape: OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(20)),
+      borderSide: BorderSide(
+        width: 1,
+        color:
+            checkBoxModel.checked == true
+                ? PaletaCores.corCastanho
+                : PaletaCores.corAzulCiano,
+      ),
+    ),
     child: CheckboxListTile(
       activeColor: PaletaCores.corAzulEscuro,
       checkColor: PaletaCores.corRosaClaro,
@@ -94,14 +115,16 @@ class _TelaSelecaoNomesVoluntariosState
                 child: const Icon(Icons.edit, size: 20),
                 onPressed: () {
                   var dadosUsuario = {};
-                  dadosUsuario[Constantes.rotaArgumentoAtualizarDadosVoluntario] = checkBoxModel;
+                  dadosUsuario[Constantes
+                          .rotaArgumentoAtualizarDadosVoluntario] =
+                      checkBoxModel;
                   Navigator.pushReplacementNamed(
                     context,
                     Constantes.rotaTelaAtualizarDadosVoluntario,
                     arguments: dadosUsuario,
                   );
                   // chamando alerta para confirmar exclusao do item
-                 // alertaExclusao(context, checkBoxModel);
+                  // alertaExclusao(context, checkBoxModel);
                 },
               ),
             ),
@@ -116,36 +139,81 @@ class _TelaSelecaoNomesVoluntariosState
             checkBoxModel.texto.replaceAll("_", " ").toUpperCase(),
             style: const TextStyle(fontSize: 20),
           ),
-          Row(
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(
-                Textos.telaSelecaoVoluntariosCategoria,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: 300,
+                  height: 40,
+                  child: Row(
+                    children: [
+                      Text(
+                        Textos.telaSelecaoVoluntariosCategoria,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        checkBoxModel.categoriaVoluntario.replaceAll("_", " "),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Text(
-                checkBoxModel.categoriaVoluntario.replaceAll("_", " "),
-                style: const TextStyle(fontSize: 14),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                Textos.telaSelecaoVoluntariosDiasDisponiveis,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: 300,
+                  height: 40,
+                  child: Row(
+                    children: [
+                      Text(
+                        Textos.telaSelecaoVoluntariosDiasDisponiveis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        checkBoxModel.diasDisponiveis
+                            .replaceAll("_", " ")
+                            .replaceAll("[", " ")
+                            .replaceAll("]", " "),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Text(
-                checkBoxModel.diasDisponiveis
-                    .replaceAll("_", " ")
-                    .replaceAll("[", " ")
-                    .replaceAll("]", " "),
-                style: const TextStyle(fontSize: 14),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: 300,
+                  height: 40,
+                  child: Row(
+                    children: [
+                      Text(
+                        Textos.telaSelecaoVoluntariosObservacao,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        checkBoxModel.observacao
+                            .replaceAll("_", " ")
+                            .replaceAll("[", " ")
+                            .replaceAll("]", " "),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -169,7 +237,7 @@ class _TelaSelecaoNomesVoluntariosState
   // para adicionar na lista de itens selecionados
   verificarItensSelecionados() {
     //verificando cada elemento da lista de nomes cadastrados
-    for (var element in listaNomesCadastrados) {
+    for (var element in listaNomesVoluntariosListaReferencia) {
       //verificando se o usuario selecionou um item
       if (element.checked == true) {
         // verificando se o item Nao foi adicionado anteriormente na lista
@@ -203,8 +271,10 @@ class _TelaSelecaoNomesVoluntariosState
   }
 
   chamarTelaCarregamento() {
-    listaNomesCadastrados.clear();
+    listaNomesVoluntariosListaReferencia.clear();
+    listaNomesExibicaoFiltragram.clear();
     listaNomesSelecionados.clear();
+    listaNomeCategoriasVoluntario.clear();
     setState(() {
       exibirWidgetCarregamento = true;
     });
@@ -255,6 +325,82 @@ class _TelaSelecaoNomesVoluntariosState
     }
   }
 
+  Widget radioButtonFiltro(String nome, int index) => ListTile(
+    title: Text(nome),
+    leading: Radio(
+      value: index,
+      groupValue: indexRadioButton,
+      onChanged: (value) {
+        setState(() {
+          indexRadioButton = value!;
+          if (nome == Textos.telaSelecaoVoluntariosFiltrarTodos) {
+            filtroDesativado = Textos.telaSelecaoVoluntariosFiltrarTodos;
+          } else {
+            filtroDesativado = "";
+          }
+          fazerFiltragemVoluntarios(nome);
+        });
+      },
+    ),
+  );
+
+  fazerFiltragemVoluntarios(String nome) {
+    //limpando lista de exibicao
+    listaNomesExibicaoFiltragram.clear();
+    //verificando que se a opcao do radio button selecionado for listar todos
+    // caso contrario listar somente os nomes que contem a categoria selecionada
+    if (nome == Textos.telaSelecaoVoluntariosFiltrarTodos) {
+      for (var voluntarios in listaNomesVoluntariosListaReferencia) {
+        listaNomesExibicaoFiltragram.add(voluntarios);
+        ordenarListaNomesVoluntarios();
+      }
+      exibirTelaFiltro = false;
+    } else {
+      //pegando os nomes cadastrados de forma original
+      for (var voluntario in listaNomesVoluntariosListaReferencia) {
+        // pegando a categoria e separando as
+        // categorias de forma individual para separar os voluntarios
+        // que tem mais de uma categoria
+        List<String> categoriaSeparadas = voluntario.categoriaVoluntario.split(
+          ",",
+        );
+        for (var categoria in categoriaSeparadas) {
+          //caso a categoria tenha o mesmo nome do radio
+          // button fazer a listagem somente
+          // dos voluntarios que tem aquela categoria
+          if (categoria == nome) {
+            listaNomesExibicaoFiltragram.add(voluntario);
+            exibirTelaFiltro = false;
+          }
+        }
+      }
+    }
+  }
+
+  listarCategoriasVoluntarios() {
+    // criando um index para poder fazer o radioButton
+    int indexCategoria = 0;
+    for (var categoriasCadastrada in listaNomesVoluntariosListaReferencia) {
+      //separando as categorias em seguimentos separados,
+      // pois o mesmo voluntario pode estar em mais de uma categoria
+      List<String> categoriaSeparadas = categoriasCadastrada.categoriaVoluntario
+          .split(",");
+      //percorrendo a lista criada de categorias separadas
+      for (var categoriaSeparada in categoriaSeparadas) {
+        //verificando se a lista de catoria voluntario NAO contem a categoria cadastrada
+        // caso nao conter adicionar
+        if (!listaNomeCategoriasVoluntario.entries.contains(
+          categoriaSeparada,
+        )) {
+          Map<String, int> dados = {};
+          indexCategoria++;
+          dados[categoriaSeparada] = indexCategoria;
+          listaNomeCategoriasVoluntario.addAll(dados);
+        }
+      }
+    }
+  }
+
   //metodo para converter json em Objeto
   converterJsonParaObjeto(String id, int tamanhoEscala) async {
     var db = FirebaseFirestore.instance;
@@ -280,12 +426,14 @@ class _TelaSelecaoNomesVoluntariosState
       dados.id = docSnap.id;
       indexTabela++;
       //adicionando os dados convertidos na lista
-      listaNomesCadastrados.add(dados);
+      listaNomesVoluntariosListaReferencia.add(dados);
+      listaNomesExibicaoFiltragram.add(dados);
       if (indexTabela == tamanhoEscala) {
         setState(() {
           indexTabela = 0;
           //chamando ordenacao dos itens
           ordenarListaNomesVoluntarios();
+          listarCategoriasVoluntarios();
           exibirWidgetCarregamento = false;
         });
       }
@@ -294,7 +442,7 @@ class _TelaSelecaoNomesVoluntariosState
 
   ordenarListaNomesVoluntarios() {
     // ordenando a lista por ondem alfabetica de A-Z
-    listaNomesCadastrados.sort((a, b) {
+    listaNomesExibicaoFiltragram.sort((a, b) {
       return a.categoriaVoluntario.compareTo(b.categoriaVoluntario);
     });
   }
@@ -385,6 +533,21 @@ class _TelaSelecaoNomesVoluntariosState
     );
   }
 
+  Widget botoesIcone(IconData icone, Color corBotao) => Container(
+    margin: EdgeInsets.symmetric(horizontal: 5.0),
+    width: 40,
+    height: 40,
+    child: FloatingActionButton(
+      heroTag: icone.toString(),
+      onPressed: () {
+        setState(() {
+          exibirTelaFiltro = !exibirTelaFiltro;
+        });
+      },
+      child: Icon(icone, color: corBotao, size: 25),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     double larguraTela = MediaQuery.of(context).size.width;
@@ -409,6 +572,23 @@ class _TelaSelecaoNomesVoluntariosState
               return Scaffold(
                 appBar: AppBar(
                   title: Text(Textos.telaSelecaoVoluntariosTitulo),
+                  actions: [
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (listaNomesVoluntariosListaReferencia.isEmpty) {
+                          return Container();
+                        } else {
+                          return botoesIcone(
+                            filtroDesativado ==
+                                    Textos.telaSelecaoVoluntariosFiltrarTodos
+                                ? Constantes.iconeFiltroDesativado
+                                : Constantes.iconeFiltroAtivo,
+                            PaletaCores.corAzulEscuro,
+                          );
+                        }
+                      },
+                    ),
+                  ],
                   leading: IconButton(
                     color: Colors.white,
                     onPressed: () {
@@ -420,7 +600,6 @@ class _TelaSelecaoNomesVoluntariosState
                     },
                     icon: const Icon(Icons.arrow_back_ios),
                   ),
-                  actions: [],
                 ),
                 body: Container(
                   color: Colors.white,
@@ -432,7 +611,7 @@ class _TelaSelecaoNomesVoluntariosState
                         scrollDirection: Axis.vertical,
                         child: LayoutBuilder(
                           builder: (context, constraints) {
-                            if (listaNomesCadastrados.isEmpty) {
+                            if (listaNomesExibicaoFiltragram.isEmpty) {
                               return Container(
                                 margin: const EdgeInsets.all(10.0),
                                 transformAlignment: Alignment.center,
@@ -444,47 +623,120 @@ class _TelaSelecaoNomesVoluntariosState
                                 ),
                               );
                             } else {
-                              return Column(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 10.0,
-                                    ),
-                                    width: larguraTela,
-                                    child: Text(
-                                      textAlign: TextAlign.center,
-                                      Textos
-                                          .telaSelecaoDescricaoSelecaoVoluntarios,
-                                      style: TextTheme.of(context).bodySmall,
-                                    ),
-                                  ),
-                                  //Area de exibicao dos voluntarios
-                                  Card(
-                                    child: SizedBox(
-                                      height:
-                                          Platform.isAndroid || Platform.isIOS
-                                              ? listaNomesSelecionados
-                                                      .isNotEmpty
-                                                  ? alturaTela * 0.35
-                                                  : alturaTela * 0.45
-                                              : listaNomesSelecionados
-                                                  .isNotEmpty
-                                              ? alturaTela * 0.45
-                                              : alturaTela * 0.6,
-                                      width:
-                                          Platform.isAndroid || Platform.isIOS
-                                              ? larguraTela
-                                              : larguraTela * 0.9,
-                                      child: ListView(
-                                        children: [
-                                          ...listaNomesCadastrados.map(
-                                            (e) => checkBoxPersonalizado(e),
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  if (exibirTelaFiltro) {
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                          width: larguraTela,
+                                          child: Text(
+                                            textAlign: TextAlign.center,
+                                            Textos
+                                                .telaSelecaoVoluntariosFiltroDescricao,
+                                            style:
+                                                TextTheme.of(context).bodySmall,
+                                          ),
+                                        ),
+
+                                        //Area de exibicao dos voluntarios
+                                        Card(
+                                          child: SizedBox(
+                                            height:
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? listaNomesSelecionados
+                                                            .isNotEmpty
+                                                        ? alturaTela * 0.35
+                                                        : alturaTela * 0.45
+                                                    : listaNomesSelecionados
+                                                        .isNotEmpty
+                                                    ? alturaTela * 0.45
+                                                    : alturaTela * 0.6,
+                                            width:
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? larguraTela
+                                                    : larguraTela * 0.9,
+                                            child: ListView(
+                                              children: [
+                                                ...listaNomeCategoriasVoluntario
+                                                    .entries
+                                                    .map((e) {
+                                                      return radioButtonFiltro(
+                                                        e.key
+                                                            .toString()
+                                                            .replaceAll("(", "")
+                                                            .replaceAll(
+                                                              ")",
+                                                              "",
+                                                            ),
+                                                        e.value,
+                                                      );
+                                                    }),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  } else {
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                          ),
+                                          width: larguraTela,
+                                          child: Text(
+                                            textAlign: TextAlign.center,
+                                            Textos
+                                                .telaSelecaoDescricaoSelecaoVoluntarios,
+                                            style:
+                                                TextTheme.of(context).bodySmall,
+                                          ),
+                                        ),
+
+                                        //Area de exibicao dos voluntarios
+                                        Card(
+                                          child: SizedBox(
+                                            height:
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? listaNomesSelecionados
+                                                            .isNotEmpty
+                                                        ? alturaTela * 0.35
+                                                        : alturaTela * 0.45
+                                                    : listaNomesSelecionados
+                                                        .isNotEmpty
+                                                    ? alturaTela * 0.45
+                                                    : alturaTela * 0.6,
+                                            width:
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? larguraTela
+                                                    : larguraTela * 0.9,
+                                            child: ListView(
+                                              children: [
+                                                ...listaNomesExibicaoFiltragram
+                                                    .map(
+                                                      (e) =>
+                                                          checkBoxPersonalizado(
+                                                            e,
+                                                            larguraTela,
+                                                          ),
+                                                    ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                },
                               );
                             }
                           },
@@ -560,6 +812,23 @@ class _TelaSelecaoNomesVoluntariosState
                     alignment: WrapAlignment.spaceAround,
                     children: [
                       SizedBox(
+                        width: 160,
+                        height: 40,
+                        child: FloatingActionButton(
+                          heroTag: Textos.btnAvancar,
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              Constantes.rotaTelaCadastroDadosVoluntarios,
+                            );
+                          },
+                          child: Text(
+                            Textos.btnCadastrarVoluntarios,
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
                         width: 100,
                         height: 40,
                         child: FloatingActionButton(
@@ -586,23 +855,6 @@ class _TelaSelecaoNomesVoluntariosState
                           },
                           child: Text(
                             Textos.btnAvancar,
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 160,
-                        height: 40,
-                        child: FloatingActionButton(
-                          heroTag: Textos.btnAvancar,
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              Constantes.rotaTelaCadastroDadosVoluntarios,
-                            );
-                          },
-                          child: Text(
-                            Textos.btnCadastrarVoluntarios,
                             style: TextStyle(color: Colors.black),
                           ),
                         ),

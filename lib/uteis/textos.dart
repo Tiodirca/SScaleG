@@ -97,6 +97,8 @@ class Textos {
   static String labelTextFieldNomeVoluntario = "Nome do Voluntario";
   static String labelTextFieldCategoriaVoluntario = "Categoria Voluntario";
   static String labelHintCategoriaVoluntario = "Cooperador,Cooperadora,Midia";
+  static String labelTextFieldObservacaoVoluntario = "Observação";
+  static String labelHintObservacaoVoluntario = "Dificuldade em escrever";
   static String telaSCadastroVoluntariosDescricao=
       "Use o campo abaixo para "
       "cadastrar o nome do voluntario que estará compondo a escala de trabalho";
@@ -115,7 +117,11 @@ class Textos {
       "Quantidade de voluntários : ";
   static String telaSelecaoVoluntariosCategoria = "Categoria : ";
   static String telaSelecaoVoluntariosDiasDisponiveis = "Disponibilidade : ";
-  static String telaSelecaoVoluntariosFiltroDescricao = "Filtre as categorias";
+  static String telaSelecaoVoluntariosObservacao = "Observação : ";
+
+  static String telaSelecaoVoluntariosFiltroDescricao = "Selecione qual categoria você "
+      "quer filtrar os voluntarios";
+  static String telaSelecaoVoluntariosFiltrarTodos = "Listar todos";
 
   // TELA SELECAO DIAS SEMANA
   static String telaSelecaoDiasSemanaDescricao =

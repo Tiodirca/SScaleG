@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sscaleg/Modelo/check_box_modelo.dart';
 import 'package:sscaleg/Uteis/paleta_cores.dart';
+import 'package:sscaleg/modelo/check_box_modelo_voluntario.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';

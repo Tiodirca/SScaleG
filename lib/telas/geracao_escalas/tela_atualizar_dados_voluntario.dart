@@ -35,11 +35,15 @@ class _TelaAtualizarDadosVoluntarioState
   Estilo estilo = Estilo();
   String nomeCadastro = "";
   String nomeCategoriaVoluntario = "";
+  String observacaoVoluntario = "";
   String uidUsuario = "";
   TextEditingController nomeVoluntarioControle = TextEditingController(
     text: "",
   );
   TextEditingController categoriaVoluntarioControle = TextEditingController(
+    text: "",
+  );
+  TextEditingController observacaoVoluntarioControle = TextEditingController(
     text: "",
   );
   int indexTabela = 0;
@@ -50,6 +54,8 @@ class _TelaAtualizarDadosVoluntarioState
       Constantes.fireBaseDocumentoCategoriaVoluntario;
   String nomeDocumentoNomeVoluntariosDiasDisponiveis =
       Constantes.fireBaseDocumentoNomeVoluntariosDiasDisponiveis;
+  String nomeDocumentoObservacaoFireBase =
+      Constantes.fireBaseDocumentoVoluntariosObservacao;
 
   List<CheckBoxModelo> listaDiasSemana = [
     CheckBoxModelo(texto: Constantes.diaSegunda),
@@ -64,8 +70,6 @@ class _TelaAtualizarDadosVoluntarioState
 
   List<String> listaDiasUsuario = [];
 
-
-
   @override
   void initState() {
     super.initState();
@@ -78,6 +82,7 @@ class _TelaAtualizarDadosVoluntarioState
     categoriaVoluntarioControle.text =
         widget.dadosVoluntario.categoriaVoluntario;
     nomeVoluntarioControle.text = widget.dadosVoluntario.texto;
+    observacaoVoluntarioControle.text = widget.dadosVoluntario.observacao;
     String diasDisponiveis = widget.dadosVoluntario.diasDisponiveis;
     setState(() {
       //percorendo a lista de dias da semana
@@ -147,6 +152,7 @@ class _TelaAtualizarDadosVoluntarioState
             nomeDocumentoCategoriaFireBase: nomeCategoriaVoluntario,
             nomeDocumentoNomeVoluntariosDiasDisponiveis:
                 listaDiasSelecionado.toString(),
+            nomeDocumentoObservacaoFireBase: observacaoVoluntario,
           })
           .then(
             (value) {
@@ -197,12 +203,21 @@ class _TelaAtualizarDadosVoluntarioState
                 .trim()
                 .replaceAll(" ", "_")
                 .toLowerCase();
+        if (observacaoVoluntarioControle.text.isEmpty) {
+          observacaoVoluntario = Textos.observacaoSem;
+        } else {
+          observacaoVoluntario =
+              observacaoVoluntarioControle.text
+                  .trim()
+                  .replaceAll(" ", "_")
+                  .toLowerCase();
+        }
         atualizarDadosVoluntario();
       });
     }
   }
 
-  redirecionarTelaSelecaoVoluntarios(){
+  redirecionarTelaSelecaoVoluntarios() {
     Navigator.pushReplacementNamed(
       context,
       Constantes.rotaTelaSelecaoNomesVoluntarios,
@@ -326,6 +341,29 @@ class _TelaAtualizarDadosVoluntarioState
                                                   return Textos.erroCampoVazio;
                                                 }
                                                 return null;
+                                              },
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.all(20),
+                                            width:
+                                                MetodosAuxiliares.ajustarTamanhoTextField(
+                                                  larguraTela,
+                                                ),
+                                            child: TextFormField(
+                                              decoration: InputDecoration(
+                                                label: Text(
+                                                  Textos
+                                                      .labelTextFieldObservacaoVoluntario,
+                                                ),
+                                                hintText:
+                                                    Textos
+                                                        .labelHintObservacaoVoluntario,
+                                              ),
+                                              controller:
+                                                  observacaoVoluntarioControle,
+                                              onFieldSubmitted: (value) {
+                                                validarCampoEChamarCadastrar();
                                               },
                                             ),
                                           ),

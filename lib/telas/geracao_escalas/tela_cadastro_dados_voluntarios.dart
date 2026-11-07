@@ -29,11 +29,15 @@ class _TelaCadastroDadosVoluntariosState
   Estilo estilo = Estilo();
   String nomeCadastro = "";
   String nomeCategoriaVoluntario = "";
+  String observacaoVoluntario = " ";
   String uidUsuario = "";
   TextEditingController nomeVoluntarioControle = TextEditingController(
     text: "",
   );
   TextEditingController categoriaVoluntarioControle = TextEditingController(
+    text: "",
+  );
+  TextEditingController observacaoVoluntarioControle = TextEditingController(
     text: "",
   );
   int indexTabela = 0;
@@ -44,6 +48,8 @@ class _TelaCadastroDadosVoluntariosState
       Constantes.fireBaseDocumentoCategoriaVoluntario;
   String nomeDocumentoNomeVoluntariosDiasDisponiveis =
       Constantes.fireBaseDocumentoNomeVoluntariosDiasDisponiveis;
+  String nomeDocumentoObservacaoFireBase =
+      Constantes.fireBaseDocumentoVoluntariosObservacao;
 
   List<CheckBoxModelo> listaDiasSemana = [
     CheckBoxModelo(texto: Constantes.diaSegunda),
@@ -100,11 +106,12 @@ class _TelaCadastroDadosVoluntariosState
     setState(() {
       exibirWidgetCarregamento = true;
     });
-    if(listaDiasSelecionado.isEmpty){
-      listaDiasSelecionado.add(Constantes.fireBaseVoluntariosDiasDisponiveisTodoDia);
+    if (listaDiasSelecionado.isEmpty) {
+      listaDiasSelecionado.add(
+        Constantes.fireBaseVoluntariosDiasDisponiveisTodoDia,
+      );
     }
     try {
-
       // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
@@ -117,6 +124,7 @@ class _TelaCadastroDadosVoluntariosState
             nomeDocumentoCategoriaFireBase: nomeCategoriaVoluntario,
             nomeDocumentoNomeVoluntariosDiasDisponiveis:
                 listaDiasSelecionado.toString(),
+            nomeDocumentoObservacaoFireBase: observacaoVoluntario,
           })
           .then(
             (value) {
@@ -162,6 +170,7 @@ class _TelaCadastroDadosVoluntariosState
       }
       categoriaVoluntarioControle.clear();
       nomeVoluntarioControle.clear();
+      observacaoVoluntarioControle.clear();
       exibirWidgetCarregamento = false;
     });
   }
@@ -179,6 +188,16 @@ class _TelaCadastroDadosVoluntariosState
                 .trim()
                 .replaceAll(" ", "_")
                 .toLowerCase();
+        if (observacaoVoluntarioControle.text.isEmpty) {
+          observacaoVoluntario = Textos.observacaoSem;
+        } else {
+          observacaoVoluntario =
+              observacaoVoluntarioControle.text
+                  .trim()
+                  .replaceAll(" ", "_")
+                  .toLowerCase();
+        }
+
         cadastrarVoluntario();
       });
     }
@@ -224,134 +243,162 @@ class _TelaCadastroDadosVoluntariosState
                   color: Colors.white,
                   width: larguraTela,
                   height: alturaTela,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        flex: 0,
-                        child: Container(
-                          padding: const EdgeInsets.only(bottom: 20.0),
-                          width: larguraTela,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                  ),
-                                  child: Text(
-                                    Textos.telaSCadastroVoluntariosDescricao,
-                                    textAlign: TextAlign.center,
-                                    style: TextTheme.of(context).bodySmall,
-                                  ),
-                                ),
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.start,
-                                  alignment: WrapAlignment.center,
-                                  children: [
-                                    Form(
-                                      key: validacaoFormulario,
-                                      child: Wrap(
-                                        children: [
-                                          Container(
-                                            margin: EdgeInsets.all(20),
-                                            width:
-                                                MetodosAuxiliares.ajustarTamanhoTextField(
-                                                  larguraTela,
-                                                ),
-                                            child: TextFormField(
-                                              decoration: InputDecoration(
-                                                label: Text(
-                                                  Textos
-                                                      .labelTextFieldNomeVoluntario,
-                                                ),
-                                              ),
-                                              controller:
-                                                  nomeVoluntarioControle,
-                                              onFieldSubmitted: (value) {
-                                                validarCampoEChamarCadastrar();
-                                              },
-                                              validator: (value) {
-                                                if (value!.isEmpty) {
-                                                  return Textos.erroCampoVazio;
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.all(20),
-                                            width:
-                                                MetodosAuxiliares.ajustarTamanhoTextField(
-                                                  larguraTela,
-                                                ),
-                                            child: TextFormField(
-                                              decoration: InputDecoration(
-                                                label: Text(
-                                                  Textos
-                                                      .labelTextFieldCategoriaVoluntario,
-                                                ),
-                                                hintText:
-                                                    Textos
-                                                        .labelHintCategoriaVoluntario,
-                                              ),
-                                              controller:
-                                                  categoriaVoluntarioControle,
-                                              onFieldSubmitted: (value) {
-                                                validarCampoEChamarCadastrar();
-                                              },
-                                              validator: (value) {
-                                                if (value!.isEmpty) {
-                                                  return Textos.erroCampoVazio;
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 0,
+                          child: Container(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            width: larguraTela,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
                                     ),
-                                  ],
-                                ),
-                              ],
+                                    child: Text(
+                                      Textos.telaSCadastroVoluntariosDescricao,
+                                      textAlign: TextAlign.center,
+                                      style: TextTheme.of(context).bodySmall,
+                                    ),
+                                  ),
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.start,
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      Form(
+                                        key: validacaoFormulario,
+                                        child: Wrap(
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.all(20),
+                                              width:
+                                                  MetodosAuxiliares.ajustarTamanhoTextField(
+                                                    larguraTela,
+                                                  ),
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                  label: Text(
+                                                    Textos
+                                                        .labelTextFieldNomeVoluntario,
+                                                  ),
+                                                ),
+                                                controller:
+                                                    nomeVoluntarioControle,
+                                                onFieldSubmitted: (value) {
+                                                  validarCampoEChamarCadastrar();
+                                                },
+                                                validator: (value) {
+                                                  if (value!.isEmpty) {
+                                                    return Textos
+                                                        .erroCampoVazio;
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.all(20),
+                                              width:
+                                                  MetodosAuxiliares.ajustarTamanhoTextField(
+                                                    larguraTela,
+                                                  ),
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                  label: Text(
+                                                    Textos
+                                                        .labelTextFieldCategoriaVoluntario,
+                                                  ),
+                                                  hintText:
+                                                      Textos
+                                                          .labelHintCategoriaVoluntario,
+                                                ),
+                                                controller:
+                                                    categoriaVoluntarioControle,
+                                                onFieldSubmitted: (value) {
+                                                  validarCampoEChamarCadastrar();
+                                                },
+                                                validator: (value) {
+                                                  if (value!.isEmpty) {
+                                                    return Textos
+                                                        .erroCampoVazio;
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.all(20),
+                                              width:
+                                                  MetodosAuxiliares.ajustarTamanhoTextField(
+                                                    larguraTela,
+                                                  ),
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                  label: Text(
+                                                    Textos
+                                                        .labelTextFieldObservacaoVoluntario,
+                                                  ),
+                                                  hintText:
+                                                      Textos
+                                                          .labelHintObservacaoVoluntario,
+                                                ),
+                                                controller:
+                                                    observacaoVoluntarioControle,
+                                                onFieldSubmitted: (value) {
+                                                  validarCampoEChamarCadastrar();
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 0,
-                        child: Column(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
-                              ),
-                              child: Text(
-                                Textos
-                                    .telaCadatroVoluntariosDescricaoDiasSemana,
-                                textAlign: TextAlign.center,
-                                style: TextTheme.of(context).bodySmall,
-                              ),
-                            ),
-                            Card(
-                              child: SizedBox(
-                                height: alturaTela * 0.5,
-                                width:
-                                    Platform.isAndroid || Platform.isIOS
-                                        ? larguraTela
-                                        : larguraTela * 0.7,
-                                child: ListView(
-                                  children: [
-                                    ...listaDiasSemana.map(
-                                      (e) => checkBoxPersonalizado(e),
-                                    ),
-                                  ],
+                        Expanded(
+                          flex: 0,
+                          child: Column(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                ),
+                                child: Text(
+                                  Textos
+                                      .telaCadatroVoluntariosDescricaoDiasSemana,
+                                  textAlign: TextAlign.center,
+                                  style: TextTheme.of(context).bodySmall,
                                 ),
                               ),
-                            ),
-                          ],
+                              Card(
+                                child: SizedBox(
+                                  height: alturaTela * 0.5,
+                                  width:
+                                      Platform.isAndroid || Platform.isIOS
+                                          ? larguraTela
+                                          : larguraTela * 0.7,
+                                  child: ListView(
+                                    children: [
+                                      ...listaDiasSemana.map(
+                                        (e) => checkBoxPersonalizado(e),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 bottomNavigationBar: Container(

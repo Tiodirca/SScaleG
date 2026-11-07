@@ -96,6 +96,8 @@ class Constantes {
   static const iconeEmail = Icons.email;
   static const iconeSenha = Icons.password;
   static const iconeConfiguracao = Icons.settings;
+  static const iconeFiltroAtivo = Icons.filter_alt;
+  static const iconeFiltroDesativado = Icons.filter_alt_off;
 
   // SHARE PREFERENCES
   static const sharePreferencesAjustarHorarioSemana = "ajustarHorarioSemana";
@@ -151,6 +153,8 @@ class Constantes {
   static const fireBaseDocumentoCategoriaVoluntario = "categoriaVoluntario";
   static const fireBaseDocumentoNomeVoluntariosDiasDisponiveis =
       "diasDisponiveis";
+  static const fireBaseDocumentoVoluntariosObservacao =
+      "observacao";
   static const fireBaseVoluntariosDiasDisponiveisTodoDia = "Disponivel Todos os Dias";
 
   //OBSERVACOES

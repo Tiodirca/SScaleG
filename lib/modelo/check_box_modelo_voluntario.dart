@@ -7,12 +7,14 @@ class CheckBoxModeloVoluntario {
     this.checked = false,
     required this.categoriaVoluntario,
     this.diasDisponiveis = "",
+    this.observacao = ""
   });
 
   String id;
   String texto;
   String categoriaVoluntario;
   String diasDisponiveis;
+  String observacao;
   bool checked;
 
   factory CheckBoxModeloVoluntario.fromFirestore(
@@ -24,6 +26,7 @@ class CheckBoxModeloVoluntario {
       texto: data?['nomeVoluntario'],
       categoriaVoluntario: data?['categoriaVoluntario'],
       diasDisponiveis: data?['diasDisponiveis'],
+      observacao: data?['observacao']
     );
   }
 
@@ -33,6 +36,7 @@ class CheckBoxModeloVoluntario {
       "nomeVoluntario": texto,
       "categoriaVoluntario": categoriaVoluntario,
       "diasDisponiveis": diasDisponiveis,
+      "observacao" : observacao
     };
   }
 }
