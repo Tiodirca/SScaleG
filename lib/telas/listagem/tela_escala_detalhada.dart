@@ -301,6 +301,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   carregarCabecalho() {
     for (var element in cabecalhoEscala) {
+      print(element);
       cabecalhoDataColumn.add(
         DataColumn(
           label: Text(

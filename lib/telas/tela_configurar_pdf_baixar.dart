@@ -9,6 +9,7 @@ import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/uteis/PDF/gerar_pdf_escala.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
+import 'package:sscaleg/uteis/seletor_cor.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 import '../Modelo/check_box_modelo.dart';
@@ -49,6 +50,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
   int indexTabela = 0;
   int valorRadioButtonSelecionado = 0;
   String nomeCadastro = "";
+  String corSelecionada = "#FFFFFF";
   List<Map> linhasRecebidas = [];
   List<Map> linhasEscalaAuxiliarRemocao = [];
   double indicadorPagina = 0.5;
@@ -496,6 +498,7 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
         nomeCabecalho: nomeCabelhadoPDFSelecionado,
         imagemLogo: imagemLogo,
         observacoes: listaObservacoes,
+        cor: corSelecionada,
         valorOrientacaoPagina: valorRadioButtonSelecionado,
       );
       gerarPDFEscala.pegarDados();
@@ -688,6 +691,16 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                       ],
                                     ),
                                   ),
+                                  SizedBox(
+                                    width: 300,
+                                    height: 100,
+                                    child:  SeletorCor(
+                                      corInicial: '#FFFFFF',
+                                      onColorSelected: (hex) {
+                                        corSelecionada = hex;
+                                      },
+                                    ),
+                                  )
                                 ],
                               );
                             } else {

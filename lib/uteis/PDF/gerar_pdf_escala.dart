@@ -15,6 +15,7 @@ class GerarPDFEscala {
   String nomeEscala;
   String nomeCabecalho;
   List<String> observacoes;
+  String cor;
   XFile? imagemLogo;
 
   GerarPDFEscala({
@@ -23,6 +24,7 @@ class GerarPDFEscala {
     required this.nomeCabecalho,
     required this.imagemLogo,
     required this.observacoes,
+    required this.cor,
     required this.valorOrientacaoPagina,
   });
 
@@ -79,7 +81,7 @@ class GerarPDFEscala {
                 textAlign: pdflib.TextAlign.center,
               ),
             ),
-        pageFormat: PdfPageFormat.a4,
+        pageFormat: validarOrientacaoPaginaGeral(),
 
         orientation: validarOrientacaoPagina(),
         //CORPO DO PDF
@@ -92,6 +94,14 @@ class GerarPDFEscala {
                 cellPadding: pdflib.EdgeInsets.symmetric(
                   horizontal: 0.0,
                   vertical: 1.0,
+                ),
+                cellDecoration: (index, data, rowNum) {
+                  return pdflib.BoxDecoration(
+                    color: PdfColor.fromHex(cor),
+                  );
+                },
+                headerDecoration: pdflib.BoxDecoration(
+                  color: PdfColor.fromHex(cor),
                 ),
                 headerPadding: pdflib.EdgeInsets.symmetric(
                   horizontal: 1.0,
@@ -160,6 +170,14 @@ class GerarPDFEscala {
       return pdflib.PageOrientation.landscape;
     } else {
       return pdflib.PageOrientation.portrait;
+    }
+  }
+
+  validarOrientacaoPaginaGeral(){
+    if(valorOrientacaoPagina == 0){
+      return PdfPageFormat.a4.landscape;
+    }else{
+      return PdfPageFormat.a4.portrait;
     }
   }
 

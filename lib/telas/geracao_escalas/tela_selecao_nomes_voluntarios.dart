@@ -46,9 +46,6 @@ class _TelaSelecaoNomesVoluntariosState
     super.initState();
     Map<String, int> dados = {};
     dados[Textos.telaSelecaoVoluntariosFiltrarTodos] = 0;
-    PassarPegarDados.recuperarNomesLocaisTrabalho().forEach((element) {
-      print("LOCAIS VO : ${element.nome} ${element.observacaoLocal} ${element.diasLocalObservacao} ");
-    },);
     listaNomeCategoriasVoluntario.addAll(dados);
     uidUsuario =
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;

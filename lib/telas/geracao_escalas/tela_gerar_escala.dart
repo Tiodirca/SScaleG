@@ -262,6 +262,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   }
 
   // Validação estrita de dias, folgas e horários/turnos
+  // Validação estrita de dias, folgas, horários/turnos e restrições de "não" e "somente/apenas" por local
   bool _voluntarioPodeTrabalharNoDia(
       CheckBoxModeloVoluntario vol,
       String diaSemanaAtual,
@@ -274,23 +275,30 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     String localLimpo = _normalizar(nomeLocal);
 
     String diaIdentificado = "";
-    if (diaLimpo.contains("segunda")) diaIdentificado = "segunda";
-    else if (diaLimpo.contains("terca")) diaIdentificado = "terca";
-    else if (diaLimpo.contains("quarta")) diaIdentificado = "quarta";
-    else if (diaLimpo.contains("quinta")) diaIdentificado = "quinta";
-    else if (diaLimpo.contains("sexta")) diaIdentificado = "sexta";
-    else if (diaLimpo.contains("sabado")) diaIdentificado = "sabado";
-    else if (diaLimpo.contains("domingo")) diaIdentificado = "domingo";
+    if (diaLimpo.contains("segunda")) {
+      diaIdentificado = "segunda";
+    } else if (diaLimpo.contains("terca")) {
+      diaIdentificado = "terca";
+    } else if (diaLimpo.contains("quarta")) {
+      diaIdentificado = "quarta";
+    } else if (diaLimpo.contains("quinta")) {
+      diaIdentificado = "quinta";
+    } else if (diaLimpo.contains("sexta")) {
+      diaIdentificado = "sexta";
+    } else if (diaLimpo.contains("sabado")) {
+      diaIdentificado = "sabado";
+    } else if (diaLimpo.contains("domingo")) {
+      diaIdentificado = "domingo";
+    }
 
     // 1. VERIFICAÇÃO DE DIAS DISPONÍVEIS
-    // Se não for "Disponivel Todos os Dias", valida estritamente se o dia atual está na lista
     if (!_isDisponivelTodosOsDias(vol)) {
       if (diaIdentificado.isEmpty || !diasPermitidos.contains(diaIdentificado)) {
-        return false; // Bloqueado em dias em que não pode trabalhar!
+        return false;
       }
     }
 
-    // 2. TRAVA DE EXCEÇÃO NAS OBSERVAÇÕES OU CATEGORIA (ex: "não na quarta")
+    // 2. TRAVA DE EXCEÇÃO DE DIAS NAS OBSERVAÇÕES OU CATEGORIA (ex: "não na quarta")
     String textoPerfil = "$obsVoluntario $categoriaVol";
     if (textoPerfil.contains('nao') ||
         textoPerfil.contains('exceto') ||
@@ -302,33 +310,69 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       }
     }
 
-    // 3. RESTRIÇÕES DE PRIMEIRO OU SEGUNDO HORÁRIO
-    bool restricaoPrimeiro = textoPerfil.contains('nao primeiro') ||
+    // 3. RESTRIÇÕES DE PRIMEIRO OU SEGUNDO HORÁRIO (NÃO / SOMENTE)
+    bool restricaoNaoPrimeiro = textoPerfil.contains('nao primeiro') ||
         textoPerfil.contains('nao_primeiro') ||
         textoPerfil.contains('so segundo') ||
         textoPerfil.contains('apenas segundo');
-    bool restricaoSegundo = textoPerfil.contains('nao segundo') ||
+    bool restricaoSomentePrimeiro = textoPerfil.contains('somente primeiro') ||
+        textoPerfil.contains('apenas primeiro') ||
+        textoPerfil.contains('so primeiro');
+
+    bool restricaoNaoSegundo = textoPerfil.contains('nao segundo') ||
         textoPerfil.contains('nao_segundo') ||
         textoPerfil.contains('so primeiro') ||
         textoPerfil.contains('apenas primeiro');
+    bool restricaoSomenteSegundo = textoPerfil.contains('somente segundo') ||
+        textoPerfil.contains('apenas segundo') ||
+        textoPerfil.contains('so segundo');
 
-    if (restricaoPrimeiro &&
-        (localLimpo.contains('01') ||
-            localLimpo.contains('1') ||
-            localLimpo.contains('primeiro'))) {
-      return false;
-    }
-    if (restricaoSegundo &&
-        (localLimpo.contains('02') ||
-            localLimpo.contains('2') ||
-            localLimpo.contains('segundo'))) {
-      return false;
+    bool ehPrimeiroHorario = localLimpo.contains('01') ||
+        localLimpo.contains('1') ||
+        localLimpo.contains('primeiro');
+    bool ehSegundoHorario = localLimpo.contains('02') ||
+        localLimpo.contains('2') ||
+        localLimpo.contains('segundo');
+
+    if (restricaoNaoPrimeiro && ehPrimeiroHorario) return false;
+    if (restricaoNaoSegundo && ehSegundoHorario) return false;
+
+    if (restricaoSomentePrimeiro && !ehPrimeiroHorario) return false;
+    if (restricaoSomenteSegundo && !ehSegundoHorario) return false;
+
+    // 4. BLOQUEIO DE LOCAIS ESPECÍFICOS (NÃO / EXCETO)
+    if (textoPerfil.contains('nao') ||
+        textoPerfil.contains('exceto') ||
+        textoPerfil.contains('fora') ||
+        textoPerfil.contains('nunca')) {
+      List<String> palavrasLocal = localLimpo.split(RegExp(r'\s+'));
+      for (String palavra in palavrasLocal) {
+        if (palavra.length > 2 && textoPerfil.contains(palavra)) {
+          return false;
+        }
+      }
     }
 
-    // 4. BLOQUEIO DE LOCAIS ESPECÍFICOS NAS OBSERVAÇÕES
-    if ((textoPerfil.contains('nao') || textoPerfil.contains('exceto')) &&
-        textoPerfil.contains(localLimpo)) {
-      return false;
+    // 5. RESTRIÇÃO EXCLUSIVA DE LOCAL ("SOMENTE" ou "APENAS")
+    // Se o usuário escreveu "somente ofertas" ou "apenas recepção", ele só pode ir nesse local exato
+    if (textoPerfil.contains('somente') || textoPerfil.contains('apenas') || textoPerfil.contains('so ')) {
+      // Verifica se o texto menciona o nome deste local atual
+      List<String> palavrasLocal = localLimpo.split(RegExp(r'\s+'));
+      bool mencionaLocalAtual = false;
+      for (String palavra in palavrasLocal) {
+        if (palavra.length > 2 && textoPerfil.contains(palavra)) {
+          mencionaLocalAtual = true;
+          break;
+        }
+      }
+
+      // Se ele usou "somente/apenas" mas o local atual NÃO é o mencionado por ele, bloqueia!
+      if (!mencionaLocalAtual) {
+        // Confirma se há menção a outro local na restrição para evitar falsos positivos
+        if (textoPerfil.contains('oferta') || textoPerfil.contains('pulpito') || textoPerfil.contains('entrada') || textoPerfil.contains('recepcao')) {
+          return false;
+        }
+      }
     }
 
     return true;

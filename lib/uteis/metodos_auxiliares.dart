@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sscaleg/uteis/constantes.dart';
@@ -6,44 +7,48 @@ import 'package:sscaleg/uteis/textos.dart';
 class MetodosAuxiliares {
   static exibirMensagens(String tipoAlerta, String msg, BuildContext context) {
     if (tipoAlerta == Constantes.tipoNotificacaoSucesso) {
-    // ElegantNotification.success(
+    //   ElegantNotification.success(
       //   width: 360,
-      //   title: Text(tipoAlerta),
+    //    title: Text(tipoAlerta),
       //  showProgressIndicator: false,
-      //   animationDuration: const Duration(seconds: 1),
-      //   toastDuration: const Duration(seconds: 2),
-      //   description: Text(msg),
-      //  ).show(context);
+      //  animationDuration: const Duration(seconds: 1),
+    //  toastDuration: const Duration(seconds: 2),
+      //    description: Text(msg),
+      // ).show(context);
     } else {
       // return ElegantNotification.error(
-      //  width: 360,
-      //   title: Text(tipoAlerta),
+        //     width: 360,
+      //     title: Text(tipoAlerta),
       //   showProgressIndicator: false,
-      //   animationDuration: const Duration(seconds: 1),
-      //  toastDuration: const Duration(seconds: 2),
+      //    animationDuration: const Duration(seconds: 1),
+      //   toastDuration: const Duration(seconds: 2),
       //   description: Text(msg),
-      //   ).show(context);
-    }
-  }
+      //).show(context);
+          }
+      }
 
   // metodo utilizado para formatar para string e deixar no formato de 19:00 por exemplo o horario
   // selecionado pelo usuario com dois caracteres de cada lado
   static formatarHorarioAjuste(TimeOfDay horarioDefinido, bool trocaTurno) {
     if (trocaTurno) {
       String horarioFormatado =
-          "${Textos.widgetAjustarTrocaHorario}${horarioDefinido.hour.toString().padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(2, "0")}";
+          "${Textos.widgetAjustarTrocaHorario}${horarioDefinido.hour
+          .toString()
+          .padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(
+          2, "0")}";
       return horarioFormatado;
     } else {
       String horarioFormatado =
-          "${Textos.widgetAjustarHorarioInicio}${horarioDefinido.hour.toString().padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(2, "0")}";
+          "${Textos.widgetAjustarHorarioInicio}${horarioDefinido.hour
+          .toString()
+          .padLeft(2, "0")}:${horarioDefinido.minute.toString().padLeft(
+          2, "0")}";
       return horarioFormatado;
     }
   }
 
-  static gravarHorarioInicioTrabalhoDefinido(
-    String parametroSharePreferences,
-    String horarioDefinido,
-  ) async {
+  static gravarHorarioInicioTrabalhoDefinido(String parametroSharePreferences,
+      String horarioDefinido,) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(parametroSharePreferences, horarioDefinido);
   }
