@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
+import 'package:sscaleg/modelo/check_box_modelo_local_trabalho.dart';
 import 'package:sscaleg/modelo/check_box_modelo_voluntario.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
@@ -28,7 +29,7 @@ class _TelaSelecaoNomesVoluntariosState
   Map<String, int> listaNomeCategoriasVoluntario = {};
   List<CheckBoxModeloVoluntario> listaNomesSelecionados = [];
   List<String> listaNomesSelecionadosExibicao = [];
-  List<String> listaValidarQuantidadeVoluntarios = [];
+  List<CheckBoxModeloLocalTrabalho> listaValidarQuantidadeVoluntarios = [];
   bool exibirWidgetCarregamento = true;
   Estilo estilo = Estilo();
   String uidUsuario = "";
@@ -45,6 +46,9 @@ class _TelaSelecaoNomesVoluntariosState
     super.initState();
     Map<String, int> dados = {};
     dados[Textos.telaSelecaoVoluntariosFiltrarTodos] = 0;
+    PassarPegarDados.recuperarNomesLocaisTrabalho().forEach((element) {
+      print("LOCAIS VO : ${element.nome} ${element.observacaoLocal} ${element.diasLocalObservacao} ");
+    },);
     listaNomeCategoriasVoluntario.addAll(dados);
     uidUsuario =
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
@@ -193,7 +197,7 @@ class _TelaSelecaoNomesVoluntariosState
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: SizedBox(
-                  width: 300,
+                  width: 400,
                   height: 40,
                   child: Row(
                     children: [
@@ -595,7 +599,7 @@ class _TelaSelecaoNomesVoluntariosState
                       PassarPegarDados.passarNomesLocaisTrabalho([]);
                       Navigator.popAndPushNamed(
                         context,
-                        Constantes.rotaTelaCadastroSelecaoLocalTrabalho,
+                        Constantes.rotaTelaSelecaoLocalTrabalho,
                       );
                     },
                     icon: const Icon(Icons.arrow_back_ios),
@@ -641,7 +645,6 @@ class _TelaSelecaoNomesVoluntariosState
                                                 TextTheme.of(context).bodySmall,
                                           ),
                                         ),
-
                                         //Area de exibicao dos voluntarios
                                         Card(
                                           child: SizedBox(

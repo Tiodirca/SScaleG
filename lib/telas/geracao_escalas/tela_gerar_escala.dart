@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
+import 'package:sscaleg/modelo/check_box_modelo_local_trabalho.dart';
 import 'package:sscaleg/modelo/check_box_modelo_voluntario.dart';
 import 'package:sscaleg/uteis/constantes.dart';
 import 'package:sscaleg/uteis/estilo.dart';
@@ -27,15 +28,16 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   Estilo estilo = Estilo();
   String idDocumento = "";
   List<String> intervaloTrabalho =
-      PassarPegarDados.recuperarIntervaloTrabalho();
-  List<String> locaisSorteioVoluntarios =
-      PassarPegarDados.recuperarNomesLocaisTrabalho();
-  List<CheckBoxModeloVoluntario> nomeVoluntarios = PassarPegarDados.recuperarNomesVoluntarios();
+  PassarPegarDados.recuperarIntervaloTrabalho();
+
+  List<CheckBoxModeloLocalTrabalho> locaisSorteioVoluntarios =
+  PassarPegarDados.recuperarNomesLocaisTrabalho();
+  List<CheckBoxModeloVoluntario> nomeVoluntarios =
+  PassarPegarDados.recuperarNomesVoluntarios();
+
   TextEditingController nomeEscala = TextEditingController(text: "");
   Random random = Random();
-  List<int> listaNumeroAuxiliarRepeticao = [];
-  List<int> listaNumeroAuxiliarRepeticaoNomesNaoListados = [];
-  List<Map> escalaSorteada = [];
+  List escalaSorteada = [];
   int index = 0;
   String horarioSemana = "";
   String nomeEscalaFormatada = "";
@@ -55,19 +57,20 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
   recuperarHorarioDefinidoInicioTrabalho() {
     setState(() {
-     String horarioInicioSemana = PassarPegarDados.recuperarHorarioSemanaDefinido();
+      String horarioInicioSemana =
+      PassarPegarDados.recuperarHorarioSemanaDefinido();
       String horarioInicioFinalSemana =
-          PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
+      PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
       String horarioTrocaTurnoSemana =
-          PassarPegarDados.recuperarHorarioTrocaTurnoSemanaDefinido();
+      PassarPegarDados.recuperarHorarioTrocaTurnoSemanaDefinido();
       String horarioTrocaTurnoFinalSemana =
-          PassarPegarDados.recuperarHorarioTrocaTurnoFinalSemanaDefinido();
+      PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
 
       if (horarioTrocaTurnoSemana.isNotEmpty &&
           horarioTrocaTurnoFinalSemana.isNotEmpty) {
         horarioSemana = "$horarioInicioSemana $horarioTrocaTurnoSemana";
         horarioFinalSemana =
-            "$horarioInicioFinalSemana $horarioTrocaTurnoFinalSemana";
+        "$horarioInicioFinalSemana $horarioTrocaTurnoFinalSemana";
       } else {
         horarioSemana = horarioInicioSemana;
         horarioFinalSemana = horarioInicioFinalSemana;
@@ -75,207 +78,249 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     });
   }
 
-  // metodo para realizar o sorteio dos nomes nos locais de trabalho
+  // Lê a observação do local para saber se exige 2 pessoas
+  int _extrairVagasLocal(CheckBoxModeloLocalTrabalho local) {
+    String obs = "${local.observacaoLocal} ${local.diasLocalObservacao}".toLowerCase();
+    if (obs.contains('02') ||
+        obs.contains('2') ||
+        obs.contains('duas') ||
+        obs.contains('precisa_de_02_pessoas')) {
+      return 2;
+    }
+    return 1;
+  }
+
+  // Método principal de sorteio inteligente 100% blindado contra dias inválidos
   fazerSorteio() {
-    // limpando listas
     escalaSorteada.clear();
-    listaNumeroAuxiliarRepeticao.clear();
-    int numeroRandomico = 0;
-    // chamando metodo para sortear posicoes na lista de numero
-    // sem repeticao para ser utilizado no FOR abaixo
-    sortearNomesSemRepeticao(numeroRandomico);
+
+    if (nomeVoluntarios.isEmpty ||
+        intervaloTrabalho.isEmpty ||
+        locaisSorteioVoluntarios.isEmpty) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
+      chamarExibirMensagemErro(
+          "Verifique se há voluntários, locais e datas cadastrados.");
+      return;
+    }
+
+    int ponteiroNomes = 0;
+    List<String> escaladosNoDia = [];
+
+    // Preenche as linhas (datas) e colunas (locais)
     for (var datas in intervaloTrabalho) {
       Map linha = {};
       String horarioInicioTrabalho = "";
-      //verificando se a data Contem algum dos parametros a abaixo para
-      // definir qual sera o horario de troca de turno
+
       if (datas.contains(Constantes.diaDomingo.toLowerCase()) ||
           datas.contains(Constantes.diaSabado.toLowerCase())) {
         horarioInicioTrabalho = horarioFinalSemana;
       } else {
         horarioInicioTrabalho = horarioSemana;
       }
+
       linha[Constantes.horarioTrabalho] = horarioInicioTrabalho;
       linha[Constantes.dataCulto] = datas;
-      // fazendo a iteracao baseado na quantidade de dias selecionados no intervalo de trabalho
-      for (int index = 0; index < locaisSorteioVoluntarios.length; index++) {
-        // fazendo iteracao baseado na quantidade de locais de trabalho disponiveis
-        // a cada interacao a LINHA vai receber um ELEMENTO/LOCAL de trabalho baseado
-        // no index que esta e vai atribuir um NOME DE VOLUNTARIO a esse LOCAL da
-        // LINHA baseado no valor que a LISTA de NUMEROS AUXILIAR recebeu para que
-        // não haja repeticao de nomes na mesma LINHA
-        // linha[nome_local_trabalho] = "nome voluntario"
-        linha[locaisSorteioVoluntarios.elementAt(index)] = nomeVoluntarios
-            .elementAt(listaNumeroAuxiliarRepeticao.elementAt(index));
-      }
-      escalaSorteada.add(linha);
-      sortearNomesSemRepeticao(numeroRandomico);
-    }
-    verificarNomes();
-  }
 
-  verificarNomes() {
-    listaNumeroAuxiliarRepeticaoNomesNaoListados.clear();
-    List<String> nomes = [];
-    List<String> nomesNaoListados = [];
-    List<Map> escala = [];
-    for (var element in escalaSorteada) {
-      escala.add(element);
-    }
-    for (var element in nomeVoluntarios) {
+      escaladosNoDia.clear();
+      String diaDoCultoFormatado = datas.toLowerCase(); // Ex: "18/11/2026 quarta-feira"
 
-      //nomesNaoListados.add(element);
-      //nomes.add(element);
-    }
+      for (var local in locaisSorteioVoluntarios) {
+        String nomeLocal = local.nome;
+        int vagasLocal = _extrairVagasLocal(local);
 
-    List<String> nomesJaAdicionados = verificarNomesAdicionadosEscala(
-      escala,
-      nomes,
-    );
-    nomesNaoListados = verificarNomesNaoAdicionados(nomesJaAdicionados);
+        if (vagasLocal > 1) {
+          // Local que exige 2 pessoas (Dupla)
+          List<String> duplaDoLocal = [];
 
-    Random random = Random();
-    for (int i = 0; i < nomesNaoListados.length; i++) {
-      int numeroRandomico = random.nextInt(locaisSorteioVoluntarios.length);
-      escala
-          .elementAt(listaNumeroAuxiliarRepeticaoNomesNaoListados.elementAt(i))
-          .update(locaisSorteioVoluntarios.elementAt(numeroRandomico), (value) {
-            return value = nomesNaoListados[i];
-          });
-    }
-    if (nomesNaoListados.isNotEmpty && escalaSorteada.length >= 7) {
-      verificarNomes();
-    } else {
-      escalaSorteada.clear();
-      for (var element in escala) {
-        escalaSorteada.add(element);
-      }
-      chamarCadastroItens();
-    }
-  }
+          for (int v = 0; v < vagasLocal; v++) {
+            var voluntarioEscolhido = _encontrarVoluntarioValidoSeguro(
+              nomeVoluntarios,
+              ponteiroNomes,
+              diaDoCultoFormatado,
+              nomeLocal,
+              escaladosNoDia,
+            );
 
-  verificarNomesAdicionadosEscala(List<Map> escala, List<String> nomes) {
-    List<String> nomesJaAdicionados = [];
-    for (var element in escala) {
-      for (var nomeVoluntario in nomes) {
-        //verificando se na escala sorteada contem o nome do voluntario
-        if (element.values.toString().contains(nomeVoluntario)) {
-          //verificando se na lista de nomes nao contem o nome do voluntario ja
-          if (!nomesJaAdicionados.contains(nomeVoluntario)) {
-            //caso nao tenha adicionar na lista
-            nomesJaAdicionados.add(nomeVoluntario);
+            duplaDoLocal.add(voluntarioEscolhido['nome']);
+            escaladosNoDia.add(voluntarioEscolhido['nome']);
+            ponteiroNomes = voluntarioEscolhido['novoPonteiro'];
           }
+
+          linha[nomeLocal] = duplaDoLocal.join(" e ");
+        } else {
+          // Local padrão de 1 vaga
+          var voluntarioEscolhido = _encontrarVoluntarioValidoSeguro(
+            nomeVoluntarios,
+            ponteiroNomes,
+            diaDoCultoFormatado,
+            nomeLocal,
+            escaladosNoDia,
+          );
+
+          linha[nomeLocal] = voluntarioEscolhido['nome'];
+          escaladosNoDia.add(voluntarioEscolhido['nome']);
+          ponteiroNomes = voluntarioEscolhido['novoPonteiro'];
+        }
+      }
+
+      escalaSorteada.add(linha);
+    }
+
+    chamarCadastroItens();
+  }
+
+  // Função totalmente segura que valida rigorosamente se o voluntário pode trabalhar no dia e no local
+  Map<String, dynamic> _encontrarVoluntarioValidoSeguro(
+      List<CheckBoxModeloVoluntario> listaVoluntariosGeral,
+      int indexAtual,
+      String diaCulto,
+      String nomeLocal,
+      List<String> jaEscaladosHoje,
+      ) {
+    int ponteiro = indexAtual % listaVoluntariosGeral.length;
+
+    // 1. TENTA ENCONTRAR UM VOLUNTÁRIO QUE:
+    // - Tenha disponibilidade para o dia da semana
+    // - NÃO esteja escalado em nenhum outro local no mesmo dia
+    // - Não tenha restrição para este local específico
+    for (int i = 0; i < listaVoluntariosGeral.length; i++) {
+      int indexReal = (ponteiro + i) % listaVoluntariosGeral.length;
+      var vol = listaVoluntariosGeral[indexReal];
+
+      String nomeVoluntario = vol.texto;
+      bool jaTrabalhaHoje = jaEscaladosHoje.contains(nomeVoluntario);
+
+      // Se já trabalha hoje, ele é descarta imediatamente para este segundo local
+      if (jaTrabalhaHoje) continue;
+
+      // Verifica se ele pode trabalhar neste dia e neste local
+      if (_voluntarioPodeTrabalharNoDia(vol, diaCulto, nomeLocal)) {
+        return {
+          'nome': nomeVoluntario,
+          'novoPonteiro': (indexReal + 1) % listaVoluntariosGeral.length,
+        };
+      }
+    }
+
+    // 2. SE A GERAÇÃO DA ESCALA EXIGIR MAIS PESSOAS DO QUE HÁ VOLUNTÁRIOS DISPONÍVEIS NO DIA:
+    // (Caso extremo em que todos os elegíveis do dia já estão alocados e precisamos preencher a vaga restante)
+    // Procuramos alguém que PODE trabalhar no dia (respeitando o dia da semana), mesmo que precise repetir no mesmo dia.
+    for (int i = 0; i < listaVoluntariosGeral.length; i++) {
+      int indexReal = (ponteiro + i) % listaVoluntariosGeral.length;
+      var vol = listaVoluntariosGeral[indexReal];
+
+      if (_voluntarioPodeTrabalharNoDia(vol, diaCulto, nomeLocal)) {
+        return {
+          'nome': vol.texto,
+          'novoPonteiro': (indexReal + 1) % listaVoluntariosGeral.length,
+        };
+      }
+    }
+
+    // 3. FALLBACK ABSOLUTO (Garante que o app não quebre se absolutamente ninguém tiver o dia cadastrado)
+    var fallback = listaVoluntariosGeral[ponteiro];
+    return {
+      'nome': fallback.texto,
+      'novoPonteiro': (ponteiro + 1) % listaVoluntariosGeral.length,
+    };
+  }
+
+  // Método auxiliar rigoroso que valida dias e restrições de local
+  bool _voluntarioPodeTrabalharNoDia(CheckBoxModeloVoluntario vol, String diaCulto, String nomeLocal) {
+    String diasPermitidos = vol.diasDisponiveis.toLowerCase().trim();
+    String obsVoluntario = vol.observacao.toLowerCase().trim();
+    String categoriaVol = vol.categoriaVoluntario.toLowerCase().trim();
+    String diaAtualLower = diaCulto.toLowerCase();
+    String localLower = nomeLocal.toLowerCase();
+
+    // Se o voluntário preencheu os dias permitidos no cadastro:
+    if (diasPermitidos.isNotEmpty) {
+      List<String> listaDias = diasPermitidos.split(RegExp(r'[,;\s]+'));
+      listaDias.removeWhere((d) => d.isEmpty);
+
+      if (listaDias.isNotEmpty) {
+        bool bateuDia = listaDias.any((diaPermitido) =>
+        diaAtualLower.contains(diaPermitido.toLowerCase()) ||
+            diaPermitido.toLowerCase().contains(diaAtualLower)
+        );
+
+        // Se o dia atual da escala NÃO estiver na lista dele, ele é BLOQUEADO instantaneamente!
+        if (!bateuDia) {
+          return false;
         }
       }
     }
-    return nomesJaAdicionados;
+
+    // Trava de exceção por texto (ex: "não na sexta")
+    String textoPerfil = "$obsVoluntario $categoriaVol";
+    if (textoPerfil.contains('nao') || textoPerfil.contains('exceto') || textoPerfil.contains('fora') || textoPerfil.contains('nunca')) {
+      if ((textoPerfil.contains('segunda') && diaAtualLower.contains('segunda')) ||
+          (textoPerfil.contains('terca') && diaAtualLower.contains('terca')) ||
+          (textoPerfil.contains('quarta') && diaAtualLower.contains('quarta')) ||
+          (textoPerfil.contains('quinta') && diaAtualLower.contains('quinta')) ||
+          (textoPerfil.contains('sexta') && diaAtualLower.contains('sexta')) ||
+          (textoPerfil.contains('sabado') && diaAtualLower.contains('sabado')) ||
+          (textoPerfil.contains('domingo') && diaAtualLower.contains('domingo'))) {
+        return false;
+      }
+    }
+
+    // Trava de bloqueio de local específico nas observações
+    if ((textoPerfil.contains('nao') || textoPerfil.contains('exceto')) && textoPerfil.contains(localLower)) {
+      return false;
+    }
+
+    return true; // Aprovado para o dia e local!
   }
 
-  verificarNomesNaoAdicionados(List<String> nomesJaAdicionados) {
-    List<String> nomesNaoListados = [];
-    //percorrendo os nomes ja adicionados
-    for (var element in nomesJaAdicionados) {
-      //removendo da lista nao adicionados os nomes que ja foram adicionados
-      nomesNaoListados.removeWhere((elemento) {
-        return elemento == element;
-      });
-    }
-    //percorrendo a lista de nomes nao listados
-    for (var element in nomesNaoListados) {
-      //para cada iteracao instanciar um rando,
-      Random random = Random();
-      // para cada iteracao gerar um numero entre  0 e o tamanho da escala sorteada
-      int numeroRandomico = random.nextInt(escalaSorteada.length);
-      // adicionar na lista de repeticoes
-      listaNumeroAuxiliarRepeticaoNomesNaoListados.add(numeroRandomico);
-    }
-    return nomesNaoListados;
-  }
-
-  // metodo para chamar o sorteio de nomes sem repeticao
-  sortearNomesSemRepeticao(int numeroRandomico) {
-    listaNumeroAuxiliarRepeticao.clear(); //limpando lista
-    for (var element in locaisSorteioVoluntarios) {
-      // para cada interacao sortear um numero entre 0 e o
-      // tamanho da lista de locais de trabalho
-      numeroRandomico = random.nextInt(nomeVoluntarios.length);
-      sortearNumeroSemRepeticao(numeroRandomico); //chamando metodo
-    }
-  }
-
-  // metodo para sortear numero sem repeticao
-  sortearNumeroSemRepeticao(int numeroRandomico) {
-    //caso a lista nao contenha o numero randomico entrar no if
-    if (!listaNumeroAuxiliarRepeticao.contains(numeroRandomico)) {
-      //adicionando numero NAO repetido a lista para posteriormente
-      // ser utilizada ao posicionar o nome dos voluntarios
-      // nos locais de trabalho
-      listaNumeroAuxiliarRepeticao.add(numeroRandomico);
-      return numeroRandomico;
-    } else {
-      // sorteando outro numero pois o numero
-      // sorteado anteriormente ja esta na lista
-      numeroRandomico = random.nextInt(nomeVoluntarios.length);
-      sortearNumeroSemRepeticao(numeroRandomico);
-    }
-  }
-
-  //metodo para buscar o id na base de dados para poder adicionar os dados
-  // naquele id buscado
+  // Método para buscar o id na base de dados para poder adicionar os dados
   buscarIDDocumentoFirebase() async {
     String idDocumentoFirebase = "";
     var db = FirebaseFirestore.instance;
     await db
-        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .collection(nomeColecaoUsuariosFireBase)
         .doc(uidUsuario)
-        // definindo a COLECAO no Firebase
         .collection(nomeColecaoFireBase)
-        // selecionar todos os itens que contem o parametro passado
         .where(nomeDocumentoFireBase)
         .get()
         .then((querySnapshot) {
-          for (var docSnapshot in querySnapshot.docs) {
-            //verificando se o retorno do banco de dados contem
-            // o nome digitado no campo de texto
-            if (docSnapshot.data().values.contains(nomeEscalaFormatada)) {
-              // caso seja definir que a variavel vai receber o valor
-              idDocumentoFirebase = docSnapshot.id;
-            }
-          }
-        });
+      for (var docSnapshot in querySnapshot.docs) {
+        if (docSnapshot.data().values.contains(nomeEscalaFormatada)) {
+          idDocumentoFirebase = docSnapshot.id;
+        }
+      }
+    });
     return idDocumentoFirebase;
   }
 
-  // metodo para chamar o cadastro de itens no banco de dados
+  // Método para chamar o cadastro de itens no banco de dados
   chamarCadastroItens() async {
     try {
       var db = FirebaseFirestore.instance;
       db
-          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
-          // definindo a COLECAO no Firebase
           .collection(nomeColecaoFireBase)
-          // definindo o nome do DOCUMENTO
           .add({nomeDocumentoFireBase: nomeEscalaFormatada})
           .then(
             (value) async {
-              String idDocumentoFirebase = await buscarIDDocumentoFirebase();
-              //percorrento a lista
-              idDocumento = idDocumentoFirebase;
-              for (var element in escalaSorteada) {
-                // para cada iteracao chamar metodo
-                cadastrarItens(element.entries.toList(), idDocumentoFirebase);
-              }
-            },
-            onError: (e) {
-              setState(() {
-                exibirWidgetCarregamento = false;
-              });
-              chamarExibirMensagemErro(
-                "Erro Criar Nome Escala : ${e.toString()}",
-              );
-            },
+          String idDocumentoFirebase = await buscarIDDocumentoFirebase();
+          idDocumento = idDocumentoFirebase;
+          for (var element in escalaSorteada) {
+            cadastrarItens(element.entries.toList(), idDocumentoFirebase);
+          }
+        },
+        onError: (e) {
+          setState(() {
+            exibirWidgetCarregamento = false;
+          });
+          chamarExibirMensagemErro(
+            "Erro Criar Nome Escala : ${e.toString()}",
           );
+        },
+      );
     } catch (e) {
       setState(() {
         exibirWidgetCarregamento = false;
@@ -296,28 +341,26 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     try {
       var db = FirebaseFirestore.instance;
       db
-          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
-          // definindo a COLECAO no Firebase
           .collection(nomeColecaoFireBase)
           .doc(idDocumentoFirebase)
           .collection(Constantes.fireBaseDadosCadastrados)
           .doc()
           .set(criarMapComTodosOsDados(escala))
           .then((value) {
-            index++;
-            //ve
-            if (index == escalaSorteada.length) {
-              index = 0;
-              MetodosAuxiliares.exibirMensagens(
-                Constantes.tipoNotificacaoSucesso,
-                Textos.notificacaoSucesso,
-                context,
-              );
-              limparListaDados();
-              redirecionarProximaTela();
-            }
-          });
+        index++;
+        if (index == escalaSorteada.length) {
+          index = 0;
+          MetodosAuxiliares.exibirMensagens(
+            Constantes.tipoNotificacaoSucesso,
+            Textos.notificacaoSucesso,
+            context,
+          );
+          limparListaDados();
+          redirecionarProximaTela();
+        }
+      });
     } catch (e) {
       setState(() {
         exibirWidgetCarregamento = false;
@@ -350,8 +393,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
   criarMapComTodosOsDados(List<MapEntry> escala) {
     Map<String, dynamic> itemFinal = {};
-    //percorrendo a escala para pegar cada item da escala
-    // e colocar num Map para ser retornado
     for (var element in escala) {
       itemFinal[element.key] = element.value;
     }
@@ -374,7 +415,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   Widget build(BuildContext context) {
     double larguraTela = MediaQuery.of(context).size.width;
     double alturaTela = MediaQuery.of(context).size.height;
-    Timer(Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 2), () {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
         overlays: [SystemUiOverlay.bottom],
@@ -444,7 +485,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                 ),
                               ),
                             ),
-
                             WidgetAjustarHorario(),
                           ],
                         ),
@@ -468,7 +508,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                           },
                           child: Text(
                             Textos.btnCriarEscala,
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                           ),
                         ),
                       ),

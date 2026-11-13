@@ -1,7 +1,8 @@
+import 'package:sscaleg/modelo/check_box_modelo_local_trabalho.dart';
 import 'package:sscaleg/modelo/check_box_modelo_voluntario.dart';
 
 class PassarPegarDados {
-  static List<String> listaNomesLocaisTrabalho = [];
+  static List<CheckBoxModeloLocalTrabalho> listaNomesLocaisTrabalho = [];
   static List<CheckBoxModeloVoluntario> listaNomesVoluntarios = [];
   static List<String> listaDiasSemana = [];
   static List<String> listaIntervaloTrabalho = [];
@@ -19,12 +20,12 @@ class PassarPegarDados {
 
   static Map informacoesUsuario = {};
 
-  static List<String> passarNomesLocaisTrabalho(List<String> locaisTrabalho) {
+  static List<CheckBoxModeloLocalTrabalho> passarNomesLocaisTrabalho(List<CheckBoxModeloLocalTrabalho> locaisTrabalho) {
     listaNomesLocaisTrabalho = locaisTrabalho;
     return listaNomesLocaisTrabalho;
   }
 
-  static List<String> recuperarNomesLocaisTrabalho() {
+  static List<CheckBoxModeloLocalTrabalho> recuperarNomesLocaisTrabalho() {
     return listaNomesLocaisTrabalho;
   }
 

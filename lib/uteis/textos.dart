@@ -5,6 +5,7 @@ class Textos {
   static String btnCriarEscala = "Criar Escala";
   static String btnDadosUsuario = "Dados do usuário";
   static String btnCadastrar = "Cadastrar";
+  static String btnCadastrarLocal = "Cadastrar Local";
   static String btnLogin = "Fazer Login";
   static String btnAvancar = "Avançar";
   static String btnCadastrarVoluntarios = "Cadastrar Voluntario";
@@ -80,26 +81,43 @@ class Textos {
       "Selecione uma opção que irá complementar a data, "
       "não é possível selecionar mais de uma opção";
 
-  // TELA CADASTRO E SELECAO DE LOCAIS DE TRABALHO
-  static String telaCadastroTituloSelecaoLocal = "Locais de Trabalho";
-  static String telaCadastroDescricaoCadastroLocal =
-      "Use o campo abaixo para "
-      "cadastrar o nome do Local de trabalho que estará compondo a escala";
-  static String telaCadastroDescricaoSelecaoLocal =
+  // TELA CADASTRO LOCAIS DE TRABALHO
+  static String telaCadastroLocais = "Cadastro Locais Trabalho";
+  static String telaCadastroLocaisDescricaoNomeObservacao =
+      "Utilize os campos abaixo para cadastrar"
+      " o nome do local e, caso necessário, adicionar uma observação";
+  static String localTrabalhoTextFieldNome = "Nome do local";
+  static String localTrabalhoHintNome = "Portaria,pulpito,altar";
+  static String localTrabalhoHintObservacao = "Precisa de 02 pessoas";
+  static String telaCadastroLocaisDescricaoDiasNecessario =
+      "Selecione os dias em que a regra do "
+      "local de trabalho descrita no campo de observação."
+      "Será aplicada sem dias selecionados, ela valerá para todos os dias.";
+
+  // TELA SELECAO DE LOCAIS DE TRABALHO
+  static String telaSelecaoLocalTitulo = "Locais de Trabalho";
+  static String telaSelecaoLocalDescricao =
       "Selecione quais "
       "Locais cadastrados que você deseja que a escala tenha";
+  static String telaSelecaoLocalDiasObservacao =
+      "Dias de aplicação da observação: ";
+  static String telaSelecaoLocalLocaisSelecionados = "Locais Selecionados : ";
+
+  //TELA ATUALIZA VOLUNTARIOS
+
+  static String telaAtualizarDadosLocalTrabalho = "Atualizar Dados Local";
 
   //TELA CADASTRO VOLUNTARIOS
   static String telaCadastroVoluntarios = "Cadastro de Voluntarios";
   static String telaCadatroVoluntariosDescricaoDiasSemana =
-      "Caso o seu voluntario não consiga cumprir a escala em um dia especifico, selecione o dia para que "
-      "ao gerar a escala ele não seja colocado no dia da semana a qual ele não esteja disponivel";
+      "Selecione os dias da semana em que o voluntário não está"
+      " disponível para evitar que ele seja escalado nessas datas.";
   static String labelTextFieldNomeVoluntario = "Nome do Voluntario";
   static String labelTextFieldCategoriaVoluntario = "Categoria Voluntario";
   static String labelHintCategoriaVoluntario = "Cooperador,Cooperadora,Midia";
-  static String labelTextFieldObservacaoVoluntario = "Observação";
+  static String labelTextFieldObservacao = "Observação";
   static String labelHintObservacaoVoluntario = "Dificuldade em escrever";
-  static String telaSCadastroVoluntariosDescricao=
+  static String telaSCadastroVoluntariosDescricao =
       "Use o campo abaixo para "
       "cadastrar o nome do voluntario que estará compondo a escala de trabalho";
 
@@ -119,7 +137,8 @@ class Textos {
   static String telaSelecaoVoluntariosDiasDisponiveis = "Disponibilidade : ";
   static String telaSelecaoVoluntariosObservacao = "Observação : ";
 
-  static String telaSelecaoVoluntariosFiltroDescricao = "Selecione qual categoria você "
+  static String telaSelecaoVoluntariosFiltroDescricao =
+      "Selecione qual categoria você "
       "quer filtrar os voluntarios";
   static String telaSelecaoVoluntariosFiltrarTodos = "Listar todos";
 

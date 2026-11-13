@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class Constantes {
@@ -10,17 +11,21 @@ class Constantes {
 
 
   //Rotas da GERACAO DE ESCALA
-  static const rotaTelaCadastroSelecaoLocalTrabalho =
-      "telaCadSelecaoLocalTrabalho";
+  static const rotaTelaSelecaoLocalTrabalho =
+      "telaSelecaoLocalTrabalho";
   static const rotaTelaSelecaoDiasSemana = "telaSelecaoDiasSemana";
   static const rotaTelaSelecaoIntervaloTrabalho =
       "telaSelecaoIntervaloTrabalho";
   static const rotaTelaGerarEscala = "telaGerarEscala";
 
 
+  static const rotaTelaCadastroLocalTrabalho = "telaCadastroLocalTrabalho";
   static const rotaTelaCadastroDadosVoluntarios = "telaCadastroDadosVoluntarios";
   static const rotaTelaSelecaoNomesVoluntarios = "telaSelecaoNomeVoluntarios";
   static const rotaTelaAtualizarDadosVoluntario = "rotaTelaAtualizarDadosVoluntario";
+
+
+  static const rotaTelaAtualizarDadosLocalTrabalho = "rotaTelaAtualizarDadosLocalTrabalho";
 
   //ROTAS LISTAGEM ESCALAS
   static const rotaTelaListagemEscalaBandoDados =
@@ -52,6 +57,7 @@ class Constantes {
   static const rotaArgumentoLinhasEscala = "linhasEscala";
   static const rotaArgumentoObservacaoEscala = "observacaoEscala";
   static const rotaArgumentoAtualizarDadosVoluntario = "atualizarDadosVoluntario";
+  static const rotaArgumentoAtualizarDadosLocalTrabalho = "atualizarDadosLocalTrabalho";
 
   //INFORMACAO USUARIO
   static const infoUsuarioUID = "uid";
@@ -142,6 +148,8 @@ class Constantes {
   //LOCAIS TRABALHO
   static const fireBaseColecaoNomeLocaisTrabalho = "locais_trabalho";
   static const fireBaseDocumentoNomeLocaisTrabalho = "nome";
+  static const fireBaseDocumentoLocaisTrabalhoObservacao = "observacaoLocal";
+  static const fireBaseDocumentLocaisTrabalhoDiasObservacao = "diasLocalObservacao";
 
   //COMPLEMENTO DATA DEPARTAMENTO
   static const fireBaseColecaoNomeDepartamentosData = "departamentos_data";
@@ -156,6 +164,7 @@ class Constantes {
   static const fireBaseDocumentoVoluntariosObservacao =
       "observacao";
   static const fireBaseVoluntariosDiasDisponiveisTodoDia = "Disponivel Todos os Dias";
+  static const fireBaseLocaisDiasObservacaoSEM = "Aplicar a todos os dias";
 
   //OBSERVACOES
   static const fireBaseColecaoNomeObservacao = "Observacoes";

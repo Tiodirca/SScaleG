@@ -38,21 +38,27 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
     validacao = FirebaseAuth.instance.authStateChanges().listen((
       User? user,
     ) async {
+      print('fdsfsdf');
       index++;
+      print(index);
+      if (user != null) {
+        debugPrint("Usuario Logado");
+        usuarioEmail = user.email.toString();
+        usuarioUID = user.uid.toString();
+        passarInformacoes(usuarioUID, usuarioEmail);
+        redirecionarTelaInicial();
+      } else {
+        print("sdadsa");
+        debugPrint("Sem Usuario Logado");
+        redirecionarTelaLoginCadastro();
+      }
       if (index == 2 && (!Platform.isIOS || !Platform.isAndroid) ||
           index == 1 && (Platform.isIOS || Platform.isAndroid)) {
         index = 0;
-        if (user != null) {
-          debugPrint("Usuario Logado");
-          usuarioEmail = user.email.toString();
-          usuarioUID = user.uid.toString();
-          passarInformacoes(usuarioUID, usuarioEmail);
-          redirecionarTelaInicial();
-        } else {
-          debugPrint("Sem Usuario Logado");
-          redirecionarTelaLoginCadastro();
-        }
+        print('asdada');
+
       }
+      print("cxzczxcz");
     });
   }
 

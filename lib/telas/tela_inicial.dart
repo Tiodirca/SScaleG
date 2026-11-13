@@ -72,9 +72,11 @@ class _TelaInicialState extends State<TelaInicial> {
               }
             },
             onError: (e) {
-              setState(() {
-                exibirTelaCarregamento = false;
-              });
+              if(mounted){
+                setState(() {
+                  exibirTelaCarregamento = false;
+                });
+              }
               debugPrint("o mesmo");
             },
           );
@@ -138,7 +140,7 @@ class _TelaInicialState extends State<TelaInicial> {
         if (nomeBtn == Textos.btnCriarEscala) {
           Navigator.pushReplacementNamed(
             context,
-            Constantes.rotaTelaCadastroSelecaoLocalTrabalho,
+            Constantes.rotaTelaSelecaoLocalTrabalho,
           );
         } else if (nomeBtn == Textos.btnListarEscalas) {
           Navigator.pushReplacementNamed(

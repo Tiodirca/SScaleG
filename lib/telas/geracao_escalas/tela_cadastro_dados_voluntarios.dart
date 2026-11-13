@@ -340,7 +340,7 @@ class _TelaCadastroDadosVoluntariosState
                                                 decoration: InputDecoration(
                                                   label: Text(
                                                     Textos
-                                                        .labelTextFieldObservacaoVoluntario,
+                                                        .labelTextFieldObservacao,
                                                   ),
                                                   hintText:
                                                       Textos

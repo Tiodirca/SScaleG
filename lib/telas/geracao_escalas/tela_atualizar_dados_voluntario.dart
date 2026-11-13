@@ -354,7 +354,7 @@ class _TelaAtualizarDadosVoluntarioState
                                               decoration: InputDecoration(
                                                 label: Text(
                                                   Textos
-                                                      .labelTextFieldObservacaoVoluntario,
+                                                      .labelTextFieldObservacao,
                                                 ),
                                                 hintText:
                                                     Textos

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:sscaleg/telas/campos/tela_cadastro_novo_campo.dart';
 import 'package:sscaleg/telas/campos/tela_remover_campos.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_atualizar_dados_voluntario.dart';
+import 'package:sscaleg/telas/geracao_escalas/tela_atualizar_local_trabalho.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_dados_voluntarios.dart';
-import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_selecao_local_trabalho.dart';
+import 'package:sscaleg/telas/geracao_escalas/tela_cadastro_local_trabalho.dart';
+import 'package:sscaleg/telas/geracao_escalas/tela_selecao_local_trabalho.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_nomes_voluntarios.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_gerar_escala.dart';
 import 'package:sscaleg/telas/geracao_escalas/tela_selecao_dias_semana.dart';
@@ -36,9 +38,13 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => const TelaLoginCadastro());
       case Constantes.rotaTelaDadosUsuario:
         return MaterialPageRoute(builder: (_) => const TelaDadosUsuario());
-      case Constantes.rotaTelaCadastroSelecaoLocalTrabalho:
+      case Constantes.rotaTelaSelecaoLocalTrabalho:
         return MaterialPageRoute(
-          builder: (_) => const TelaCadastroSelecaoLocalTrabalho(),
+          builder: (_) => const TelaSelecaoLocalTrabalho(),
+        );
+      case Constantes.rotaTelaCadastroLocalTrabalho:
+        return MaterialPageRoute(
+          builder: (_) => const TelaCadastroLocalTrabalho(),
         );
       case Constantes.rotaTelaSelecaoNomesVoluntarios:
         return MaterialPageRoute(
@@ -93,6 +99,18 @@ class Rotas {
                 (_) => TelaAtualizarDadosVoluntario(
                 dadosVoluntario:  args[Constantes.rotaArgumentoAtualizarDadosVoluntario],
                 ),
+          );
+        } else {
+          return erroRota(settings);
+        }
+
+      case Constantes.rotaTelaAtualizarDadosLocalTrabalho:
+        if (args is Map) {
+          return MaterialPageRoute(
+            builder:
+                (_) => TelaAtualizarLocalTrabalho(
+              dadosLocalTrabalho:  args[Constantes.rotaArgumentoAtualizarDadosLocalTrabalho],
+            ),
           );
         } else {
           return erroRota(settings);

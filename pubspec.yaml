@@ -24,18 +24,18 @@ dependencies:
   # pdf na web
   universal_html: ^2.2.1
   # necessario para notificacao elegante
-  elegant_notification: ^2.2.2
+  #elegant_notification: ^2.2.2
   # necessario para gravar chaves valores
   shared_preferences: ^2.5.3
   # necessario para rodar firebase
-  firebase_database: ^11.1.0
-  cloud_firestore: ^5.3.0
+  firebase_core: ^5.1.0
+  firebase_auth: ^7.0.1
+  firebase_database: ^13.0.1
+  cloud_firestore: ^7.1.0
   cupertino_icons: ^1.0.8
   #para carregar Imagem
   image_picker: ^1.1.2
   file_selector: ^1.0.3
-  firebase_auth: ^5.6.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

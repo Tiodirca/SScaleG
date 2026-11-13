@@ -239,7 +239,7 @@ class _TelaListagemTabelasBancoDadosState
         if (nomeBotao == Textos.btnCriarEscala) {
           Navigator.pushReplacementNamed(
             context,
-            Constantes.rotaTelaCadastroSelecaoLocalTrabalho,
+            Constantes.rotaTelaSelecaoLocalTrabalho,
           );
         } else if (nomeBotao == Textos.btnRecarregar) {
           setState(() {
