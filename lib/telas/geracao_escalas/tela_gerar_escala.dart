@@ -66,13 +66,16 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       String horarioTrocaTurnoFinalSemana =
       PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
 
-      if (horarioTrocaTurnoSemana.isNotEmpty &&
-          horarioTrocaTurnoFinalSemana.isNotEmpty) {
+      if (horarioTrocaTurnoSemana.isNotEmpty) {
         horarioSemana = "$horarioInicioSemana $horarioTrocaTurnoSemana";
+      } else {
+        horarioSemana = horarioInicioSemana;
+      }
+
+      if (horarioTrocaTurnoFinalSemana.isNotEmpty) {
         horarioFinalSemana =
         "$horarioInicioFinalSemana $horarioTrocaTurnoFinalSemana";
       } else {
-        horarioSemana = horarioInicioSemana;
         horarioFinalSemana = horarioInicioFinalSemana;
       }
     });
@@ -80,7 +83,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
   // Lê a observação do local para saber se exige 2 pessoas
   int _extrairVagasLocal(CheckBoxModeloLocalTrabalho local) {
-    String obs = "${local.observacaoLocal} ${local.diasLocalObservacao}".toLowerCase();
+    String obs =
+    "${local.observacaoLocal} ${local.diasLocalObservacao}".toLowerCase();
     if (obs.contains('02') ||
         obs.contains('2') ||
         obs.contains('duas') ||
@@ -90,7 +94,45 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     return 1;
   }
 
-  // Método principal de sorteio inteligente 100% blindado contra dias inválidos
+  // Extrai o dia da semana exato usando suas constantes
+  String _extrairDiaSemanaConstante(String textoData) {
+    String lower = textoData.toLowerCase();
+    if (lower.contains('segunda')) return Constantes.diaSegunda.toLowerCase();
+    if (lower.contains('terça') || lower.contains('terca')) {
+      return Constantes.diaTerca.toLowerCase();
+    }
+    if (lower.contains('quarta')) return Constantes.diaQuarta.toLowerCase();
+    if (lower.contains('quinta')) return Constantes.diaQuinta.toLowerCase();
+    if (lower.contains('sexta')) return Constantes.diaSexta.toLowerCase();
+    if (lower.contains('sábado') || lower.contains('sabado')) {
+      return Constantes.diaSabado.toLowerCase();
+    }
+    if (lower.contains('domingo')) return Constantes.diaDomingo.toLowerCase();
+    return "";
+  }
+
+  // Remove acentos e padroniza textos
+  String _normalizar(String texto) {
+    return texto
+        .toLowerCase()
+        .trim()
+        .replaceAll(RegExp(r'[áàâãä]'), 'a')
+        .replaceAll(RegExp(r'[éèêë]'), 'e')
+        .replaceAll(RegExp(r'[íìîï]'), 'i')
+        .replaceAll(RegExp(r'[óòôõö]'), 'o')
+        .replaceAll(RegExp(r'[úùûü]'), 'u')
+        .replaceAll('ç', 'c');
+  }
+
+  // Verifica se o voluntário tem disponibilidade livre ("Disponivel Todos os Dias" ou vazio)
+  bool _isDisponivelTodosOsDias(CheckBoxModeloVoluntario vol) {
+    String dias = _normalizar(vol.diasDisponiveis);
+    return dias.isEmpty ||
+        dias.contains('disponivel todos os dias') ||
+        dias.contains('todos os dias');
+  }
+
+  // Método principal de sorteio inteligente e equilibrado
   fazerSorteio() {
     escalaSorteada.clear();
 
@@ -105,16 +147,22 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       return;
     }
 
-    int ponteiroNomes = 0;
-    List<String> escaladosNoDia = [];
+    // Embaralha levemente para variar as escalas geradas mantendo a justiça
+    List<CheckBoxModeloVoluntario> voluntariosEmbaralhados =
+    List.from(nomeVoluntarios)..shuffle(random);
+
+    Map<String, int> contagemGeralEscalas = {
+      for (var v in voluntariosEmbaralhados) v.texto: 0
+    };
 
     // Preenche as linhas (datas) e colunas (locais)
     for (var datas in intervaloTrabalho) {
       Map linha = {};
       String horarioInicioTrabalho = "";
+      String diaSemanaAtual = _extrairDiaSemanaConstante(datas);
 
-      if (datas.contains(Constantes.diaDomingo.toLowerCase()) ||
-          datas.contains(Constantes.diaSabado.toLowerCase())) {
+      if (diaSemanaAtual == Constantes.diaDomingo.toLowerCase() ||
+          diaSemanaAtual == Constantes.diaSabado.toLowerCase()) {
         horarioInicioTrabalho = horarioFinalSemana;
       } else {
         horarioInicioTrabalho = horarioSemana;
@@ -123,45 +171,48 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       linha[Constantes.horarioTrabalho] = horarioInicioTrabalho;
       linha[Constantes.dataCulto] = datas;
 
-      escaladosNoDia.clear();
-      String diaDoCultoFormatado = datas.toLowerCase(); // Ex: "18/11/2026 quarta-feira"
+      List<String> escaladosHoje = [];
 
       for (var local in locaisSorteioVoluntarios) {
         String nomeLocal = local.nome;
         int vagasLocal = _extrairVagasLocal(local);
 
         if (vagasLocal > 1) {
-          // Local que exige 2 pessoas (Dupla)
           List<String> duplaDoLocal = [];
 
           for (int v = 0; v < vagasLocal; v++) {
-            var voluntarioEscolhido = _encontrarVoluntarioValidoSeguro(
-              nomeVoluntarios,
-              ponteiroNomes,
-              diaDoCultoFormatado,
-              nomeLocal,
-              escaladosNoDia,
+            String escolhido = _escolherVoluntarioEquilibrado(
+              listaVoluntarios: voluntariosEmbaralhados,
+              diaSemanaAtual: diaSemanaAtual,
+              nomeLocal: nomeLocal,
+              escaladosHoje: escaladosHoje,
+              contagemGeralEscalas: contagemGeralEscalas,
             );
 
-            duplaDoLocal.add(voluntarioEscolhido['nome']);
-            escaladosNoDia.add(voluntarioEscolhido['nome']);
-            ponteiroNomes = voluntarioEscolhido['novoPonteiro'];
+            duplaDoLocal.add(escolhido);
+            if (escolhido != "Sem voluntário") {
+              escaladosHoje.add(escolhido);
+              contagemGeralEscalas[escolhido] =
+                  (contagemGeralEscalas[escolhido] ?? 0) + 1;
+            }
           }
 
           linha[nomeLocal] = duplaDoLocal.join(" e ");
         } else {
-          // Local padrão de 1 vaga
-          var voluntarioEscolhido = _encontrarVoluntarioValidoSeguro(
-            nomeVoluntarios,
-            ponteiroNomes,
-            diaDoCultoFormatado,
-            nomeLocal,
-            escaladosNoDia,
+          String escolhido = _escolherVoluntarioEquilibrado(
+            listaVoluntarios: voluntariosEmbaralhados,
+            diaSemanaAtual: diaSemanaAtual,
+            nomeLocal: nomeLocal,
+            escaladosHoje: escaladosHoje,
+            contagemGeralEscalas: contagemGeralEscalas,
           );
 
-          linha[nomeLocal] = voluntarioEscolhido['nome'];
-          escaladosNoDia.add(voluntarioEscolhido['nome']);
-          ponteiroNomes = voluntarioEscolhido['novoPonteiro'];
+          linha[nomeLocal] = escolhido;
+          if (escolhido != "Sem voluntário") {
+            escaladosHoje.add(escolhido);
+            contagemGeralEscalas[escolhido] =
+                (contagemGeralEscalas[escolhido] ?? 0) + 1;
+          }
         }
       }
 
@@ -171,108 +222,116 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     chamarCadastroItens();
   }
 
-  // Função totalmente segura que valida rigorosamente se o voluntário pode trabalhar no dia e no local
-  Map<String, dynamic> _encontrarVoluntarioValidoSeguro(
-      List<CheckBoxModeloVoluntario> listaVoluntariosGeral,
-      int indexAtual,
-      String diaCulto,
-      String nomeLocal,
-      List<String> jaEscaladosHoje,
-      ) {
-    int ponteiro = indexAtual % listaVoluntariosGeral.length;
+  // Escolhe o melhor voluntário respeitando restrições de dias, locais e evitando duplicação diária
+  String _escolherVoluntarioEquilibrado({
+    required List<CheckBoxModeloVoluntario> listaVoluntarios,
+    required String diaSemanaAtual,
+    required String nomeLocal,
+    required List<String> escaladosHoje,
+    required Map<String, int> contagemGeralEscalas,
+  }) {
+    List<CheckBoxModeloVoluntario> elegiveisHoje = listaVoluntarios.where((vol) {
+      if (escaladosHoje.contains(vol.texto)) return false;
+      return _voluntarioPodeTrabalharNoDia(vol, diaSemanaAtual, nomeLocal);
+    }).toList();
 
-    // 1. TENTA ENCONTRAR UM VOLUNTÁRIO QUE:
-    // - Tenha disponibilidade para o dia da semana
-    // - NÃO esteja escalado em nenhum outro local no mesmo dia
-    // - Não tenha restrição para este local específico
-    for (int i = 0; i < listaVoluntariosGeral.length; i++) {
-      int indexReal = (ponteiro + i) % listaVoluntariosGeral.length;
-      var vol = listaVoluntariosGeral[indexReal];
-
-      String nomeVoluntario = vol.texto;
-      bool jaTrabalhaHoje = jaEscaladosHoje.contains(nomeVoluntario);
-
-      // Se já trabalha hoje, ele é descarta imediatamente para este segundo local
-      if (jaTrabalhaHoje) continue;
-
-      // Verifica se ele pode trabalhar neste dia e neste local
-      if (_voluntarioPodeTrabalharNoDia(vol, diaCulto, nomeLocal)) {
-        return {
-          'nome': nomeVoluntario,
-          'novoPonteiro': (indexReal + 1) % listaVoluntariosGeral.length,
-        };
-      }
+    if (elegiveisHoje.isEmpty) {
+      return "Sem voluntário";
     }
 
-    // 2. SE A GERAÇÃO DA ESCALA EXIGIR MAIS PESSOAS DO QUE HÁ VOLUNTÁRIOS DISPONÍVEIS NO DIA:
-    // (Caso extremo em que todos os elegíveis do dia já estão alocados e precisamos preencher a vaga restante)
-    // Procuramos alguém que PODE trabalhar no dia (respeitando o dia da semana), mesmo que precise repetir no mesmo dia.
-    for (int i = 0; i < listaVoluntariosGeral.length; i++) {
-      int indexReal = (ponteiro + i) % listaVoluntariosGeral.length;
-      var vol = listaVoluntariosGeral[indexReal];
+    // Ordena para garantir distribuição justa e próxima entre todos
+    elegiveisHoje.sort((a, b) {
+      int qtdA = contagemGeralEscalas[a.texto] ?? 0;
+      int qtdB = contagemGeralEscalas[b.texto] ?? 0;
 
-      if (_voluntarioPodeTrabalharNoDia(vol, diaCulto, nomeLocal)) {
-        return {
-          'nome': vol.texto,
-          'novoPonteiro': (indexReal + 1) % listaVoluntariosGeral.length,
-        };
+      if (qtdA != qtdB) {
+        return qtdA.compareTo(qtdB);
       }
-    }
 
-    // 3. FALLBACK ABSOLUTO (Garante que o app não quebre se absolutamente ninguém tiver o dia cadastrado)
-    var fallback = listaVoluntariosGeral[ponteiro];
-    return {
-      'nome': fallback.texto,
-      'novoPonteiro': (ponteiro + 1) % listaVoluntariosGeral.length,
-    };
+      // Prioridade para quem tem restrição de dias caso haja empate na quantidade geral
+      bool aLivreTodos = _isDisponivelTodosOsDias(a);
+      bool bLivreTodos = _isDisponivelTodosOsDias(b);
+
+      if (!aLivreTodos && bLivreTodos) return -1;
+      if (aLivreTodos && !bLivreTodos) return 1;
+
+      return 0;
+    });
+
+    return elegiveisHoje.first.texto;
   }
 
-  // Método auxiliar rigoroso que valida dias e restrições de local
-  bool _voluntarioPodeTrabalharNoDia(CheckBoxModeloVoluntario vol, String diaCulto, String nomeLocal) {
-    String diasPermitidos = vol.diasDisponiveis.toLowerCase().trim();
-    String obsVoluntario = vol.observacao.toLowerCase().trim();
-    String categoriaVol = vol.categoriaVoluntario.toLowerCase().trim();
-    String diaAtualLower = diaCulto.toLowerCase();
-    String localLower = nomeLocal.toLowerCase();
+  // Validação estrita de dias, folgas e horários/turnos
+  bool _voluntarioPodeTrabalharNoDia(
+      CheckBoxModeloVoluntario vol,
+      String diaSemanaAtual,
+      String nomeLocal,
+      ) {
+    String diasPermitidos = _normalizar(vol.diasDisponiveis);
+    String obsVoluntario = _normalizar(vol.observacao);
+    String categoriaVol = _normalizar(vol.categoriaVoluntario);
+    String diaLimpo = _normalizar(diaSemanaAtual);
+    String localLimpo = _normalizar(nomeLocal);
 
-    // Se o voluntário preencheu os dias permitidos no cadastro:
-    if (diasPermitidos.isNotEmpty) {
-      List<String> listaDias = diasPermitidos.split(RegExp(r'[,;\s]+'));
-      listaDias.removeWhere((d) => d.isEmpty);
+    String diaIdentificado = "";
+    if (diaLimpo.contains("segunda")) diaIdentificado = "segunda";
+    else if (diaLimpo.contains("terca")) diaIdentificado = "terca";
+    else if (diaLimpo.contains("quarta")) diaIdentificado = "quarta";
+    else if (diaLimpo.contains("quinta")) diaIdentificado = "quinta";
+    else if (diaLimpo.contains("sexta")) diaIdentificado = "sexta";
+    else if (diaLimpo.contains("sabado")) diaIdentificado = "sabado";
+    else if (diaLimpo.contains("domingo")) diaIdentificado = "domingo";
 
-      if (listaDias.isNotEmpty) {
-        bool bateuDia = listaDias.any((diaPermitido) =>
-        diaAtualLower.contains(diaPermitido.toLowerCase()) ||
-            diaPermitido.toLowerCase().contains(diaAtualLower)
-        );
-
-        // Se o dia atual da escala NÃO estiver na lista dele, ele é BLOQUEADO instantaneamente!
-        if (!bateuDia) {
-          return false;
-        }
+    // 1. VERIFICAÇÃO DE DIAS DISPONÍVEIS
+    // Se não for "Disponivel Todos os Dias", valida estritamente se o dia atual está na lista
+    if (!_isDisponivelTodosOsDias(vol)) {
+      if (diaIdentificado.isEmpty || !diasPermitidos.contains(diaIdentificado)) {
+        return false; // Bloqueado em dias em que não pode trabalhar!
       }
     }
 
-    // Trava de exceção por texto (ex: "não na sexta")
+    // 2. TRAVA DE EXCEÇÃO NAS OBSERVAÇÕES OU CATEGORIA (ex: "não na quarta")
     String textoPerfil = "$obsVoluntario $categoriaVol";
-    if (textoPerfil.contains('nao') || textoPerfil.contains('exceto') || textoPerfil.contains('fora') || textoPerfil.contains('nunca')) {
-      if ((textoPerfil.contains('segunda') && diaAtualLower.contains('segunda')) ||
-          (textoPerfil.contains('terca') && diaAtualLower.contains('terca')) ||
-          (textoPerfil.contains('quarta') && diaAtualLower.contains('quarta')) ||
-          (textoPerfil.contains('quinta') && diaAtualLower.contains('quinta')) ||
-          (textoPerfil.contains('sexta') && diaAtualLower.contains('sexta')) ||
-          (textoPerfil.contains('sabado') && diaAtualLower.contains('sabado')) ||
-          (textoPerfil.contains('domingo') && diaAtualLower.contains('domingo'))) {
+    if (textoPerfil.contains('nao') ||
+        textoPerfil.contains('exceto') ||
+        textoPerfil.contains('fora') ||
+        textoPerfil.contains('nunca') ||
+        textoPerfil.contains('folga')) {
+      if (diaIdentificado.isNotEmpty && textoPerfil.contains(diaIdentificado)) {
         return false;
       }
     }
 
-    // Trava de bloqueio de local específico nas observações
-    if ((textoPerfil.contains('nao') || textoPerfil.contains('exceto')) && textoPerfil.contains(localLower)) {
+    // 3. RESTRIÇÕES DE PRIMEIRO OU SEGUNDO HORÁRIO
+    bool restricaoPrimeiro = textoPerfil.contains('nao primeiro') ||
+        textoPerfil.contains('nao_primeiro') ||
+        textoPerfil.contains('so segundo') ||
+        textoPerfil.contains('apenas segundo');
+    bool restricaoSegundo = textoPerfil.contains('nao segundo') ||
+        textoPerfil.contains('nao_segundo') ||
+        textoPerfil.contains('so primeiro') ||
+        textoPerfil.contains('apenas primeiro');
+
+    if (restricaoPrimeiro &&
+        (localLimpo.contains('01') ||
+            localLimpo.contains('1') ||
+            localLimpo.contains('primeiro'))) {
+      return false;
+    }
+    if (restricaoSegundo &&
+        (localLimpo.contains('02') ||
+            localLimpo.contains('2') ||
+            localLimpo.contains('segundo'))) {
       return false;
     }
 
-    return true; // Aprovado para o dia e local!
+    // 4. BLOQUEIO DE LOCAIS ESPECÍFICOS NAS OBSERVAÇÕES
+    if ((textoPerfil.contains('nao') || textoPerfil.contains('exceto')) &&
+        textoPerfil.contains(localLimpo)) {
+      return false;
+    }
+
+    return true;
   }
 
   // Método para buscar o id na base de dados para poder adicionar os dados
@@ -303,8 +362,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
           .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
           .collection(nomeColecaoFireBase)
-          .add({nomeDocumentoFireBase: nomeEscalaFormatada})
-          .then(
+          .add({nomeDocumentoFireBase: nomeEscalaFormatada}).then(
             (value) async {
           String idDocumentoFirebase = await buscarIDDocumentoFirebase();
           idDocumento = idDocumentoFirebase;
@@ -474,7 +532,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                   ),
                                   controller: nomeEscala,
                                   onFieldSubmitted: (value) {
-                                    chamarFazerSorteio();
+                                    chamarFazerSorteio(); // Mantém compatibilidade
                                   },
                                   validator: (value) {
                                     if (value!.isEmpty) {
