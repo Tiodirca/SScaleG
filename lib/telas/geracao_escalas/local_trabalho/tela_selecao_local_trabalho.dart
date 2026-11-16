@@ -3,15 +3,16 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sscaleg/Uteis/paleta_cores.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/modelo/check_box_modelo_local_trabalho.dart';
+import 'package:sscaleg/uteis/constantes.dart';
+import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
-import '../../uteis/estilo.dart';
-import '../../uteis/paleta_cores.dart';
-import '../../uteis/constantes.dart';
+
 
 class TelaSelecaoLocalTrabalho extends StatefulWidget {
   const TelaSelecaoLocalTrabalho({super.key});
@@ -477,7 +478,9 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 3,
+                                    flex:   Platform.isAndroid ||
+                                        Platform.isIOS
+                                        ?  3 : 6,
                                     child: SizedBox(
                                       width: larguraTela,
                                       height: alturaTela,

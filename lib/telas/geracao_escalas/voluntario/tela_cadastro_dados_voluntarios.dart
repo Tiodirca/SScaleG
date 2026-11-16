@@ -3,15 +3,16 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sscaleg/Modelo/check_box_modelo.dart';
+import 'package:sscaleg/Uteis/paleta_cores.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
+import 'package:sscaleg/uteis/constantes.dart';
+import 'package:sscaleg/uteis/estilo.dart';
 import 'package:sscaleg/uteis/metodos_auxiliares.dart';
 import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
-import '../../Modelo/check_box_modelo.dart';
-import '../../uteis/estilo.dart';
-import '../../uteis/paleta_cores.dart';
-import '../../uteis/constantes.dart';
+
 
 class TelaCadastroDadosVoluntarios extends StatefulWidget {
   const TelaCadastroDadosVoluntarios({super.key});
