@@ -274,7 +274,7 @@ class _TelaCadastroDadosVoluntariosState
                                         child: Wrap(
                                           children: [
                                             Container(
-                                              margin: EdgeInsets.all(20),
+                                              margin: EdgeInsets.all(10),
                                               width:
                                                   MetodosAuxiliares.ajustarTamanhoTextField(
                                                     larguraTela,
@@ -301,7 +301,7 @@ class _TelaCadastroDadosVoluntariosState
                                               ),
                                             ),
                                             Container(
-                                              margin: EdgeInsets.all(20),
+                                              margin: EdgeInsets.all(10),
                                               width:
                                                   MetodosAuxiliares.ajustarTamanhoTextField(
                                                     larguraTela,
@@ -331,7 +331,7 @@ class _TelaCadastroDadosVoluntariosState
                                               ),
                                             ),
                                             Container(
-                                              margin: EdgeInsets.all(20),
+                                              margin: EdgeInsets.all(10),
                                               width:
                                                   MetodosAuxiliares.ajustarTamanhoTextField(
                                                     larguraTela,
@@ -380,7 +380,10 @@ class _TelaCadastroDadosVoluntariosState
                               ),
                               Card(
                                 child: SizedBox(
-                                  height: alturaTela * 0.5,
+                                  height:
+                                      Platform.isAndroid || Platform.isIOS
+                                          ? alturaTela * 0.3
+                                          : alturaTela * 0.5,
                                   width:
                                       Platform.isAndroid || Platform.isIOS
                                           ? larguraTela

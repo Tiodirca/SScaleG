@@ -606,30 +606,87 @@ class _TelaSelecaoNomesVoluntariosState
                   color: Colors.white,
                   width: larguraTela,
                   height: alturaTela,
-                  child: Column(
-                    children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            if (listaNomesExibicaoFiltragram.isEmpty) {
-                              return Container(
-                                margin: const EdgeInsets.all(10.0),
-                                transformAlignment: Alignment.center,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  Textos.erroBaseDadosVazia,
-                                  textAlign: TextAlign.center,
-                                  style: TextTheme.of(context).bodySmall,
-                                ),
-                              );
-                            } else {
-                              return LayoutBuilder(
-                                builder: (context, constraints) {
-                                  if (exibirTelaFiltro) {
-                                    return Column(
-                                      children: [
-                                        Container(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (listaNomesExibicaoFiltragram.isEmpty) {
+                          return Container(
+                            margin: const EdgeInsets.all(10.0),
+                            transformAlignment: Alignment.center,
+                            alignment: Alignment.center,
+                            child: Text(
+                              Textos.erroBaseDadosVazia,
+                              textAlign: TextAlign.center,
+                              style: TextTheme.of(context).bodySmall,
+                            ),
+                          );
+                        } else {
+                          return LayoutBuilder(
+                            builder: (context, constraints) {
+                              if (exibirTelaFiltro) {
+                                return Column(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                      ),
+                                      width: larguraTela,
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        Textos
+                                            .telaSelecaoVoluntariosFiltroDescricao,
+                                        style: TextTheme.of(context).bodySmall,
+                                      ),
+                                    ),
+                                    //Area de exibicao dos voluntarios
+                                    Card(
+                                      child: SizedBox(
+                                        height:
+                                            Platform.isAndroid || Platform.isIOS
+                                                ? listaNomesSelecionados
+                                                        .isNotEmpty
+                                                    ? alturaTela * 0.35
+                                                    : alturaTela * 0.45
+                                                : listaNomesSelecionados
+                                                    .isNotEmpty
+                                                ? alturaTela * 0.45
+                                                : alturaTela * 0.6,
+                                        width:
+                                            Platform.isAndroid || Platform.isIOS
+                                                ? larguraTela
+                                                : larguraTela * 0.9,
+                                        child: ListView(
+                                          children: [
+                                            ...listaNomeCategoriasVoluntario
+                                                .entries
+                                                .map((e) {
+                                                  return radioButtonFiltro(
+                                                    e.key
+                                                        .toString()
+                                                        .replaceAll("(", "")
+                                                        .replaceAll(")", ""),
+                                                    e.value,
+                                                  );
+                                                }),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                return SizedBox(
+                                  width: larguraTela,
+                                  height:
+                                      Platform.isAndroid || Platform.isIOS
+                                          ? alturaTela * 0.75
+                                          : alturaTela * 0.8,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        flex: 0,
+                                        child: Container(
                                           margin: const EdgeInsets.symmetric(
                                             horizontal: 10.0,
                                           ),
@@ -637,222 +694,149 @@ class _TelaSelecaoNomesVoluntariosState
                                           child: Text(
                                             textAlign: TextAlign.center,
                                             Textos
-                                                .telaSelecaoVoluntariosFiltroDescricao,
+                                                .telaSelecaoDescricaoSelecaoVoluntarios,
                                             style:
                                                 TextTheme.of(context).bodySmall,
                                           ),
                                         ),
-                                        //Area de exibicao dos voluntarios
-                                        Card(
-                                          child: SizedBox(
-                                            height:
-                                                Platform.isAndroid ||
-                                                        Platform.isIOS
-                                                    ? listaNomesSelecionados
-                                                            .isNotEmpty
-                                                        ? alturaTela * 0.35
-                                                        : alturaTela * 0.45
-                                                    : listaNomesSelecionados
-                                                        .isNotEmpty
-                                                    ? alturaTela * 0.45
-                                                    : alturaTela * 0.6,
-                                            width:
-                                                Platform.isAndroid ||
-                                                        Platform.isIOS
-                                                    ? larguraTela
-                                                    : larguraTela * 0.9,
-                                            child: ListView(
-                                              children: [
-                                                ...listaNomeCategoriasVoluntario
-                                                    .entries
-                                                    .map((e) {
-                                                      return radioButtonFiltro(
-                                                        e.key
-                                                            .toString()
-                                                            .replaceAll("(", "")
-                                                            .replaceAll(
-                                                              ")",
-                                                              "",
-                                                            ),
-                                                        e.value,
-                                                      );
-                                                    }),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  } else {
-                                    return SizedBox(
-                                      width: larguraTela,
-                                      height: alturaTela - 160,
-                                      child: Column(
-                                        children: [
-                                          Expanded(
-                                            flex: 0,
-                                            child: Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 10.0,
-                                                  ),
-                                              width: larguraTela,
-                                              child: Text(
-                                                textAlign: TextAlign.center,
-                                                Textos
-                                                    .telaSelecaoDescricaoSelecaoVoluntarios,
-                                                style:
-                                                    TextTheme.of(
-                                                      context,
-                                                    ).bodySmall,
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 5,
-                                            child: SizedBox(
-                                              width: larguraTela,
-                                              height: alturaTela,
-                                              child: SingleChildScrollView(
-                                                child: Card(
-                                                  child: SizedBox(
-                                                    height:
-                                                        Platform.isAndroid ||
-                                                                Platform.isIOS
-                                                            ? alturaTela * 0.45
-                                                            : alturaTela * 0.6,
-                                                    width:
-                                                        Platform.isAndroid ||
-                                                                Platform.isIOS
-                                                            ? larguraTela
-                                                            : larguraTela * 0.9,
-                                                    child: ListView(
-                                                      children: [
-                                                        ...listaNomesExibicaoFiltragram
-                                                            .map(
-                                                              (e) =>
-                                                                  checkBoxPersonalizado(
-                                                                    e,
-                                                                    larguraTela,
-                                                                  ),
-                                                            ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 1,
-                                            child: Visibility(
-                                              visible:
-                                                  listaNomesSelecionados
-                                                          .isNotEmpty
-                                                      ? true
-                                                      : false,
+                                      ),
+                                      Expanded(
+                                        flex: 3,
+                                        child: SizedBox(
+                                          width: larguraTela,
+                                          height: alturaTela,
+                                          child: SingleChildScrollView(
+                                            child: Card(
                                               child: SizedBox(
+                                                height:
+                                                    Platform.isAndroid ||
+                                                            Platform.isIOS
+                                                        ? alturaTela * 0.45
+                                                        : alturaTela * 0.6,
                                                 width:
                                                     Platform.isAndroid ||
                                                             Platform.isIOS
                                                         ? larguraTela
                                                         : larguraTela * 0.9,
-                                                child: Card(
-                                                  child: SingleChildScrollView(
-                                                    child: Column(
-                                                      children: [
-                                                        Row(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Text(
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              Textos
-                                                                  .telaSelecaoDescricaoVoluntarioNomesSelecionadosQuantidade,
-                                                              style:
-                                                                  TextTheme.of(
-                                                                    context,
-                                                                  ).bodySmall,
-                                                            ),
-                                                            Text(
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              listaNomesSelecionados
-                                                                  .length
-                                                                  .toString(),
-                                                              style:
-                                                                  TextTheme.of(
-                                                                    context,
-                                                                  ).bodySmall,
-                                                            ),
-                                                          ],
+                                                child: ListView(
+                                                  children: [
+                                                    ...listaNomesExibicaoFiltragram
+                                                        .map(
+                                                          (e) =>
+                                                              checkBoxPersonalizado(
+                                                                e,
+                                                                larguraTela,
+                                                              ),
                                                         ),
-                                                        Wrap(
-                                                          alignment:
-                                                              WrapAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Text(
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              Textos
-                                                                  .telaSelecaoDescricaoVoluntarioNomesSelecionados,
-                                                              style:
-                                                                  TextTheme.of(
-                                                                    context,
-                                                                  ).bodySmall,
-                                                            ),
-                                                            Text(
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              listaNomesSelecionadosExibicao
-                                                                  .toString()
-                                                                  .replaceAll(
-                                                                    "_",
-                                                                    " ",
-                                                                  )
-                                                                  .replaceAll(
-                                                                    "[",
-                                                                    " ",
-                                                                  )
-                                                                  .replaceAll(
-                                                                    "]",
-                                                                    " ",
-                                                                  ),
-                                                              style:
-                                                                  TextTheme.of(
-                                                                    context,
-                                                                  ).bodySmall,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                                  ],
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    );
-                                  }
-                                },
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+                                      Expanded(
+                                        flex: 1,
+                                        child: Visibility(
+                                          visible:
+                                              listaNomesSelecionados.isNotEmpty
+                                                  ? true
+                                                  : false,
+                                          child: SizedBox(
+                                            width:
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? larguraTela
+                                                    : larguraTela * 0.9,
+                                            child: Card(
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          Textos
+                                                              .telaSelecaoDescricaoVoluntarioNomesSelecionadosQuantidade,
+                                                          style:
+                                                              TextTheme.of(
+                                                                context,
+                                                              ).bodySmall,
+                                                        ),
+                                                        Text(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          listaNomesSelecionados
+                                                              .length
+                                                              .toString(),
+                                                          style:
+                                                              TextTheme.of(
+                                                                context,
+                                                              ).bodySmall,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Wrap(
+                                                      alignment:
+                                                          WrapAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          Textos
+                                                              .telaSelecaoDescricaoVoluntarioNomesSelecionados,
+                                                          style:
+                                                              TextTheme.of(
+                                                                context,
+                                                              ).bodySmall,
+                                                        ),
+                                                        Text(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          listaNomesSelecionadosExibicao
+                                                              .toString()
+                                                              .replaceAll(
+                                                                "_",
+                                                                " ",
+                                                              )
+                                                              .replaceAll(
+                                                                "[",
+                                                                " ",
+                                                              )
+                                                              .replaceAll(
+                                                                "]",
+                                                                " ",
+                                                              ),
+                                                          style:
+                                                              TextTheme.of(
+                                                                context,
+                                                              ).bodySmall,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            },
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
                 bottomNavigationBar: Container(

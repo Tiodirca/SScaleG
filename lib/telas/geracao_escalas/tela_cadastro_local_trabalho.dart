@@ -348,11 +348,10 @@ class _TelaCadastroLocalTrabalhoState extends State<TelaCadastroLocalTrabalho> {
                               ),
                               Card(
                                 child: SizedBox(
-                                  height: alturaTela * 0.5,
-                                  width:
-                                      Platform.isAndroid || Platform.isIOS
-                                          ? larguraTela
-                                          : larguraTela * 0.7,
+                                  height:  Platform.isAndroid || Platform.isIOS
+                                      ? alturaTela *0.35
+                                      : alturaTela * 0.5,
+                                  width : larguraTela,
                                   child: ListView(
                                     children: [
                                       ...listaDiasSemana.map(

@@ -52,6 +52,7 @@ class _TelaSplashScreenState extends State<TelaSplashScreen> {
         debugPrint("Sem Usuario Logado");
         redirecionarTelaLoginCadastro();
       }
+      if(Platform.isIOS || Platform.isAndroid)
       if (index == 2 && (!Platform.isIOS || !Platform.isAndroid) ||
           index == 1 && (Platform.isIOS || Platform.isAndroid)) {
         index = 0;
