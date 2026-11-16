@@ -117,7 +117,7 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
         children: [
           Text(
             checkBoxModel.nome.replaceAll("_", " ").toUpperCase(),
-            style: const TextStyle(fontSize: 20),
+            style: const TextStyle(fontSize: 18),
           ),
           Wrap(
             alignment: WrapAlignment.center,
@@ -125,9 +125,9 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
             children: [
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: 500,
-                  height: 40,
+                child: Container(
+                  margin: EdgeInsets.only(right: 10),
+                  height: 20,
                   child: Row(
                     children: [
                       Text(
@@ -150,9 +150,9 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
               ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: 300,
-                  height: 40,
+                child: Container(
+                  margin: EdgeInsets.only(right: 10),
+                  height: 20,
                   child: Row(
                     children: [
                       Text(
@@ -211,7 +211,6 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
       }
     }
   }
-
 
   chamarExibirMensagemErro(String erro) {
     MetodosAuxiliares.exibirMensagens(
@@ -287,7 +286,9 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
         .withConverter(
           // chamando modelos para fazer conversao
           fromFirestore: CheckBoxModeloLocalTrabalho.fromFirestore,
-          toFirestore: (CheckBoxModeloLocalTrabalho checkbox, _) => checkbox.toFirestore(),
+          toFirestore:
+              (CheckBoxModeloLocalTrabalho checkbox, _) =>
+                  checkbox.toFirestore(),
         );
 
     final docSnap = await ref.get();
@@ -454,73 +455,149 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
                             builder: (context, constraints) {
                               if (listaNomesCadastrados.isNotEmpty) {
                                 // area de exibicao de descricao e listagem de nomes
-                                return SingleChildScrollView(
+                                return SizedBox(
+                                  width: larguraTela,
+                                  height: alturaTela - 160,
                                   child: Column(
                                     children: [
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 10.0,
-                                        ),
-                                        width: larguraTela,
-                                        child: Text(
-                                          textAlign: TextAlign.center,
-                                          Textos
-                                              .telaSelecaoLocalDescricao,
-                                          style:
-                                              TextTheme.of(context).bodySmall,
-                                        ),
-                                      ),
-                                      // Area de Exibicao da lista com os nomes dos voluntarios
-                                      Card(
-                                        child: SizedBox(
-                                          height: alturaTela * 0.6,
-                                          width:
-                                              Platform.isAndroid ||
-                                                      Platform.isIOS
-                                                  ? larguraTela
-                                                  : larguraTela * 0.9,
-                                          child: ListView(
-                                            children: [
-                                              ...listaNomesCadastrados.map(
-                                                (e) => checkBoxPersonalizado(
-                                                  e,
-                                                  larguraTela,
-                                                ),
-                                              ),
-                                            ],
+                                      Expanded(
+                                        flex: 0,
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                          ),
+                                          width: larguraTela,
+                                          child: Text(
+                                            textAlign: TextAlign.center,
+                                            Textos
+                                                .telaSelecaoLocalDescricao,
+                                            style:
+                                                TextTheme.of(context).bodySmall,
                                           ),
                                         ),
                                       ),
-                                      Visibility(
-                                        visible:
-                                        listaNomesSelecionados.isNotEmpty ? true : false,
+                                      Expanded(
+                                        flex: 5,
                                         child: SizedBox(
-                                          height: 100,
-                                          width:
-                                          Platform.isAndroid || Platform.isIOS
-                                              ? larguraTela
-                                              : larguraTela * 0.5,
-                                          child: Card(
-                                            child: SingleChildScrollView(
-                                              child:   Wrap(
-                                                alignment: WrapAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    textAlign: TextAlign.center,
-                                                    Textos
-                                                        .telaSelecaoLocalLocaisSelecionados,
-                                                    style: TextTheme.of(context).bodySmall,
-                                                  ),
-                                                  Text(
-                                                    textAlign: TextAlign.center,
-                                                    listaNomesSelecionadosExibicao
-                                                        .toString()
-                                                        .replaceAll("_", " ")
-                                                        .replaceAll("[", " ")
-                                                        .replaceAll("]", " "),
-                                                    style: TextTheme.of(context).bodySmall,
-                                                  ),
-                                                ],
+                                          width: larguraTela,
+                                          height: alturaTela,
+                                          child: SingleChildScrollView(
+                                            child: Card(
+                                              child: SizedBox(
+                                                height:
+                                                    Platform.isAndroid ||
+                                                            Platform.isIOS
+                                                        ? alturaTela * 0.45
+                                                        : alturaTela * 0.6,
+                                                width:
+                                                    Platform.isAndroid ||
+                                                            Platform.isIOS
+                                                        ? larguraTela
+                                                        : larguraTela * 0.9,
+                                                child: ListView(
+                                                  children: [
+                                                    ...listaNomesCadastrados.map(
+                                                      (e) =>
+                                                          checkBoxPersonalizado(
+                                                            e,
+                                                            larguraTela,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Visibility(
+                                          visible:
+                                              listaNomesSelecionados.isNotEmpty
+                                                  ? true
+                                                  : false,
+                                          child: SizedBox(
+                                            width:
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? larguraTela
+                                                    : larguraTela * 0.9,
+                                            child: Card(
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          Textos
+                                                              .telaSelecaoLocalLocaisSelecionados,
+                                                          style:
+                                                              TextTheme.of(
+                                                                context,
+                                                              ).bodySmall,
+                                                        ),
+                                                        Text(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          listaNomesSelecionados
+                                                              .length
+                                                              .toString(),
+                                                          style:
+                                                              TextTheme.of(
+                                                                context,
+                                                              ).bodySmall,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Wrap(
+                                                      alignment:
+                                                          WrapAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          Textos
+                                                              .telaSelecaoDescricaoVoluntarioNomesSelecionados,
+                                                          style:
+                                                              TextTheme.of(
+                                                                context,
+                                                              ).bodySmall,
+                                                        ),
+                                                        Text(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          listaNomesSelecionadosExibicao
+                                                              .toString()
+                                                              .replaceAll(
+                                                                "_",
+                                                                " ",
+                                                              )
+                                                              .replaceAll(
+                                                                "[",
+                                                                " ",
+                                                              )
+                                                              .replaceAll(
+                                                                "]",
+                                                                " ",
+                                                              ),
+                                                          style:
+                                                              TextTheme.of(
+                                                                context,
+                                                              ).bodySmall,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
