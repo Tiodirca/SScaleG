@@ -53,6 +53,10 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     super.initState();
     uidUsuario =
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+
+    PassarPegarDados.recuperarNomesVoluntarios().forEach((element) {
+          print("NOME : ${element.texto} Categoria : ${element.categoriaVoluntario} Observação : ${element.observacao} Dias : ${element.diasDisponiveis}");
+        },);
   }
 
   recuperarHorarioDefinidoInicioTrabalho() {
@@ -132,7 +136,9 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
         dias.contains('todos os dias');
   }
 
-  // Método principal de sorteio inteligente e equilibrado
+
+
+  // Método principal de sorteio inteligente, equilibrado e com rodízio de locais
   fazerSorteio() {
     escalaSorteada.clear();
 
@@ -147,15 +153,19 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       return;
     }
 
-    // Embaralha levemente para variar as escalas geradas mantendo a justiça
     List<CheckBoxModeloVoluntario> voluntariosEmbaralhados =
     List.from(nomeVoluntarios)..shuffle(random);
 
+    // Contador global de escalas no mês por voluntário
     Map<String, int> contagemGeralEscalas = {
       for (var v in voluntariosEmbaralhados) v.texto: 0
     };
 
-    // Preenche as linhas (datas) e colunas (locais)
+    // Contador de quantas vezes cada voluntário trabalhou em CADA local específico (evita repetir sempre o mesmo posto)
+    Map<String, Map<String, int>> contagemPorLocal = {
+      for (var v in voluntariosEmbaralhados) v.texto: {}
+    };
+
     for (var datas in intervaloTrabalho) {
       Map linha = {};
       String horarioInicioTrabalho = "";
@@ -187,6 +197,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
               nomeLocal: nomeLocal,
               escaladosHoje: escaladosHoje,
               contagemGeralEscalas: contagemGeralEscalas,
+              contagemPorLocal: contagemPorLocal,
             );
 
             duplaDoLocal.add(escolhido);
@@ -194,6 +205,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
               escaladosHoje.add(escolhido);
               contagemGeralEscalas[escolhido] =
                   (contagemGeralEscalas[escolhido] ?? 0) + 1;
+              contagemPorLocal[escolhido]![nomeLocal] =
+                  (contagemPorLocal[escolhido]![nomeLocal] ?? 0) + 1;
             }
           }
 
@@ -205,6 +218,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
             nomeLocal: nomeLocal,
             escaladosHoje: escaladosHoje,
             contagemGeralEscalas: contagemGeralEscalas,
+            contagemPorLocal: contagemPorLocal,
           );
 
           linha[nomeLocal] = escolhido;
@@ -212,6 +226,8 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
             escaladosHoje.add(escolhido);
             contagemGeralEscalas[escolhido] =
                 (contagemGeralEscalas[escolhido] ?? 0) + 1;
+            contagemPorLocal[escolhido]![nomeLocal] =
+                (contagemPorLocal[escolhido]![nomeLocal] ?? 0) + 1;
           }
         }
       }
@@ -222,13 +238,19 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     chamarCadastroItens();
   }
 
-  // Escolhe o melhor voluntário respeitando restrições de dias, locais e evitando duplicação diária
+
+
+  // Escolhe o melhor voluntário garantindo:
+  // 1. Todos sejam escalados ao menos 1 vez
+  // 2. Prioridade para quem tem restrição de local exclusivo ou dias específicos
+  // 3. Rodízio real entre os locais para quem pode trabalhar em vários postos
   String _escolherVoluntarioEquilibrado({
     required List<CheckBoxModeloVoluntario> listaVoluntarios,
     required String diaSemanaAtual,
     required String nomeLocal,
     required List<String> escaladosHoje,
     required Map<String, int> contagemGeralEscalas,
+    required Map<String, Map<String, int>> contagemPorLocal,
   }) {
     List<CheckBoxModeloVoluntario> elegiveisHoje = listaVoluntarios.where((vol) {
       if (escaladosHoje.contains(vol.texto)) return false;
@@ -239,21 +261,54 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       return "Sem voluntário";
     }
 
-    // Ordena para garantir distribuição justa e próxima entre todos
-    elegiveisHoje.sort((a, b) {
-      int qtdA = contagemGeralEscalas[a.texto] ?? 0;
-      int qtdB = contagemGeralEscalas[b.texto] ?? 0;
+    // 1. REGRA DE OURO: Quem ainda não foi escalado NENHUMA vez (0 escalas)
+    List<CheckBoxModeloVoluntario> nuncaEscalados = elegiveisHoje
+        .where((vol) => (contagemGeralEscalas[vol.texto] ?? 0) == 0)
+        .toList();
 
-      if (qtdA != qtdB) {
-        return qtdA.compareTo(qtdB);
+    if (nuncaEscalados.isNotEmpty) {
+      nuncaEscalados.sort((a, b) {
+        // Prioridade máxima para quem só pode trabalhar neste local exclusivo
+        bool aLocalExclusivo = _temRestricaoLocalExclusivo(a);
+        bool bLocalExclusivo = _temRestricaoLocalExclusivo(b);
+        if (aLocalExclusivo && !bLocalExclusivo) return -1;
+        if (!aLocalExclusivo && bLocalExclusivo) return 1;
+
+        // Segunda prioridade para quem tem restrição de dias da semana
+        bool aRestricaoDia = !_isDisponivelTodosOsDias(a);
+        bool bRestricaoDia = !_isDisponivelTodosOsDias(b);
+        if (aRestricaoDia && !bRestricaoDia) return -1;
+        if (!aRestricaoDia && bRestricaoDia) return 1;
+
+        return 0;
+      });
+      return nuncaEscalados.first.texto;
+    }
+
+    // 2. EQUILÍBRIO GERAL + RODÍZIO DE LOCAIS (evita cair sempre no mesmo posto)
+    elegiveisHoje.sort((a, b) {
+      int qtdGeralA = contagemGeralEscalas[a.texto] ?? 0;
+      int qtdGeralB = contagemGeralEscalas[b.texto] ?? 0;
+
+      // Primeiro equilibra o total geral de escalas no mês
+      if (qtdGeralA != qtdGeralB) {
+        return qtdGeralA.compareTo(qtdGeralB);
       }
 
-      // Prioridade para quem tem restrição de dias caso haja empate na quantidade geral
-      bool aLivreTodos = _isDisponivelTodosOsDias(a);
-      bool bLivreTodos = _isDisponivelTodosOsDias(b);
+      // Em caso de empate no total geral, escolhe quem trabalhou MENOS vezes NESTE local específico
+      int qtdLocalA = contagemPorLocal[a.texto]?[nomeLocal] ?? 0;
+      int qtdLocalB = contagemPorLocal[b.texto]?[nomeLocal] ?? 0;
+      if (qtdLocalA != qtdLocalB) {
+        return qtdLocalA.compareTo(qtdLocalB);
+      }
 
-      if (!aLivreTodos && bLivreTodos) return -1;
-      if (aLivreTodos && !bLivreTodos) return 1;
+      // Por fim, prioriza quem tem menos flexibilidade (local exclusivo ou dia restrito)
+      bool aRestrito =
+          _temRestricaoLocalExclusivo(a) || !_isDisponivelTodosOsDias(a);
+      bool bRestrito =
+          _temRestricaoLocalExclusivo(b) || !_isDisponivelTodosOsDias(b);
+      if (aRestrito && !bRestrito) return -1;
+      if (!aRestrito && bRestrito) return 1;
 
       return 0;
     });
@@ -263,6 +318,43 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
   // Validação estrita de dias, folgas e horários/turnos
   // Validação estrita de dias, folgas, horários/turnos e restrições de "não" e "somente/apenas" por local
+  // Validação estrita de dias, horários/turnos e restrições dinâmicas de "não" e "somente/apenas"
+  // Validação estrita de dias, horários/turnos e restrições de local por frase natural
+  // Identifica de forma ampla se o voluntário possui restrição exclusiva de local baseada na frase
+  // Identifica se o voluntário possui restrição exclusiva de local baseada na frase
+  bool _temRestricaoLocalExclusivo(CheckBoxModeloVoluntario vol) {
+    String textoPerfil = _normalizar("${vol.observacao} ${vol.categoriaVoluntario}");
+
+    bool temTermoExclusivo = textoPerfil.contains('somente') ||
+        textoPerfil.contains('apenas') ||
+        textoPerfil.contains('colocar em') ||
+        textoPerfil.contains('colocar nas') ||
+        textoPerfil.contains('colocar no') ||
+        textoPerfil.contains('trabalhar em') ||
+        textoPerfil.contains('trabalhar nas') ||
+        textoPerfil.contains('trabalhar no') ||
+        textoPerfil.contains('escala em') ||
+        textoPerfil.contains('escalado em') ||
+        RegExp(r'\bso\b').hasMatch(textoPerfil);
+
+    if (!temTermoExclusivo) return false;
+
+    // Verifica se menciona qualquer local cadastrado ou variações/sinônimos comuns (ofertas, sentinela, portaria, altar, etc.)
+    for (var loc in locaisSorteioVoluntarios) {
+      String nomeLocNorm = _normalizar(loc.nome);
+      if (textoPerfil.contains(nomeLocNorm) ||
+          (nomeLocNorm.contains('oferta') && (textoPerfil.contains('oferta') || textoPerfil.contains('recolher'))) ||
+          (nomeLocNorm.contains('sentinela') && textoPerfil.contains('sentinela')) ||
+          (nomeLocNorm.contains('portaria') && textoPerfil.contains('portaria')) ||
+          (nomeLocNorm.contains('altar') && textoPerfil.contains('altar'))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Validação estrita considerando sinônimos e novos locais (sentinela, portaria, altar, ofertas)
   bool _voluntarioPodeTrabalharNoDia(
       CheckBoxModeloVoluntario vol,
       String diaSemanaAtual,
@@ -275,21 +367,13 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     String localLimpo = _normalizar(nomeLocal);
 
     String diaIdentificado = "";
-    if (diaLimpo.contains("segunda")) {
-      diaIdentificado = "segunda";
-    } else if (diaLimpo.contains("terca")) {
-      diaIdentificado = "terca";
-    } else if (diaLimpo.contains("quarta")) {
-      diaIdentificado = "quarta";
-    } else if (diaLimpo.contains("quinta")) {
-      diaIdentificado = "quinta";
-    } else if (diaLimpo.contains("sexta")) {
-      diaIdentificado = "sexta";
-    } else if (diaLimpo.contains("sabado")) {
-      diaIdentificado = "sabado";
-    } else if (diaLimpo.contains("domingo")) {
-      diaIdentificado = "domingo";
-    }
+    if (diaLimpo.contains("segunda")) diaIdentificado = "segunda";
+    else if (diaLimpo.contains("terca")) diaIdentificado = "terca";
+    else if (diaLimpo.contains("quarta")) diaIdentificado = "quarta";
+    else if (diaLimpo.contains("quinta")) diaIdentificado = "quinta";
+    else if (diaLimpo.contains("sexta")) diaIdentificado = "sexta";
+    else if (diaLimpo.contains("sabado")) diaIdentificado = "sabado";
+    else if (diaLimpo.contains("domingo")) diaIdentificado = "domingo";
 
     // 1. VERIFICAÇÃO DE DIAS DISPONÍVEIS
     if (!_isDisponivelTodosOsDias(vol)) {
@@ -298,7 +382,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       }
     }
 
-    // 2. TRAVA DE EXCEÇÃO DE DIAS NAS OBSERVAÇÕES OU CATEGORIA (ex: "não na quarta")
+    // 2. TRAVA DE EXCEÇÃO DE DIAS
     String textoPerfil = "$obsVoluntario $categoriaVol";
     if (textoPerfil.contains('nao') ||
         textoPerfil.contains('exceto') ||
@@ -310,37 +394,26 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       }
     }
 
-    // 3. RESTRIÇÕES DE PRIMEIRO OU SEGUNDO HORÁRIO (NÃO / SOMENTE)
-    bool restricaoNaoPrimeiro = textoPerfil.contains('nao primeiro') ||
-        textoPerfil.contains('nao_primeiro') ||
-        textoPerfil.contains('so segundo') ||
-        textoPerfil.contains('apenas segundo');
+    // 3. RESTRIÇÕES DE PRIMEIRO OU SEGUNDO HORÁRIO
+    bool restricaoNaoPrimeiro = textoPerfil.contains('nao primeiro') || textoPerfil.contains('nao_primeiro');
     bool restricaoSomentePrimeiro = textoPerfil.contains('somente primeiro') ||
         textoPerfil.contains('apenas primeiro') ||
-        textoPerfil.contains('so primeiro');
+        RegExp(r'\bso primeiro\b').hasMatch(textoPerfil);
 
-    bool restricaoNaoSegundo = textoPerfil.contains('nao segundo') ||
-        textoPerfil.contains('nao_segundo') ||
-        textoPerfil.contains('so primeiro') ||
-        textoPerfil.contains('apenas primeiro');
+    bool restricaoNaoSegundo = textoPerfil.contains('nao segundo') || textoPerfil.contains('nao_segundo');
     bool restricaoSomenteSegundo = textoPerfil.contains('somente segundo') ||
         textoPerfil.contains('apenas segundo') ||
-        textoPerfil.contains('so segundo');
+        RegExp(r'\bso segundo\b').hasMatch(textoPerfil);
 
-    bool ehPrimeiroHorario = localLimpo.contains('01') ||
-        localLimpo.contains('1') ||
-        localLimpo.contains('primeiro');
-    bool ehSegundoHorario = localLimpo.contains('02') ||
-        localLimpo.contains('2') ||
-        localLimpo.contains('segundo');
+    bool ehPrimeiroHorario = localLimpo.contains('01') || localLimpo.contains('1') || localLimpo.contains('primeiro');
+    bool ehSegundoHorario = localLimpo.contains('02') || localLimpo.contains('2') || localLimpo.contains('segundo');
 
     if (restricaoNaoPrimeiro && ehPrimeiroHorario) return false;
     if (restricaoNaoSegundo && ehSegundoHorario) return false;
-
     if (restricaoSomentePrimeiro && !ehPrimeiroHorario) return false;
     if (restricaoSomenteSegundo && !ehSegundoHorario) return false;
 
-    // 4. BLOQUEIO DE LOCAIS ESPECÍFICOS (NÃO / EXCETO)
+    // 4. BLOQUEIO DE LOCAIS ESPECÍFICOS POR NEGAÇÃO ("NÃO", "EXCETO")
     if (textoPerfil.contains('nao') ||
         textoPerfil.contains('exceto') ||
         textoPerfil.contains('fora') ||
@@ -353,31 +426,44 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       }
     }
 
-    // 5. RESTRIÇÃO EXCLUSIVA DE LOCAL ("SOMENTE" ou "APENAS")
-    // Se o usuário escreveu "somente ofertas" ou "apenas recepção", ele só pode ir nesse local exato
-    if (textoPerfil.contains('somente') || textoPerfil.contains('apenas') || textoPerfil.contains('so ')) {
-      // Verifica se o texto menciona o nome deste local atual
-      List<String> palavrasLocal = localLimpo.split(RegExp(r'\s+'));
-      bool mencionaLocalAtual = false;
-      for (String palavra in palavrasLocal) {
-        if (palavra.length > 2 && textoPerfil.contains(palavra)) {
-          mencionaLocalAtual = true;
+    // 5. RESTRIÇÃO EXCLUSIVA DE LOCAL AMPLIADA (Trata ofertas, sentinela, portaria, altar e variações)
+    if (_temRestricaoLocalExclusivo(vol)) {
+      bool bateuComLocalAtual = false;
+
+      List<String> palavrasLocalAtual = localLimpo
+          .split(RegExp(r'\s+'))
+          .where((p) => p.length > 2)
+          .toList();
+
+      for (String palavra in palavrasLocalAtual) {
+        if (textoPerfil.contains(palavra)) {
+          bateuComLocalAtual = true;
           break;
         }
       }
 
-      // Se ele usou "somente/apenas" mas o local atual NÃO é o mencionado por ele, bloqueia!
-      if (!mencionaLocalAtual) {
-        // Confirma se há menção a outro local na restrição para evitar falsos positivos
-        if (textoPerfil.contains('oferta') || textoPerfil.contains('pulpito') || textoPerfil.contains('entrada') || textoPerfil.contains('recepcao')) {
-          return false;
+      // Equivalência semântica expandida
+      if (!bateuComLocalAtual) {
+        if ((localLimpo.contains('oferta') || localLimpo.contains('recolher')) &&
+            (textoPerfil.contains('oferta') || textoPerfil.contains('recolher'))) {
+          bateuComLocalAtual = true;
+        } else if (localLimpo.contains('sentinela') && textoPerfil.contains('sentinela')) {
+          bateuComLocalAtual = true;
+        } else if (localLimpo.contains('portaria') && textoPerfil.contains('portaria')) {
+          bateuComLocalAtual = true;
+        } else if (localLimpo.contains('altar') && textoPerfil.contains('altar')) {
+          bateuComLocalAtual = true;
         }
+      }
+
+      // Se a pessoa tem restrição exclusiva, bloqueia qualquer local que não seja o correspondente
+      if (!bateuComLocalAtual) {
+        return false;
       }
     }
 
     return true;
   }
-
   // Método para buscar o id na base de dados para poder adicionar os dados
   buscarIDDocumentoFirebase() async {
     String idDocumentoFirebase = "";
