@@ -14,6 +14,8 @@ dependencies:
 
   flutter_localizations:
     sdk: flutter
+  syncfusion_flutter_pdf: ^35.1.46
+  file_picker: ^8.0.0
   #utilizado para gerar pdf
   pdf: ^3.10.1
   #utilizado para salvar

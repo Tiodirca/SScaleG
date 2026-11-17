@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/modelo/check_box_modelo_local_trabalho.dart';
 import 'package:sscaleg/modelo/check_box_modelo_voluntario.dart';
@@ -28,12 +30,12 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   Estilo estilo = Estilo();
   String idDocumento = "";
   List<String> intervaloTrabalho =
-  PassarPegarDados.recuperarIntervaloTrabalho();
+      PassarPegarDados.recuperarIntervaloTrabalho();
 
   List<CheckBoxModeloLocalTrabalho> locaisSorteioVoluntarios =
-  PassarPegarDados.recuperarNomesLocaisTrabalho();
+      PassarPegarDados.recuperarNomesLocaisTrabalho();
   List<CheckBoxModeloVoluntario> nomeVoluntarios =
-  PassarPegarDados.recuperarNomesVoluntarios();
+      PassarPegarDados.recuperarNomesVoluntarios();
 
   TextEditingController nomeEscala = TextEditingController(text: "");
   Random random = Random();
@@ -48,27 +50,120 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   String nomeColecaoFireBase = Constantes.fireBaseColecaoEscalas;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeEscalas;
 
+  // Alterado para suportar múltiplos PDFs
+  List<String> nomesArquivosPdf = [];
+  Map<String, Set<String>> escalasExternasPorVoluntario = {};
+
   @override
   void initState() {
     super.initState();
     uidUsuario =
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
+  }
 
-    PassarPegarDados.recuperarNomesVoluntarios().forEach((element) {
-          print("NOME : ${element.texto} Categoria : ${element.categoriaVoluntario} Observação : ${element.observacao} Dias : ${element.diasDisponiveis}");
-        },);
+  // Método atualizado para permitir a seleção de múltiplos PDFs de uma vez ou em etapas
+  Future<void> _anexarEExtrairPdf() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+        allowMultiple: true, // Habilita selecionar mais de um arquivo
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        setState(() {
+          exibirWidgetCarregamento = true;
+        });
+
+        for (var fileObj in result.files) {
+          if (fileObj.path != null) {
+            if (!nomesArquivosPdf.contains(fileObj.name)) {
+              nomesArquivosPdf.add(fileObj.name);
+            }
+
+            File file = File(fileObj.path!);
+            final List<int> bytes = await file.readAsBytes();
+            final PdfDocument document = PdfDocument(inputBytes: bytes);
+            String textoPdf = PdfTextExtractor(document).extractText();
+            document.dispose();
+
+            _processarTextoPdf(textoPdf);
+          }
+        }
+
+        setState(() {
+          exibirWidgetCarregamento = false;
+        });
+
+        MetodosAuxiliares.exibirMensagens(
+          Constantes.tipoNotificacaoSucesso,
+          "PDF(s) anexado(s) e processado(s) com sucesso!",
+          context,
+        );
+      }
+    } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
+      chamarExibirMensagemErro("Erro ao processar PDF: ${e.toString()}");
+    }
+  }
+
+  // Processa o texto extraído acumulando no mapa geral de escalas externas
+  // Processa o texto extraído acumulando no mapa geral de escalas externas de forma inteligente
+  void _processarTextoPdf(String textoPdf) {
+    List<String> linhas = textoPdf.split('\n');
+    String dataAtualDetectada = "";
+
+    // Regex aprimorada para capturar datas no formato DD/MM, DD/MM/AAAA ou DD-MM
+    final RegExp regexData = RegExp(r'\b\d{2}[/\-]\d{2}(?:[/\-]\d{4})?\b');
+
+    for (var linha in linhas) {
+      String linhaNorm = linha.trim();
+      if (linhaNorm.isEmpty) continue;
+
+      // Tenta encontrar uma data na linha atual
+      Match? matchData = regexData.firstMatch(linhaNorm);
+      if (matchData != null) {
+        // Padroniza a data encontrada para usar sempre barra (/) e pega apenas o Dia/Mês (DD/MM) para evitar conflito de ano
+        String dataBruta = matchData.group(0)!.replaceAll('-', '/');
+        List<String> partes = dataBruta.split('/');
+        if (partes.length >= 2) {
+          dataAtualDetectada = "${partes[0]}/${partes[1]}";
+        }
+      }
+
+      // Se já identificamos uma data no contexto, verificamos quais voluntários aparecem nesta mesma linha ou bloco
+      if (dataAtualDetectada.isNotEmpty) {
+        for (var vol in nomeVoluntarios) {
+          String nomeVolNorm = _normalizar(vol.texto);
+          String linhaNormalizadaCompleta = _normalizar(linhaNorm);
+
+          // Verifica se o nome do voluntário está presente na linha do PDF
+          if (linhaNormalizadaCompleta.contains(nomeVolNorm)) {
+            escalasExternasPorVoluntario.putIfAbsent(nomeVolNorm, () => {});
+            escalasExternasPorVoluntario[nomeVolNorm]!.add(dataAtualDetectada);
+
+            // Debug no console para você acompanhar o que o app leu (abra o console do Flutter para ver)
+            print(
+              "PDF CONFLITO DETECTADO -> Voluntário: ${vol.texto} | Data: $dataAtualDetectada",
+            );
+          }
+        }
+      }
+    }
   }
 
   recuperarHorarioDefinidoInicioTrabalho() {
     setState(() {
       String horarioInicioSemana =
-      PassarPegarDados.recuperarHorarioSemanaDefinido();
+          PassarPegarDados.recuperarHorarioSemanaDefinido();
       String horarioInicioFinalSemana =
-      PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
+          PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
       String horarioTrocaTurnoSemana =
-      PassarPegarDados.recuperarHorarioTrocaTurnoSemanaDefinido();
+          PassarPegarDados.recuperarHorarioTrocaTurnoSemanaDefinido();
       String horarioTrocaTurnoFinalSemana =
-      PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
+          PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
 
       if (horarioTrocaTurnoSemana.isNotEmpty) {
         horarioSemana = "$horarioInicioSemana $horarioTrocaTurnoSemana";
@@ -78,17 +173,16 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
       if (horarioTrocaTurnoFinalSemana.isNotEmpty) {
         horarioFinalSemana =
-        "$horarioInicioFinalSemana $horarioTrocaTurnoFinalSemana";
+            "$horarioInicioFinalSemana $horarioTrocaTurnoFinalSemana";
       } else {
         horarioFinalSemana = horarioInicioFinalSemana;
       }
     });
   }
 
-  // Lê a observação do local para saber se exige 2 pessoas
   int _extrairVagasLocal(CheckBoxModeloLocalTrabalho local) {
     String obs =
-    "${local.observacaoLocal} ${local.diasLocalObservacao}".toLowerCase();
+        "${local.observacaoLocal} ${local.diasLocalObservacao}".toLowerCase();
     if (obs.contains('02') ||
         obs.contains('2') ||
         obs.contains('duas') ||
@@ -98,7 +192,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     return 1;
   }
 
-  // Extrai o dia da semana exato usando suas constantes
   String _extrairDiaSemanaConstante(String textoData) {
     String lower = textoData.toLowerCase();
     if (lower.contains('segunda')) return Constantes.diaSegunda.toLowerCase();
@@ -115,7 +208,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     return "";
   }
 
-  // Remove acentos e padroniza textos
   String _normalizar(String texto) {
     return texto
         .toLowerCase()
@@ -128,7 +220,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
         .replaceAll('ç', 'c');
   }
 
-  // Verifica se o voluntário tem disponibilidade livre ("Disponivel Todos os Dias" ou vazio)
   bool _isDisponivelTodosOsDias(CheckBoxModeloVoluntario vol) {
     String dias = _normalizar(vol.diasDisponiveis);
     return dias.isEmpty ||
@@ -136,9 +227,6 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
         dias.contains('todos os dias');
   }
 
-
-
-  // Método principal de sorteio inteligente, equilibrado e com rodízio de locais
   fazerSorteio() {
     escalaSorteada.clear();
 
@@ -149,21 +237,21 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
         exibirWidgetCarregamento = false;
       });
       chamarExibirMensagemErro(
-          "Verifique se há voluntários, locais e datas cadastrados.");
+        "Verifique se há voluntários, locais e datas cadastrados.",
+      );
       return;
     }
 
-    List<CheckBoxModeloVoluntario> voluntariosEmbaralhados =
-    List.from(nomeVoluntarios)..shuffle(random);
+    List<CheckBoxModeloVoluntario> voluntariosEmbaralhados = List.from(
+      nomeVoluntarios,
+    )..shuffle(random);
 
-    // Contador global de escalas no mês por voluntário
     Map<String, int> contagemGeralEscalas = {
-      for (var v in voluntariosEmbaralhados) v.texto: 0
+      for (var v in voluntariosEmbaralhados) v.texto: 0,
     };
 
-    // Contador de quantas vezes cada voluntário trabalhou em CADA local específico (evita repetir sempre o mesmo posto)
     Map<String, Map<String, int>> contagemPorLocal = {
-      for (var v in voluntariosEmbaralhados) v.texto: {}
+      for (var v in voluntariosEmbaralhados) v.texto: {},
     };
 
     for (var datas in intervaloTrabalho) {
@@ -195,6 +283,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
               listaVoluntarios: voluntariosEmbaralhados,
               diaSemanaAtual: diaSemanaAtual,
               nomeLocal: nomeLocal,
+              dataAtual: datas,
               escaladosHoje: escaladosHoje,
               contagemGeralEscalas: contagemGeralEscalas,
               contagemPorLocal: contagemPorLocal,
@@ -216,6 +305,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
             listaVoluntarios: voluntariosEmbaralhados,
             diaSemanaAtual: diaSemanaAtual,
             nomeLocal: nomeLocal,
+            dataAtual: datas,
             escaladosHoje: escaladosHoje,
             contagemGeralEscalas: contagemGeralEscalas,
             contagemPorLocal: contagemPorLocal,
@@ -238,43 +328,50 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     chamarCadastroItens();
   }
 
-
-
-  // Escolhe o melhor voluntário garantindo:
-  // 1. Todos sejam escalados ao menos 1 vez
-  // 2. Prioridade para quem tem restrição de local exclusivo ou dias específicos
-  // 3. Rodízio real entre os locais para quem pode trabalhar em vários postos
   String _escolherVoluntarioEquilibrado({
     required List<CheckBoxModeloVoluntario> listaVoluntarios,
     required String diaSemanaAtual,
     required String nomeLocal,
+    required String dataAtual,
     required List<String> escaladosHoje,
     required Map<String, int> contagemGeralEscalas,
     required Map<String, Map<String, int>> contagemPorLocal,
   }) {
-    List<CheckBoxModeloVoluntario> elegiveisHoje = listaVoluntarios.where((vol) {
-      if (escaladosHoje.contains(vol.texto)) return false;
-      return _voluntarioPodeTrabalharNoDia(vol, diaSemanaAtual, nomeLocal);
-    }).toList();
+    List<CheckBoxModeloVoluntario> elegiveisHoje =
+        listaVoluntarios.where((vol) {
+          if (escaladosHoje.contains(vol.texto)) return false;
+
+          // Validação aprimorada em todos os PDFs carregados
+          String nomeNorm = _normalizar(vol.texto);
+          if (escalasExternasPorVoluntario.containsKey(nomeNorm)) {
+            Set<String> datasOcupadas = escalasExternasPorVoluntario[nomeNorm]!;
+            for (var dOcupada in datasOcupadas) {
+              // Compara se o dia/mês (ex: 18/11) está presente na data do culto atual
+              if (_normalizar(dataAtual).contains(_normalizar(dOcupada))) {
+                return false; // Pula imediatamente se já estiver escalado no PDF nesta data!
+              }
+            }
+          }
+
+          return _voluntarioPodeTrabalharNoDia(vol, diaSemanaAtual, nomeLocal);
+        }).toList();
 
     if (elegiveisHoje.isEmpty) {
       return "Sem voluntário";
     }
 
-    // 1. REGRA DE OURO: Quem ainda não foi escalado NENHUMA vez (0 escalas)
-    List<CheckBoxModeloVoluntario> nuncaEscalados = elegiveisHoje
-        .where((vol) => (contagemGeralEscalas[vol.texto] ?? 0) == 0)
-        .toList();
+    List<CheckBoxModeloVoluntario> nuncaEscalados =
+        elegiveisHoje
+            .where((vol) => (contagemGeralEscalas[vol.texto] ?? 0) == 0)
+            .toList();
 
     if (nuncaEscalados.isNotEmpty) {
       nuncaEscalados.sort((a, b) {
-        // Prioridade máxima para quem só pode trabalhar neste local exclusivo
         bool aLocalExclusivo = _temRestricaoLocalExclusivo(a);
         bool bLocalExclusivo = _temRestricaoLocalExclusivo(b);
         if (aLocalExclusivo && !bLocalExclusivo) return -1;
         if (!aLocalExclusivo && bLocalExclusivo) return 1;
 
-        // Segunda prioridade para quem tem restrição de dias da semana
         bool aRestricaoDia = !_isDisponivelTodosOsDias(a);
         bool bRestricaoDia = !_isDisponivelTodosOsDias(b);
         if (aRestricaoDia && !bRestricaoDia) return -1;
@@ -285,24 +382,20 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       return nuncaEscalados.first.texto;
     }
 
-    // 2. EQUILÍBRIO GERAL + RODÍZIO DE LOCAIS (evita cair sempre no mesmo posto)
     elegiveisHoje.sort((a, b) {
       int qtdGeralA = contagemGeralEscalas[a.texto] ?? 0;
       int qtdGeralB = contagemGeralEscalas[b.texto] ?? 0;
 
-      // Primeiro equilibra o total geral de escalas no mês
       if (qtdGeralA != qtdGeralB) {
         return qtdGeralA.compareTo(qtdGeralB);
       }
 
-      // Em caso de empate no total geral, escolhe quem trabalhou MENOS vezes NESTE local específico
       int qtdLocalA = contagemPorLocal[a.texto]?[nomeLocal] ?? 0;
       int qtdLocalB = contagemPorLocal[b.texto]?[nomeLocal] ?? 0;
       if (qtdLocalA != qtdLocalB) {
         return qtdLocalA.compareTo(qtdLocalB);
       }
 
-      // Por fim, prioriza quem tem menos flexibilidade (local exclusivo ou dia restrito)
       bool aRestrito =
           _temRestricaoLocalExclusivo(a) || !_isDisponivelTodosOsDias(a);
       bool bRestrito =
@@ -316,16 +409,13 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     return elegiveisHoje.first.texto;
   }
 
-  // Validação estrita de dias, folgas e horários/turnos
-  // Validação estrita de dias, folgas, horários/turnos e restrições de "não" e "somente/apenas" por local
-  // Validação estrita de dias, horários/turnos e restrições dinâmicas de "não" e "somente/apenas"
-  // Validação estrita de dias, horários/turnos e restrições de local por frase natural
-  // Identifica de forma ampla se o voluntário possui restrição exclusiva de local baseada na frase
-  // Identifica se o voluntário possui restrição exclusiva de local baseada na frase
   bool _temRestricaoLocalExclusivo(CheckBoxModeloVoluntario vol) {
-    String textoPerfil = _normalizar("${vol.observacao} ${vol.categoriaVoluntario}");
+    String textoPerfil = _normalizar(
+      "${vol.observacao} ${vol.categoriaVoluntario}",
+    );
 
-    bool temTermoExclusivo = textoPerfil.contains('somente') ||
+    bool temTermoExclusivo =
+        textoPerfil.contains('somente') ||
         textoPerfil.contains('apenas') ||
         textoPerfil.contains('colocar em') ||
         textoPerfil.contains('colocar nas') ||
@@ -339,13 +429,16 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
     if (!temTermoExclusivo) return false;
 
-    // Verifica se menciona qualquer local cadastrado ou variações/sinônimos comuns (ofertas, sentinela, portaria, altar, etc.)
     for (var loc in locaisSorteioVoluntarios) {
       String nomeLocNorm = _normalizar(loc.nome);
       if (textoPerfil.contains(nomeLocNorm) ||
-          (nomeLocNorm.contains('oferta') && (textoPerfil.contains('oferta') || textoPerfil.contains('recolher'))) ||
-          (nomeLocNorm.contains('sentinela') && textoPerfil.contains('sentinela')) ||
-          (nomeLocNorm.contains('portaria') && textoPerfil.contains('portaria')) ||
+          (nomeLocNorm.contains('oferta') &&
+              (textoPerfil.contains('oferta') ||
+                  textoPerfil.contains('recolher'))) ||
+          (nomeLocNorm.contains('sentinela') &&
+              textoPerfil.contains('sentinela')) ||
+          (nomeLocNorm.contains('portaria') &&
+              textoPerfil.contains('portaria')) ||
           (nomeLocNorm.contains('altar') && textoPerfil.contains('altar'))) {
         return true;
       }
@@ -354,12 +447,11 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     return false;
   }
 
-  // Validação estrita considerando sinônimos e novos locais (sentinela, portaria, altar, ofertas)
   bool _voluntarioPodeTrabalharNoDia(
-      CheckBoxModeloVoluntario vol,
-      String diaSemanaAtual,
-      String nomeLocal,
-      ) {
+    CheckBoxModeloVoluntario vol,
+    String diaSemanaAtual,
+    String nomeLocal,
+  ) {
     String diasPermitidos = _normalizar(vol.diasDisponiveis);
     String obsVoluntario = _normalizar(vol.observacao);
     String categoriaVol = _normalizar(vol.categoriaVoluntario);
@@ -367,22 +459,28 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
     String localLimpo = _normalizar(nomeLocal);
 
     String diaIdentificado = "";
-    if (diaLimpo.contains("segunda")) diaIdentificado = "segunda";
-    else if (diaLimpo.contains("terca")) diaIdentificado = "terca";
-    else if (diaLimpo.contains("quarta")) diaIdentificado = "quarta";
-    else if (diaLimpo.contains("quinta")) diaIdentificado = "quinta";
-    else if (diaLimpo.contains("sexta")) diaIdentificado = "sexta";
-    else if (diaLimpo.contains("sabado")) diaIdentificado = "sabado";
-    else if (diaLimpo.contains("domingo")) diaIdentificado = "domingo";
+    if (diaLimpo.contains("segunda"))
+      diaIdentificado = "segunda";
+    else if (diaLimpo.contains("terca"))
+      diaIdentificado = "terca";
+    else if (diaLimpo.contains("quarta"))
+      diaIdentificado = "quarta";
+    else if (diaLimpo.contains("quinta"))
+      diaIdentificado = "quinta";
+    else if (diaLimpo.contains("sexta"))
+      diaIdentificado = "sexta";
+    else if (diaLimpo.contains("sabado"))
+      diaIdentificado = "sabado";
+    else if (diaLimpo.contains("domingo"))
+      diaIdentificado = "domingo";
 
-    // 1. VERIFICAÇÃO DE DIAS DISPONÍVEIS
     if (!_isDisponivelTodosOsDias(vol)) {
-      if (diaIdentificado.isEmpty || !diasPermitidos.contains(diaIdentificado)) {
+      if (diaIdentificado.isEmpty ||
+          !diasPermitidos.contains(diaIdentificado)) {
         return false;
       }
     }
 
-    // 2. TRAVA DE EXCEÇÃO DE DIAS
     String textoPerfil = "$obsVoluntario $categoriaVol";
     if (textoPerfil.contains('nao') ||
         textoPerfil.contains('exceto') ||
@@ -394,26 +492,36 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       }
     }
 
-    // 3. RESTRIÇÕES DE PRIMEIRO OU SEGUNDO HORÁRIO
-    bool restricaoNaoPrimeiro = textoPerfil.contains('nao primeiro') || textoPerfil.contains('nao_primeiro');
-    bool restricaoSomentePrimeiro = textoPerfil.contains('somente primeiro') ||
+    bool restricaoNaoPrimeiro =
+        textoPerfil.contains('nao primeiro') ||
+        textoPerfil.contains('nao_primeiro');
+    bool restricaoSomentePrimeiro =
+        textoPerfil.contains('somente primeiro') ||
         textoPerfil.contains('apenas primeiro') ||
         RegExp(r'\bso primeiro\b').hasMatch(textoPerfil);
 
-    bool restricaoNaoSegundo = textoPerfil.contains('nao segundo') || textoPerfil.contains('nao_segundo');
-    bool restricaoSomenteSegundo = textoPerfil.contains('somente segundo') ||
+    bool restricaoNaoSegundo =
+        textoPerfil.contains('nao segundo') ||
+        textoPerfil.contains('nao_segundo');
+    bool restricaoSomenteSegundo =
+        textoPerfil.contains('somente segundo') ||
         textoPerfil.contains('apenas segundo') ||
         RegExp(r'\bso segundo\b').hasMatch(textoPerfil);
 
-    bool ehPrimeiroHorario = localLimpo.contains('01') || localLimpo.contains('1') || localLimpo.contains('primeiro');
-    bool ehSegundoHorario = localLimpo.contains('02') || localLimpo.contains('2') || localLimpo.contains('segundo');
+    bool ehPrimeiroHorario =
+        localLimpo.contains('01') ||
+        localLimpo.contains('1') ||
+        localLimpo.contains('primeiro');
+    bool ehSegundoHorario =
+        localLimpo.contains('02') ||
+        localLimpo.contains('2') ||
+        localLimpo.contains('segundo');
 
     if (restricaoNaoPrimeiro && ehPrimeiroHorario) return false;
     if (restricaoNaoSegundo && ehSegundoHorario) return false;
     if (restricaoSomentePrimeiro && !ehPrimeiroHorario) return false;
     if (restricaoSomenteSegundo && !ehSegundoHorario) return false;
 
-    // 4. BLOQUEIO DE LOCAIS ESPECÍFICOS POR NEGAÇÃO ("NÃO", "EXCETO")
     if (textoPerfil.contains('nao') ||
         textoPerfil.contains('exceto') ||
         textoPerfil.contains('fora') ||
@@ -426,14 +534,11 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
       }
     }
 
-    // 5. RESTRIÇÃO EXCLUSIVA DE LOCAL AMPLIADA (Trata ofertas, sentinela, portaria, altar e variações)
     if (_temRestricaoLocalExclusivo(vol)) {
       bool bateuComLocalAtual = false;
 
-      List<String> palavrasLocalAtual = localLimpo
-          .split(RegExp(r'\s+'))
-          .where((p) => p.length > 2)
-          .toList();
+      List<String> palavrasLocalAtual =
+          localLimpo.split(RegExp(r'\s+')).where((p) => p.length > 2).toList();
 
       for (String palavra in palavrasLocalAtual) {
         if (textoPerfil.contains(palavra)) {
@@ -442,21 +547,24 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
         }
       }
 
-      // Equivalência semântica expandida
       if (!bateuComLocalAtual) {
-        if ((localLimpo.contains('oferta') || localLimpo.contains('recolher')) &&
-            (textoPerfil.contains('oferta') || textoPerfil.contains('recolher'))) {
+        if ((localLimpo.contains('oferta') ||
+                localLimpo.contains('recolher')) &&
+            (textoPerfil.contains('oferta') ||
+                textoPerfil.contains('recolher'))) {
           bateuComLocalAtual = true;
-        } else if (localLimpo.contains('sentinela') && textoPerfil.contains('sentinela')) {
+        } else if (localLimpo.contains('sentinela') &&
+            textoPerfil.contains('sentinela')) {
           bateuComLocalAtual = true;
-        } else if (localLimpo.contains('portaria') && textoPerfil.contains('portaria')) {
+        } else if (localLimpo.contains('portaria') &&
+            textoPerfil.contains('portaria')) {
           bateuComLocalAtual = true;
-        } else if (localLimpo.contains('altar') && textoPerfil.contains('altar')) {
+        } else if (localLimpo.contains('altar') &&
+            textoPerfil.contains('altar')) {
           bateuComLocalAtual = true;
         }
       }
 
-      // Se a pessoa tem restrição exclusiva, bloqueia qualquer local que não seja o correspondente
       if (!bateuComLocalAtual) {
         return false;
       }
@@ -464,7 +572,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
     return true;
   }
-  // Método para buscar o id na base de dados para poder adicionar os dados
+
   buscarIDDocumentoFirebase() async {
     String idDocumentoFirebase = "";
     var db = FirebaseFirestore.instance;
@@ -475,16 +583,15 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
         .where(nomeDocumentoFireBase)
         .get()
         .then((querySnapshot) {
-      for (var docSnapshot in querySnapshot.docs) {
-        if (docSnapshot.data().values.contains(nomeEscalaFormatada)) {
-          idDocumentoFirebase = docSnapshot.id;
-        }
-      }
-    });
+          for (var docSnapshot in querySnapshot.docs) {
+            if (docSnapshot.data().values.contains(nomeEscalaFormatada)) {
+              idDocumentoFirebase = docSnapshot.id;
+            }
+          }
+        });
     return idDocumentoFirebase;
   }
 
-  // Método para chamar o cadastro de itens no banco de dados
   chamarCadastroItens() async {
     try {
       var db = FirebaseFirestore.instance;
@@ -492,23 +599,24 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
           .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
           .collection(nomeColecaoFireBase)
-          .add({nomeDocumentoFireBase: nomeEscalaFormatada}).then(
+          .add({nomeDocumentoFireBase: nomeEscalaFormatada})
+          .then(
             (value) async {
-          String idDocumentoFirebase = await buscarIDDocumentoFirebase();
-          idDocumento = idDocumentoFirebase;
-          for (var element in escalaSorteada) {
-            cadastrarItens(element.entries.toList(), idDocumentoFirebase);
-          }
-        },
-        onError: (e) {
-          setState(() {
-            exibirWidgetCarregamento = false;
-          });
-          chamarExibirMensagemErro(
-            "Erro Criar Nome Escala : ${e.toString()}",
+              String idDocumentoFirebase = await buscarIDDocumentoFirebase();
+              idDocumento = idDocumentoFirebase;
+              for (var element in escalaSorteada) {
+                cadastrarItens(element.entries.toList(), idDocumentoFirebase);
+              }
+            },
+            onError: (e) {
+              setState(() {
+                exibirWidgetCarregamento = false;
+              });
+              chamarExibirMensagemErro(
+                "Erro Criar Nome Escala : ${e.toString()}",
+              );
+            },
           );
-        },
-      );
     } catch (e) {
       setState(() {
         exibirWidgetCarregamento = false;
@@ -537,18 +645,18 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
           .doc()
           .set(criarMapComTodosOsDados(escala))
           .then((value) {
-        index++;
-        if (index == escalaSorteada.length) {
-          index = 0;
-          MetodosAuxiliares.exibirMensagens(
-            Constantes.tipoNotificacaoSucesso,
-            Textos.notificacaoSucesso,
-            context,
-          );
-          limparListaDados();
-          redirecionarProximaTela();
-        }
-      });
+            index++;
+            if (index == escalaSorteada.length) {
+              index = 0;
+              MetodosAuxiliares.exibirMensagens(
+                Constantes.tipoNotificacaoSucesso,
+                Textos.notificacaoSucesso,
+                context,
+              );
+              limparListaDados();
+              redirecionarProximaTela();
+            }
+          });
     } catch (e) {
       setState(() {
         exibirWidgetCarregamento = false;
@@ -662,7 +770,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                   ),
                                   controller: nomeEscala,
                                   onFieldSubmitted: (value) {
-                                    chamarFazerSorteio(); // Mantém compatibilidade
+                                    chamarFazerSorteio();
                                   },
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -670,6 +778,35 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                                     }
                                     return null;
                                   },
+                                ),
+                              ),
+                            ),
+                            // Botão para anexar múltiplos PDFs
+                            Container(
+                              margin: EdgeInsets.only(top: 10, bottom: 10),
+                              child: ElevatedButton.icon(
+                                onPressed: _anexarEExtrairPdf,
+                                icon: const Icon(Icons.picture_as_pdf),
+                                label: Text(
+                                  nomesArquivosPdf.isEmpty
+                                      ? "Anexar Escalas em PDF (Opcional)"
+                                      : "PDFs anexados (${nomesArquivosPdf.length})",
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              child: Container(
+                                margin: EdgeInsets.only(top: 10, bottom: 10),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "Arquivos: ${nomesArquivosPdf.join(', ')}",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
                             ),
