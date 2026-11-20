@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:sscaleg/Uteis/paleta_cores.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:sscaleg/Widgets/tela_carregamento.dart';
 import 'package:sscaleg/modelo/check_box_modelo_local_trabalho.dart';
@@ -783,31 +784,47 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
                             ),
                             // Botão para anexar múltiplos PDFs
                             Container(
-                              margin: EdgeInsets.only(top: 10, bottom: 10),
+                              height: 40,
+                              margin: EdgeInsets.only(top: 20, bottom: 10),
                               child: ElevatedButton.icon(
+                                style: ButtonStyle(
+                                  side: WidgetStatePropertyAll(
+                                    BorderSide(
+                                      width: 1,
+                                      color: PaletaCores.corCastanho,
+                                    ),
+                                  ),
+                                  backgroundColor: WidgetStatePropertyAll(
+                                    Colors.white,
+                                  ),
+                                  elevation: WidgetStatePropertyAll(0),
+                                ),
                                 onPressed: _anexarEExtrairPdf,
-                                icon: const Icon(Icons.picture_as_pdf),
+                                icon: Icon(
+                                  Icons.picture_as_pdf,
+                                  color: PaletaCores.corAzulEscuro,
+                                  size: 25,
+                                ),
                                 label: Text(
                                   nomesArquivosPdf.isEmpty
                                       ? "Anexar Escalas em PDF (Opcional)"
                                       : "PDFs anexados (${nomesArquivosPdf.length})",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ),
                             Visibility(
-                              child: Container(
-                                margin: EdgeInsets.only(top: 10, bottom: 10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    "Arquivos: ${nomesArquivosPdf.join(', ')}",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
+                              visible: nomesArquivosPdf.isNotEmpty,
+                              child: Text(
+                                "Arquivos: ${nomesArquivosPdf.join(', ')}",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                             WidgetAjustarHorario(),

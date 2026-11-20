@@ -157,8 +157,8 @@ class Textos {
 
   // TELA GERAR ESCALA
   static String telaGerarEscalaDescricao =
-      "Defina o nome que a escala irá receber";
-
+      "Defina o nome que a escala irá receber e caso tenha outras escalas criadas com algum dos voluntarios selecionados "
+      "anexe para que os eles não sejam escalados no mesmo dia";
   // TELA SELECAO TABELAS
   static String telaSelecaoEscalaTitulo = "Seleção de Escalas";
   static String telaSelecaoEscalaDescricaoDropDownTabelas =
