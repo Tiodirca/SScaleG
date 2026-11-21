@@ -92,6 +92,7 @@ class _TelaSelecaoNomesVoluntariosState
               width: 30,
               height: 30,
               child: FloatingActionButton(
+                tooltip: Textos.btnExcluir,
                 heroTag: "btnExcluir ${checkBoxModel.id}",
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -108,6 +109,7 @@ class _TelaSelecaoNomesVoluntariosState
               width: 30,
               height: 30,
               child: FloatingActionButton(
+                tooltip: Textos.btnEditar,
                 heroTag: "btnEditar ${checkBoxModel.id}",
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -534,20 +536,22 @@ class _TelaSelecaoNomesVoluntariosState
     );
   }
 
-  Widget botoesIcone(IconData icone, Color corBotao) => Container(
-    margin: EdgeInsets.symmetric(horizontal: 5.0),
-    width: 40,
-    height: 40,
-    child: FloatingActionButton(
-      heroTag: icone.toString(),
-      onPressed: () {
-        setState(() {
-          exibirTelaFiltro = !exibirTelaFiltro;
-        });
-      },
-      child: Icon(icone, color: corBotao, size: 25),
-    ),
-  );
+  Widget botoesIcone(IconData icone, Color corBotao, String legenda) =>
+      Container(
+        margin: EdgeInsets.symmetric(horizontal: 5.0),
+        width: 40,
+        height: 40,
+        child: FloatingActionButton(
+          tooltip: legenda,
+          heroTag: icone.toString(),
+          onPressed: () {
+            setState(() {
+              exibirTelaFiltro = !exibirTelaFiltro;
+            });
+          },
+          child: Icon(icone, color: corBotao, size: 25),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -585,6 +589,7 @@ class _TelaSelecaoNomesVoluntariosState
                                 ? Constantes.iconeFiltroDesativado
                                 : Constantes.iconeFiltroAtivo,
                             PaletaCores.corAzulEscuro,
+                            Textos.btnFiltrarLista,
                           );
                         }
                       },
@@ -701,9 +706,10 @@ class _TelaSelecaoNomesVoluntariosState
                                         ),
                                       ),
                                       Expanded(
-                                        flex:   Platform.isAndroid ||
-                                            Platform.isIOS
-                                            ?  3 : 6,
+                                        flex:
+                                            Platform.isAndroid || Platform.isIOS
+                                                ? 3
+                                                : 6,
                                         child: SizedBox(
                                           width: larguraTela,
                                           height: alturaTela,

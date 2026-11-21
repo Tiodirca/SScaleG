@@ -158,13 +158,13 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
   recuperarHorarioDefinidoInicioTrabalho() {
     setState(() {
       String horarioInicioSemana =
-          PassarPegarDados.recuperarHorarioSemanaDefinido();
+      PassarPegarDados.recuperarHorarioSemanaDefinido();
       String horarioInicioFinalSemana =
-          PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
+      PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
       String horarioTrocaTurnoSemana =
-          PassarPegarDados.recuperarHorarioTrocaTurnoSemanaDefinido();
+      PassarPegarDados.recuperarHorarioTrocaTurnoSemanaDefinido();
       String horarioTrocaTurnoFinalSemana =
-          PassarPegarDados.recuperarHorarioFinalSemanaDefinido();
+      PassarPegarDados.recuperarHorarioTrocaTurnoFinalSemanaDefinido();
 
       if (horarioTrocaTurnoSemana.isNotEmpty) {
         horarioSemana = "$horarioInicioSemana $horarioTrocaTurnoSemana";
@@ -174,7 +174,7 @@ class _TelaGerarEscalaState extends State<TelaGerarEscala> {
 
       if (horarioTrocaTurnoFinalSemana.isNotEmpty) {
         horarioFinalSemana =
-            "$horarioInicioFinalSemana $horarioTrocaTurnoFinalSemana";
+        "$horarioInicioFinalSemana $horarioTrocaTurnoFinalSemana";
       } else {
         horarioFinalSemana = horarioInicioFinalSemana;
       }

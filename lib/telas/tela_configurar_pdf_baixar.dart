@@ -28,7 +28,7 @@ class TelaConfigurarPDFBaixar extends StatefulWidget {
   });
 
   final List<dynamic> cabecalhoEscala;
-  final List<Map> linhasEscala;
+  final List linhasEscala;
   final List<String> observacoes;
   final String nomeTabela;
   final String idTabelaSelecionada;
@@ -51,8 +51,8 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
   int valorRadioButtonSelecionado = 0;
   String nomeCadastro = "";
   String corSelecionada = "#FFFFFF";
-  List<Map> linhasRecebidas = [];
-  List<Map> linhasEscalaAuxiliarRemocao = [];
+  List linhasRecebidas = [];
+  List linhasEscalaAuxiliarRemocao = [];
   double indicadorPagina = 0.5;
   String nomeColecaoFireBase = Constantes.fireBaseColecaoNomeCabecalhoPDF;
   String nomeDocumentoFireBase = Constantes.fireBaseDocumentoNomeCabecalhoPDF;
@@ -66,51 +66,204 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
     super.initState();
     uidUsuario =
         PassarPegarDados.recuperarInformacoesUsuario().entries.first.value;
-    for (var element in widget.linhasEscala) {
-      linhasRecebidas.add(element);
-    }
-    listaObservacoes = PassarPegarDados.recuperarObservacoesPDF();
+
+    final List<dynamic> colunasRecebidasOrdenadas = [];
     for (var element in widget.cabecalhoEscala) {
       if (!(element.contains(Constantes.dataCulto) ||
           element.contains(Constantes.horarioTrabalho) ||
           element.contains(Constantes.editar) ||
           element.contains(Constantes.excluir))) {
+        colunasRecebidasOrdenadas.add(element);
         listaCabecalhosExibicao.add(
           CheckBoxModelo(texto: element, checked: true),
         );
       }
     }
+
+    for (var element in widget.linhasEscala) {
+      final Map linhaOrdenada = {};
+
+      for (final entry in element.entries) {
+        final chave = entry.key.toString();
+        if (chave.contains(Constantes.dataCulto) ||
+            chave.contains(Constantes.horarioTrabalho)) {
+          linhaOrdenada[entry.key] = entry.value;
+        }
+      }
+
+      for (final coluna in colunasRecebidasOrdenadas) {
+        if (element.containsKey(coluna)) {
+          linhaOrdenada[coluna] = element[coluna];
+        }
+      }
+
+      for (final entry in element.entries) {
+        if (!linhaOrdenada.containsKey(entry.key)) {
+          linhaOrdenada[entry.key] = entry.value;
+        }
+      }
+
+      linhasRecebidas.add(linhaOrdenada);
+    }
+
+    listaObservacoes = PassarPegarDados.recuperarObservacoesPDF();
+
     Timer(const Duration(seconds: 1), () {
       realizarBuscaDadosFireBase();
     });
+  }
+
+  // Método para atualizar título de cabeçalho editado no Firestore
+  atualizarCabecalhoPDF(CheckBoxModelo checkbox, String novoTexto) async {
+    final textoLimpo = novoTexto.trim();
+    if (textoLimpo.isEmpty || textoLimpo == checkbox.texto) {
+      return;
+    }
+
+    setState(() {
+      exibirWidgetCarregamento = true;
+    });
+
+    try {
+      var db = FirebaseFirestore.instance;
+      await db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
+          .doc(checkbox.id)
+          .update({nomeDocumentoFireBase: textoLimpo});
+
+      if (nomeCabelhadoPDFSelecionado == checkbox.texto) {
+        nomeCabelhadoPDFSelecionado = textoLimpo;
+      }
+
+      final textoSelecionadoAnterior = nomeCabelhadoPDFSelecionado;
+      limparDados();
+      nomeCabelhadoPDFSelecionado = textoSelecionadoAnterior;
+      realizarBuscaDadosFireBase();
+      chamarExibirMensagemSucesso();
+    } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
+      chamarExibirMensagemErro("Erro Atualizar Cabeçalho: ${e.toString()}");
+    }
+  }
+
+  Future<void> alertaEdicao(
+    BuildContext context,
+    CheckBoxModelo checkbox,
+  ) async {
+    final TextEditingController edicaoControle = TextEditingController(
+      text: checkbox.texto,
+    );
+    final GlobalKey<FormState> formEdicaoKey = GlobalKey<FormState>();
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Editar título",
+            style: TextStyle(color: Colors.black),
+          ),
+          content: Form(
+            key: formEdicaoKey,
+            child: TextFormField(
+              controller: edicaoControle,
+              autofocus: true,
+              decoration: InputDecoration(hintText: Textos.labelTextFieldCampo),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return Textos.erroCampoVazio;
+                }
+                return null;
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Salvar',
+                style: TextStyle(
+                  color: PaletaCores.corAzulEscuro,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                if (formEdicaoKey.currentState!.validate()) {
+                  final textoAtualizado = edicaoControle.text;
+                  Navigator.of(context).pop();
+                  atualizarCabecalhoPDF(checkbox, textoAtualizado);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget checkBoxPersonalizado(CheckBoxModelo checkBoxModel) =>
       CheckboxListTile(
         activeColor: PaletaCores.corAzulEscuro,
         checkColor: PaletaCores.corRosaClaro,
-        secondary: SizedBox(
-          width: 30,
-          height: 30,
-          child: FloatingActionButton(
-            heroTag: "btnExcluir${checkBoxModel.id}",
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: const BorderSide(color: Colors.red, width: 1),
+        secondary: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: EdgeInsets.only(right: 10),
+              width: 30,
+              height: 30,
+              child: FloatingActionButton(
+                tooltip: Textos.btnEditar,
+                heroTag: "btnEditar${checkBoxModel.id}",
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(
+                    color: PaletaCores.corCastanho,
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(Icons.edit, size: 20),
+                onPressed: () {
+                  alertaEdicao(context, checkBoxModel);
+                },
+              ),
             ),
-            child: const Icon(Icons.close, size: 20),
-            onPressed: () {
-              // chamando alerta para confirmar exclusao do item
-              alertaExclusao(context, checkBoxModel);
-            },
-          ),
+            SizedBox(
+              width: 30,
+              height: 30,
+              child: FloatingActionButton(
+                tooltip: Textos.btnExcluir,
+                heroTag: "btnExcluir${checkBoxModel.id}",
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(color: Colors.red, width: 1),
+                ),
+                child: const Icon(Icons.close, size: 20),
+                onPressed: () {
+                  alertaExclusao(context, checkBoxModel);
+                },
+              ),
+            ),
+          ],
         ),
         title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 18)),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
           setState(() {
-            // verificando se o balor
             checkBoxModel.checked = value!;
             validarSelecaoCabecalhoPDF(checkBoxModel);
           });
@@ -118,79 +271,63 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
       );
 
   validarSelecaoCabecalhoPDF(CheckBoxModelo checkBoxModel) {
-    //verificando se o checkbox selecionado
     if (checkBoxModel.checked == true) {
-      // caso tenha sido definir que a variavel receber o valor
       nomeCabelhadoPDFSelecionado = checkBoxModel.texto;
     } else {
-      // caso seja desmarcado vai receber o seguinte valor
       nomeCabelhadoPDFSelecionado = "";
     }
-    //percorrendo a lista
     for (var element in listaNomeCabecalhoPDF) {
-      //caso a variavel seja DIFERENTE do elemento passado
       if (nomeCabelhadoPDFSelecionado != element.texto) {
-        // definir que o valor do elemento sera
-        // false para poder desmarcar na lista de checkbox
         element.checked = false;
       }
     }
   }
 
-  Widget checkBoxExibicaoCamposEscala(CheckBoxModelo checkBoxModel) =>
-      CheckboxListTile(
-        activeColor: PaletaCores.corAzulEscuro,
-        checkColor: PaletaCores.corRosaClaro,
-        title: Text(
-          checkBoxModel.texto.replaceAll("_", " "),
-          style: const TextStyle(fontSize: 18),
-        ),
-        value: checkBoxModel.checked,
-        onChanged: (value) {
-          setState(() {
-            // verificando se o balor
-            checkBoxModel.checked = value!;
-
-            validarSelecaoCamposExibicao(checkBoxModel);
-          });
-        },
-      );
+  Widget itemReordenavelColuna(CheckBoxModelo checkBoxModel) => ListTile(
+    key: ValueKey(checkBoxModel.texto),
+    leading: const Icon(Icons.drag_handle, color: PaletaCores.corAzulEscuro),
+    title: Text(
+      checkBoxModel.texto.replaceAll("_", " "),
+      style: const TextStyle(fontSize: 18),
+    ),
+    trailing: Checkbox(
+      activeColor: PaletaCores.corAzulEscuro,
+      checkColor: PaletaCores.corRosaClaro,
+      side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
+      value: checkBoxModel.checked,
+      onChanged: (value) {
+        setState(() {
+          checkBoxModel.checked = value!;
+          validarSelecaoCamposExibicao(checkBoxModel);
+        });
+      },
+    ),
+  );
 
   validarSelecaoCamposExibicao(CheckBoxModelo checkBoxModel) {
     if (checkBoxModel.checked == false) {
       for (var element in linhasRecebidas) {
         element.removeWhere((key, value) {
-          //verificando se a key contem o valor do texto
           if (key.toString().contains(checkBoxModel.texto)) {
-            //pegando a data de cada elemento
             String data = element.entries.elementAt(0).value;
             Map itens = {};
-            //adicionando no MAP os itens e a data
             itens.addEntries([
               MapEntry(key, value),
               MapEntry(Constantes.dataCulto, data),
             ]);
-            //adicionando na lsita Auxiliar
             linhasEscalaAuxiliarRemocao.add(itens);
           }
-          //removendo itens da lista principal
           return key.toString().contains(checkBoxModel.texto);
         });
       }
     } else if (checkBoxModel.checked == true) {
-      //percorendo a lista auxiliar
       for (var itemRemovido in linhasEscalaAuxiliarRemocao) {
-        // INDEX 0 sempre sera o campo QUE FOI REMOVIDO
-        // verificando se o item contem o valor do texto
         if (itemRemovido.keys.elementAt(0).contains(checkBoxModel.texto)) {
-          //percorrendo lista principal
           for (var element in linhasRecebidas) {
-            //verificando se
             String dataListaPrincipal = element.values.elementAt(0).toString();
             String dataListaAuxiliar = itemRemovido.values.elementAt(1);
 
             if (dataListaPrincipal.contains(dataListaAuxiliar)) {
-              //caso contenha adicionar item INDEX 0 ITEM QUE FOI REMOVIDO
               element.addEntries([
                 MapEntry(
                   itemRemovido.keys.elementAt(0),
@@ -204,19 +341,54 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
     }
   }
 
-  // metodo para cadastrar item
+  List _obterLinhasOrdenadasParaPDF() {
+    final List<String> colunasOrdenadas =
+        listaCabecalhosExibicao
+            .where((coluna) => coluna.checked)
+            .map((coluna) => coluna.texto)
+            .toList();
+
+    return linhasRecebidas.map((linhaOriginal) {
+      final Map novaLinha = {};
+
+      for (final entry in linhaOriginal.entries) {
+        final chave = entry.key.toString();
+        if (chave.contains(Constantes.dataCulto) ||
+            chave.contains(Constantes.horarioTrabalho)) {
+          novaLinha[entry.key] = entry.value;
+        }
+      }
+
+      for (final nomeColuna in colunasOrdenadas) {
+        for (final entry in linhaOriginal.entries) {
+          final chave = entry.key.toString();
+          if (chave == nomeColuna || chave.contains(nomeColuna)) {
+            novaLinha[entry.key] = entry.value;
+          }
+        }
+      }
+
+      for (final entry in linhaOriginal.entries) {
+        if (!novaLinha.containsKey(entry.key)) {
+          novaLinha[entry.key] = entry.value;
+        }
+      }
+
+      return novaLinha;
+    }).toList();
+  }
+
   cadastrarNome() async {
     setState(() {
       exibirWidgetCarregamento = true;
     });
     try {
-      // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
           .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
-          .collection(nomeColecaoFireBase) // passando a colecao
-          .doc() //passando o documento
+          .collection(nomeColecaoFireBase)
+          .doc()
           .set({nomeDocumentoFireBase: nomeCadastro})
           .then(
             (value) {
@@ -264,7 +436,6 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
   realizarBuscaDadosFireBase() async {
     try {
       var db = FirebaseFirestore.instance;
-      //instanciano variavel
       db
           .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
@@ -272,11 +443,8 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
           .get()
           .then(
             (querySnapshot) async {
-              // for para percorrer todos os dados que a variavel recebeu
               if (querySnapshot.docs.isNotEmpty) {
                 for (var documentoFirebase in querySnapshot.docs) {
-                  // chamando metodo para converter json
-                  // recebido do firebase para objeto
                   converterJsonParaObjeto(
                     documentoFirebase.id,
                     querySnapshot.size,
@@ -311,18 +479,18 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
-          // chamando modelos para fazer conversao
           fromFirestore: CheckBoxModelo.fromFirestore,
           toFirestore: (CheckBoxModelo checkbox, _) => checkbox.toFirestore(),
         );
 
     final docSnap = await ref.get();
-    final dados = docSnap.data(); // convertendo
+    final dados = docSnap.data();
     if (dados != null) {
-      // pegando o id para posteriormente excluir o item caso seja necessario
       dados.id = docSnap.id;
+      if (dados.texto == nomeCabelhadoPDFSelecionado) {
+        dados.checked = true;
+      }
       indexTabela++;
-      //adicionando os dados convertidos na lista
       listaNomeCabecalhoPDF.add(dados);
       if (indexTabela == tamanhoTabela) {
         setState(() {
@@ -335,7 +503,6 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
   }
 
   ordenarListaOrdemAlfabetica() {
-    // ordenando a lista por ondem alfabetica de A-Z
     listaNomeCabecalhoPDF.sort((a, b) {
       return a.texto.compareTo(b.texto);
     });
@@ -343,11 +510,11 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
 
   @override
   void dispose() {
+    nomeControle.dispose();
     super.dispose();
     PassarPegarDados.passarObservacoesPDF([]);
   }
 
-  // Metodo para chamar deletar tabela
   chamarDeletar(CheckBoxModelo checkbox) async {
     setState(() {
       exibirWidgetCarregamento = true;
@@ -478,33 +645,31 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
     final XFile? arquivo = await openFile(
       acceptedTypeGroups: <XTypeGroup>[tipoImagem],
     );
-    if (arquivo == null) {
-      return;
-    }
-    final String arquivoCaminho = arquivo.path;
-
-    if (context.mounted) {
+    if (arquivo != null && context.mounted) {
       setState(() {
-        imagemLogo = XFile(arquivoCaminho);
+        imagemLogo = arquivo;
       });
     }
   }
 
+  removerLogoImagem() {
+    setState(() {
+      imagemLogo = null;
+    });
+  }
+
   chamarGerarPDF() {
-    if (imagemLogo != null) {
-      GerarPDFEscala gerarPDFEscala = GerarPDFEscala(
-        escala: linhasRecebidas,
-        nomeEscala: widget.nomeTabela,
-        nomeCabecalho: nomeCabelhadoPDFSelecionado,
-        imagemLogo: imagemLogo,
-        observacoes: listaObservacoes,
-        cor: corSelecionada,
-        valorOrientacaoPagina: valorRadioButtonSelecionado,
-      );
-      gerarPDFEscala.pegarDados();
-    } else {
-      chamarExibirMensagemErro(Textos.erroSemLogo);
-    }
+    final linhasOrdenadas = _obterLinhasOrdenadasParaPDF();
+    GerarPDFEscala gerarPDFEscala = GerarPDFEscala(
+      escala: linhasOrdenadas,
+      nomeEscala: widget.nomeTabela,
+      nomeCabecalho: nomeCabelhadoPDFSelecionado,
+      imagemLogo: imagemLogo,
+      observacoes: listaObservacoes,
+      cor: corSelecionada,
+      valorOrientacaoPagina: valorRadioButtonSelecionado,
+    );
+    gerarPDFEscala.pegarDados();
   }
 
   Widget botoesAcoes(String nomeBotao) => SizedBox(
@@ -636,13 +801,31 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                           Platform.isAndroid || Platform.isIOS
                                               ? larguraTela
                                               : larguraTela * 0.5,
-                                      child: ListView(
-                                        children: [
-                                          ...listaCabecalhosExibicao.map(
-                                            (e) =>
-                                                checkBoxExibicaoCamposEscala(e),
-                                          ),
-                                        ],
+                                      child: ReorderableListView.builder(
+                                        itemCount:
+                                            listaCabecalhosExibicao.length,
+                                        onReorder: (
+                                          int oldIndex,
+                                          int newIndex,
+                                        ) {
+                                          setState(() {
+                                            if (newIndex > oldIndex) {
+                                              newIndex -= 1;
+                                            }
+                                            final CheckBoxModelo item =
+                                                listaCabecalhosExibicao
+                                                    .removeAt(oldIndex);
+                                            listaCabecalhosExibicao.insert(
+                                              newIndex,
+                                              item,
+                                            );
+                                          });
+                                        },
+                                        itemBuilder: (context, index) {
+                                          return itemReordenavelColuna(
+                                            listaCabecalhosExibicao[index],
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),
@@ -668,17 +851,32 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                         ),
                                         Container(
                                           margin: const EdgeInsets.all(10),
-                                          width: 400,
+                                          width: 420,
                                           height: 50,
                                           child: ListTile(
                                             enableFeedback: true,
                                             trailing:
                                                 imagemLogo != null
-                                                    ? Image.file(
-                                                      File(imagemLogo!.path),
+                                                    ? Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Image.file(
+                                                          File(
+                                                            imagemLogo!.path,
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                          icon: const Icon(
+                                                            Icons.close,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onPressed:
+                                                              removerLogoImagem,
+                                                        ),
+                                                      ],
                                                     )
                                                     : null,
-
                                             title: Text(
                                               Textos.btnAdicionarLogoImagem,
                                             ),
@@ -694,13 +892,13 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                   SizedBox(
                                     width: 300,
                                     height: 100,
-                                    child:  SeletorCor(
+                                    child: SeletorCor(
                                       corInicial: '#FFFFFF',
                                       onColorSelected: (hex) {
                                         corSelecionada = hex;
                                       },
                                     ),
-                                  )
+                                  ),
                                 ],
                               );
                             } else {
@@ -780,13 +978,11 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                       ),
                                     ),
                                   ),
-                                  // area de listagem de nomes geral
                                   SizedBox(
                                     width: larguraTela,
                                     child: LayoutBuilder(
                                       builder: (context, constraints) {
                                         if (listaNomeCabecalhoPDF.isNotEmpty) {
-                                          // area de exibicao de descricao e listagem de nomes
                                           return SingleChildScrollView(
                                             child: Column(
                                               children: [
@@ -805,7 +1001,6 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                                     ),
                                                   ),
                                                 ),
-                                                // Area de Exibicao da lista com os nomes
                                                 Card(
                                                   child: SizedBox(
                                                     height: alturaTela * 0.3,
@@ -882,8 +1077,6 @@ class _TelaConfigurarPDFBaixarState extends State<TelaConfigurarPDFBaixar> {
                                             ),
                                           );
                                         } else {
-                                          // area caso nao tenha
-                                          // nenhum voluntario cadastrado
                                           return Container(
                                             margin: const EdgeInsets.all(10.0),
                                             transformAlignment:

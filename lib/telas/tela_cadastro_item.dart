@@ -290,11 +290,12 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
     return itemFinal;
   }
 
-  Widget botoesIcones(IconData icone, double tamanhoBotao, Color corBotao) =>
+  Widget botoesIcones(IconData icone, double tamanhoBotao, Color corBotao,String legenda) =>
       SizedBox(
         height: tamanhoBotao,
         width: tamanhoBotao,
         child: FloatingActionButton(
+          tooltip: legenda,
           heroTag: icone.toString(),
           elevation: 0,
           backgroundColor: Colors.white,
@@ -531,7 +532,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                               botoesIcones(
                                 Constantes.iconeDataCulto,
                                 40,
-                                PaletaCores.corCastanho,
+                                PaletaCores.corCastanho,Textos.btnData
                               ),
                               botoesAcoes(Textos.btnOpcaoData),
                               Column(
@@ -545,7 +546,7 @@ class _TelaCadastroItemState extends State<TelaCadastroItem> {
                                   botoesIcones(
                                     Constantes.iconeMudarHorario,
                                     40,
-                                    PaletaCores.corCastanho,
+                                    PaletaCores.corCastanho,Textos.btnHorarioTrocaTurno
                                   ),
                                 ],
                               ),

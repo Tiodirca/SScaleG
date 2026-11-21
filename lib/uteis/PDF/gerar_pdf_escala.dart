@@ -10,7 +10,8 @@ import 'salvarPDF/save_pdf_web.dart'
 
 class GerarPDFEscala {
   List<dynamic> listaLegenda = [];
-  List<Map> escala;
+  List<dynamic> _chavesOrdenadas = [];
+  List escala;
   int valorOrientacaoPagina;
   String nomeEscala;
   String nomeCabecalho;
@@ -29,50 +30,71 @@ class GerarPDFEscala {
   });
 
   pegarDados() async {
-    List<dynamic> itens = escala.first.keys.toList();
-    for (var element in itens) {
-      listaLegenda.add(
-        element
-            .toString()
-            .replaceAll("_", " ")
-            .replaceAll("01 data", "data")
-            .replaceAll("02 horario de Trabalho", "HORARIO DE TRABALHO")
-            .toUpperCase(),
-      );
+    listaLegenda = [];
+    _chavesOrdenadas = [];
+
+    if (escala.isNotEmpty) {
+      _chavesOrdenadas = escala.first.keys.toList();
+      for (var element in _chavesOrdenadas) {
+        listaLegenda.add(
+          element
+              .toString()
+              .replaceAll("_", " ")
+              .replaceAll("01 data", "data")
+              .replaceAll("02 horario de Trabalho", "HORARIO DE TRABALHO")
+              .toUpperCase(),
+        );
+      }
     }
     gerarPDF();
   }
 
+  pdflib.Widget _construirCabecalho(pdflib.MemoryImage? image) {
+    final textoCabecalho = pdflib.Text(
+      nomeCabecalho,
+      textAlign: pdflib.TextAlign.center,
+    );
+
+    if (image == null) {
+      return pdflib.Container(
+        width: double.infinity,
+        alignment: pdflib.Alignment.center,
+        child: textoCabecalho,
+      );
+    }
+
+    // Mantém o título centralizado mesmo quando a logo está à direita
+    return pdflib.Row(
+      mainAxisAlignment: pdflib.MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: pdflib.CrossAxisAlignment.center,
+      children: [
+        pdflib.SizedBox(width: 40, height: 40),
+        pdflib.Expanded(child: textoCabecalho),
+        pdflib.SizedBox(
+          width: 40,
+          height: 40,
+          child: pdflib.Image(image, width: 40, height: 40),
+        ),
+      ],
+    );
+  }
+
   gerarPDF() async {
     final pdflib.Document pdf = pdflib.Document();
-    //definindo que a variavel vai receber o caminho da
-    // imagem para serem exibidas
-    final image = pdflib.MemoryImage(File(imagemLogo!.path).readAsBytesSync());
-    //adicionando a pagina ao pdf
+    pdflib.MemoryImage? image;
+    if (imagemLogo != null) {
+      image = pdflib.MemoryImage(File(imagemLogo!.path).readAsBytesSync());
+    }
+
     pdf.addPage(
       pdflib.MultiPage(
-        //definindo formato
         margin: const pdflib.EdgeInsets.only(
           left: 5,
           top: 5,
           right: 5,
           bottom: 10,
         ),
-        //CABECALHO DO PDF
-        header:
-            (context) => pdflib.Column(
-              children: [
-                pdflib.Container(
-                  alignment: pdflib.Alignment.centerRight,
-                  child: pdflib.Column(
-                    children: [pdflib.Image(image, width: 40, height: 40)],
-                  ),
-                ),
-                pdflib.SizedBox(height: 5),
-                pdflib.Text(nomeCabecalho, textAlign: pdflib.TextAlign.center),
-              ],
-            ),
-        //RODAPE DO PDF
+        header: (context) => _construirCabecalho(image),
         footer:
             (context) => pdflib.Container(
               width: 1000,
@@ -82,13 +104,9 @@ class GerarPDFEscala {
               ),
             ),
         pageFormat: validarOrientacaoPaginaGeral(),
-
         orientation: validarOrientacaoPagina(),
-        //CORPO DO PDF
         build:
             (context) => [
-              //adicionando container para dar espacamento entre
-              // cabecalho PDF e comeco da escala
               pdflib.SizedBox(height: 10),
               pdflib.TableHelper.fromTextArray(
                 cellPadding: pdflib.EdgeInsets.symmetric(
@@ -96,9 +114,7 @@ class GerarPDFEscala {
                   vertical: 1.0,
                 ),
                 cellDecoration: (index, data, rowNum) {
-                  return pdflib.BoxDecoration(
-                    color: PdfColor.fromHex(cor),
-                  );
+                  return pdflib.BoxDecoration(color: PdfColor.fromHex(cor));
                 },
                 headerDecoration: pdflib.BoxDecoration(
                   color: PdfColor.fromHex(cor),
@@ -115,7 +131,6 @@ class GerarPDFEscala {
                   fontWeight: pdflib.FontWeight.bold,
                   fontSize: 10,
                 ),
-
                 cellAlignment: pdflib.Alignment.center,
                 data: listagemDados(),
               ),
@@ -162,10 +177,10 @@ class GerarPDFEscala {
     salvarPDF(bytes, '$nomeEscala.pdf');
     escala = [];
     listaLegenda = [];
+    _chavesOrdenadas = [];
   }
 
   validarOrientacaoPagina() {
-    //se for 0 é horizontal
     if (valorOrientacaoPagina == 0) {
       return pdflib.PageOrientation.landscape;
     } else {
@@ -173,21 +188,19 @@ class GerarPDFEscala {
     }
   }
 
-  validarOrientacaoPaginaGeral(){
-    if(valorOrientacaoPagina == 0){
+  validarOrientacaoPaginaGeral() {
+    if (valorOrientacaoPagina == 0) {
       return PdfPageFormat.a4.landscape;
-    }else{
+    } else {
       return PdfPageFormat.a4.portrait;
     }
   }
 
   listagemDados() {
-    int index = -1;
     return <List<dynamic>>[
       listaLegenda,
-      ...escala.map((e) {
-        index++;
-        return escala.elementAt(index).values.toList();
+      ...escala.map((linha) {
+        return _chavesOrdenadas.map((chave) => linha[chave] ?? '').toList();
       }),
     ];
   }

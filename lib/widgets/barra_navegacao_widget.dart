@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sscaleg/Uteis/paleta_cores.dart';
+import 'package:sscaleg/uteis/textos.dart';
 
 import '../uteis/constantes.dart';
 
@@ -8,11 +9,12 @@ class BarraNavegacao extends StatelessWidget {
 
   final Color corTextoBotao = PaletaCores.corAzulEscuro;
 
-  Widget botoesIcones(BuildContext context, IconData icon) =>
+  Widget botoesIcones(BuildContext context, IconData icon,String legenda) =>
       SizedBox(
           height: 45,
           width: 45,
           child: FloatingActionButton(
+            tooltip: legenda,
             heroTag: icon.toString(),
             onPressed: () {
               if (icon == Constantes.iconeTelaInicial) {
@@ -45,8 +47,8 @@ class BarraNavegacao extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          botoesIcones(context, Constantes.iconeTelaInicial),
-          botoesIcones(context, Constantes.iconeLista),
+          botoesIcones(context, Constantes.iconeTelaInicial,Textos.btnTelaInicial),
+          botoesIcones(context, Constantes.iconeLista,Textos.btnListarEscalas),
         ],
       ),
     );

@@ -301,11 +301,12 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
     ),
   );
 
-  Widget botoesIcones(IconData icone, double tamanhoBotao, Color corBotao) =>
+  Widget botoesIcones(IconData icone, double tamanhoBotao, Color corBotao,String legenda) =>
       SizedBox(
         height: tamanhoBotao,
         width: tamanhoBotao,
         child: FloatingActionButton(
+          tooltip: legenda,
           heroTag: icone.toString(),
           elevation: 0,
           backgroundColor: Colors.white,
@@ -544,7 +545,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                               botoesIcones(
                                 Constantes.iconeDataCulto,
                                 40,
-                                PaletaCores.corCastanho,
+                                PaletaCores.corCastanho,Textos.btnData
                               ),
                               botoesAcoes(Textos.btnOpcaoData),
                               Column(
@@ -558,7 +559,7 @@ class _TelaAtualizarItemState extends State<TelaAtualizarItem> {
                                   botoesIcones(
                                     Constantes.iconeMudarHorario,
                                     40,
-                                    PaletaCores.corCastanho,
+                                    PaletaCores.corCastanho,Textos.btnHorarioTrocaTurno
                                   ),
                                 ],
                               ),

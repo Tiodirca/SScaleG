@@ -26,7 +26,7 @@ dependencies:
   # pdf na web
   universal_html: ^2.2.1
   # necessario para notificacao elegante
-  #elegant_notification: ^2.5.4
+  elegant_notification: ^2.5.4
   # necessario para gravar chaves valores
   shared_preferences: ^2.5.3
   # necessario para rodar firebase

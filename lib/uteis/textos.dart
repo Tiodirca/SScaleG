@@ -23,6 +23,7 @@ class Textos {
   static String btnSalvar = "Salvar";
   static String btnRemoverCampo = "Remover Campos";
   static String btnAdicionarCampo = "Novo Campo";
+  static String btnFiltrarLista = "Filtrar Lista";
   static String btnEditar = "Editar";
   static String btnSalvarOpcaoData = "Salvar Data";
   static String btnVerEscalaAtual = "Escala Atual";
@@ -32,7 +33,10 @@ class Textos {
   static String btnExcluirConta = "Excluir Conta";
   static String btnAlterarSenha = "Alterar Senha";
   static String btnAutenticar = "Autenticar usuário";
+  static String btnConfiguracao = "Configurações";
+  static String btnFechar = "Fechar";
   static String btnReenviarEmail = "Reenviar E-mail";
+  static String btnHorarioTrocaTurno = "Horario Turno";
 
   // TELA LOGIN CADASTRO - LOGIN
   static String telaLoginUsuarioDescricao =
@@ -171,6 +175,11 @@ class Textos {
       "Escala completa com todos os itens adicionados, arraste para os lados para ver demais campos";
   static String telaEscalaDetalhadaQuantiNomePesquisa =
       "Vezes que o nome se repete : ";
+  static String telaEscalaDetalhadaLegandaToolTipOrganizarColunas = "Organizar Colunas";
+  static String telaEscalaDetalhadaLegandaToolTipPesquisaNome = "Pesquisar Nome";
+  static String telaEscalaDetalhadaLegandaToolTipPesquisar = "Pesquisar";
+  static String telaEscalaDetalhadaLegandaToolTipFechar = "Fechar Janela";
+
 
   // TELA DE CADASTRO DE ITEM
   static String telaCadastroTitulo = "Cadastro de item na Escalas";
@@ -232,7 +241,7 @@ class Textos {
   static String telaConfiguracaoPDFTitulo = "Configurações do PDF";
   static String telaConfiguracaoPDFDescricao =
       "Desmarque as caixas para deixar de exibir determinada coluna "
-      "no arquivo PDF, deixe marcado para exibir todas as colunas";
+      "no arquivo PDF, deixe marcado para exibir todas as colunas e arraste para alterar a ordem das colunas no arquivo PDF";
   static String telaConfiguracaoPDFDescricaoCadastroTitulo =
       "Digite o cabeçalho que o PDF irá ter";
   static String telaConfiguracaoPDFDescricaoSelecaoTitulo =
@@ -246,7 +255,7 @@ class Textos {
 
   // TELA CONFIGURACAO PDF SELECAO DE ARQUIVO DE IMAGEM
   static String telaConfiguracaoPDFAdicaoLogo =
-      "Selecione uma Logo/Imagem para compor o cabeçalho do arquivo PDF";
+      "Adicione uma logo para compor o cabeçalho do arquivo PDF (Opicional)";
 
   //MENSAGENS DE ERROS
   static String erroSemLogo = "Selecione uma imagem/logo para prosseguir";

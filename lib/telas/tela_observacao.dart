@@ -57,82 +57,205 @@ class _TelaObservacaoState extends State<TelaObservacao> {
       CheckboxListTile(
         activeColor: PaletaCores.corAzulEscuro,
         checkColor: PaletaCores.corRosaClaro,
-        secondary: SizedBox(
-          width: 30,
-          height: 30,
-          child: FloatingActionButton(
-            heroTag: "btnExcluir${checkBoxModel.id}",
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: const BorderSide(color: Colors.red, width: 1),
+        secondary: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: EdgeInsets.only(left: 10),
+              width: 30,
+              height: 30,
+              child: FloatingActionButton(
+                tooltip: Textos.btnEditar,
+                heroTag: "btnEditar${checkBoxModel.id}",
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(
+                    color: PaletaCores.corAzulEscuro,
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(Icons.edit, size: 20),
+                onPressed: () {
+                  alertaEdicao(context, checkBoxModel);
+                },
+              ),
             ),
-            child: const Icon(Icons.close, size: 20),
-            onPressed: () {
-              // chamando alerta para confirmar exclusao do item
-              alertaExclusao(context, checkBoxModel);
-            },
-          ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 30,
+              height: 30,
+              child: FloatingActionButton(
+                tooltip: Textos.btnExcluir,
+                heroTag: "btnExcluir${checkBoxModel.id}",
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(color: Colors.red, width: 1),
+                ),
+                child: const Icon(Icons.close, size: 20),
+                onPressed: () {
+                  alertaExclusao(context, checkBoxModel);
+                },
+              ),
+            ),
+          ],
         ),
         title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 18)),
         value: checkBoxModel.checked,
         side: const BorderSide(width: 2, color: PaletaCores.corAzulEscuro),
         onChanged: (value) {
           setState(() {
-            // verificando se o balor
             checkBoxModel.checked = value!;
             verificarItensSelecionados();
           });
         },
       );
 
-  // metodo para verificar se o item foi selecionado
-  // para adicionar na lista de itens selecionados
   verificarItensSelecionados() {
-    //verificando cada elemento da lista de nomes cadastrados
     for (var element in listaNomesCadastrados) {
-      //verificando se o usuario selecionou um item
       if (element.checked == true) {
-        // verificando se o item Nao foi adicionado anteriormente na lista
         if (!(listaObservacaoSelecionadas.contains(element.texto))) {
-          //add item
           listaObservacaoSelecionadas.add(element.texto);
         }
       } else if (element.checked == false) {
-        // removendo item caso seja desmarcado
         listaObservacaoSelecionadas.remove(element.texto);
       }
     }
   }
 
-  // metodo para cadastrar item
+  atualizarObservacao(CheckBoxModelo checkbox, String novoTexto) async {
+    final textoLimpo = novoTexto.trim();
+    if (textoLimpo.isEmpty || textoLimpo == checkbox.texto) {
+      return;
+    }
+
+    setState(() {
+      exibirWidgetCarregamento = true;
+    });
+
+    try {
+      var db = FirebaseFirestore.instance;
+      await db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
+          .doc(checkbox.id)
+          .update({nomeDocumentoFireBase: textoLimpo});
+
+      // Atualiza na lista de observações selecionadas para o PDF, se estiver presente
+      final indiceSelecionado = listaObservacaoSelecionadas.indexOf(
+        checkbox.texto,
+      );
+      if (indiceSelecionado != -1) {
+        listaObservacaoSelecionadas[indiceSelecionado] = textoLimpo;
+      }
+
+      limparDados();
+      realizarBuscaDadosFireBase();
+      chamarExibirMensagemSucesso();
+    } catch (e) {
+      setState(() {
+        exibirWidgetCarregamento = false;
+      });
+      chamarExibirMensagemErro(
+        "Erro Atualizar Observação: ${e.toString()}",
+      );
+    }
+  }
+
+  Future<void> alertaEdicao(
+      BuildContext context,
+      CheckBoxModelo checkbox,
+      ) async {
+    final TextEditingController edicaoControle = TextEditingController(
+      text: checkbox.texto,
+    );
+    final GlobalKey<FormState> formEdicaoKey = GlobalKey<FormState>();
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Editar observação",
+            style: TextStyle(color: Colors.black),
+          ),
+          content: Form(
+            key: formEdicaoKey,
+            child: TextFormField(
+              controller: edicaoControle,
+              autofocus: true,
+              maxLines: 2,
+              decoration: InputDecoration(
+                hintText: Textos.telaObservacaoHintTextField,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return Textos.erroCampoVazio;
+                }
+                return null;
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Salvar',
+                style: TextStyle(
+                  color: PaletaCores.corAzulEscuro,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                if (formEdicaoKey.currentState!.validate()) {
+                  final textoAtualizado = edicaoControle.text;
+                  Navigator.of(context).pop();
+                  atualizarObservacao(checkbox, textoAtualizado);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   cadastrarNome() async {
     setState(() {
       exibirWidgetCarregamento = true;
     });
     try {
-      // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
           .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
-          .collection(nomeColecaoFireBase) // passando a colecao
-          .doc() //passando o documento
+          .collection(nomeColecaoFireBase)
+          .doc()
           .set({nomeDocumentoFireBase: nomeCadastro})
           .then(
             (value) {
-              limparDados();
-              realizarBuscaDadosFireBase();
-              chamarExibirMensagemSucesso();
-            },
-            onError: (e) {
-              setState(() {
-                exibirWidgetCarregamento = false;
-              });
-              chamarExibirMensagemErro(
-                "Erro Cadastrar Observação: ${e.toString()}",
-              );
-            },
+          limparDados();
+          realizarBuscaDadosFireBase();
+          chamarExibirMensagemSucesso();
+        },
+        onError: (e) {
+          setState(() {
+            exibirWidgetCarregamento = false;
+          });
+          chamarExibirMensagemErro(
+            "Erro Cadastrar Observação: ${e.toString()}",
           );
+        },
+      );
     } catch (e) {
       setState(() {
         exibirWidgetCarregamento = false;
@@ -165,7 +288,6 @@ class _TelaObservacaoState extends State<TelaObservacao> {
   realizarBuscaDadosFireBase() async {
     try {
       var db = FirebaseFirestore.instance;
-      //instanciano variavel
       db
           .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
@@ -173,31 +295,28 @@ class _TelaObservacaoState extends State<TelaObservacao> {
           .get()
           .then(
             (querySnapshot) async {
-              // for para percorrer todos os dados que a variavel recebeu
-              if (querySnapshot.docs.isNotEmpty) {
-                for (var documentoFirebase in querySnapshot.docs) {
-                  // chamando metodo para converter json
-                  // recebido do firebase para objeto
-                  converterJsonParaObjeto(
-                    documentoFirebase.id,
-                    querySnapshot.size,
-                  );
-                }
-              } else {
-                setState(() {
-                  exibirWidgetCarregamento = false;
-                });
-              }
-            },
-            onError: (e) {
-              setState(() {
-                exibirWidgetCarregamento = false;
-              });
-              chamarExibirMensagemErro(
-                "Erro Buscar Observações: ${e.toString()}",
+          if (querySnapshot.docs.isNotEmpty) {
+            for (var documentoFirebase in querySnapshot.docs) {
+              converterJsonParaObjeto(
+                documentoFirebase.id,
+                querySnapshot.size,
               );
-            },
+            }
+          } else {
+            setState(() {
+              exibirWidgetCarregamento = false;
+            });
+          }
+        },
+        onError: (e) {
+          setState(() {
+            exibirWidgetCarregamento = false;
+          });
+          chamarExibirMensagemErro(
+            "Erro Buscar Observações: ${e.toString()}",
           );
+        },
+      );
     } catch (e) {
       setState(() {
         exibirWidgetCarregamento = false;
@@ -214,18 +333,15 @@ class _TelaObservacaoState extends State<TelaObservacao> {
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
-          // chamando modelos para fazer conversao
-          fromFirestore: CheckBoxModelo.fromFirestore,
-          toFirestore: (CheckBoxModelo checkbox, _) => checkbox.toFirestore(),
-        );
+      fromFirestore: CheckBoxModelo.fromFirestore,
+      toFirestore: (CheckBoxModelo checkbox, _) => checkbox.toFirestore(),
+    );
 
     final docSnap = await ref.get();
-    final dados = docSnap.data(); // convertendo
+    final dados = docSnap.data();
     if (dados != null) {
-      // pegando o id para posteriormente excluir o item caso seja necessario
       dados.id = docSnap.id;
       indexTabela++;
-      //adicionando os dados convertidos na lista
       listaNomesCadastrados.add(dados);
       if (indexTabela == tamanhoTabela) {
         setState(() {
@@ -251,7 +367,6 @@ class _TelaObservacaoState extends State<TelaObservacao> {
   }
 
   ordenarListaOrdemAlfabetica() {
-    // ordenando a lista por ondem alfabetica de A-Z
     listaNomesCadastrados.sort((a, b) {
       return a.texto.compareTo(b.texto);
     });
@@ -259,11 +374,11 @@ class _TelaObservacaoState extends State<TelaObservacao> {
 
   @override
   void dispose() {
+    nomeControle.dispose();
     super.dispose();
     PassarPegarDados.passarObservacoesPDF([]);
   }
 
-  // Metodo para chamar deletar tabela
   chamarDeletar(CheckBoxModelo checkbox) async {
     setState(() {
       exibirWidgetCarregamento = true;
@@ -277,25 +392,26 @@ class _TelaObservacaoState extends State<TelaObservacao> {
         .delete()
         .then(
           (doc) {
-            setState(() {
-              limparDados();
-              realizarBuscaDadosFireBase();
-              chamarExibirMensagemSucesso();
-            });
-          },
-          onError: (e) {
-            setState(() {
-              exibirWidgetCarregamento = false;
-            });
-            chamarExibirMensagemErro("Erro Deletar: ${e.toString()}");
-          },
-        );
+        setState(() {
+          listaObservacaoSelecionadas.remove(checkbox.texto);
+          limparDados();
+          realizarBuscaDadosFireBase();
+          chamarExibirMensagemSucesso();
+        });
+      },
+      onError: (e) {
+        setState(() {
+          exibirWidgetCarregamento = false;
+        });
+        chamarExibirMensagemErro("Erro Deletar: ${e.toString()}");
+      },
+    );
   }
 
   Future<void> alertaExclusao(
-    BuildContext context,
-    CheckBoxModelo checkbox,
-  ) async {
+      BuildContext context,
+      CheckBoxModelo checkbox,
+      ) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -441,9 +557,9 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                       key: validacaoFormulario,
                                       child: SizedBox(
                                         width:
-                                            Platform.isWindows
-                                                ? larguraTela * 0.6
-                                                : larguraTela * 0.9,
+                                        Platform.isWindows
+                                            ? larguraTela * 0.6
+                                            : larguraTela * 0.9,
                                         child: TextFormField(
                                           maxLines: 2,
                                           controller: nomeControle,
@@ -452,8 +568,8 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                           },
                                           decoration: InputDecoration(
                                             hintText:
-                                                Textos
-                                                    .telaObservacaoHintTextField,
+                                            Textos
+                                                .telaObservacaoHintTextField,
                                           ),
                                           validator: (value) {
                                             if (value!.isEmpty) {
@@ -467,9 +583,9 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                     Container(
                                       margin: EdgeInsets.symmetric(
                                         vertical:
-                                            Platform.isAndroid || Platform.isIOS
-                                                ? 10
-                                                : 0,
+                                        Platform.isAndroid || Platform.isIOS
+                                            ? 10
+                                            : 0,
                                         horizontal: 10.0,
                                       ),
                                       width: 100,
@@ -491,13 +607,11 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                             ),
                           ),
                         ),
-                        // area de listagem de nomes geral
                         SizedBox(
                           width: larguraTela,
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               if (listaNomesCadastrados.isNotEmpty) {
-                                // area de exibicao de descricao e listagem de nomes
                                 return SingleChildScrollView(
                                   child: Column(
                                     children: [
@@ -512,19 +626,18 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                           style: const TextStyle(fontSize: 18),
                                         ),
                                       ),
-                                      // Area de Exibicao da lista com os nomes dos voluntarios
                                       Card(
                                         child: SizedBox(
                                           height: alturaTela * 0.35,
                                           width:
-                                              Platform.isAndroid ||
-                                                      Platform.isIOS
-                                                  ? larguraTela
-                                                  : larguraTela * 0.8,
+                                          Platform.isAndroid ||
+                                              Platform.isIOS
+                                              ? larguraTela
+                                              : larguraTela * 0.8,
                                           child: ListView(
                                             children: [
                                               ...listaNomesCadastrados.map(
-                                                (e) => checkBoxPersonalizado(e),
+                                                    (e) => checkBoxPersonalizado(e),
                                               ),
                                             ],
                                           ),
@@ -534,8 +647,6 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                                   ),
                                 );
                               } else {
-                                // area caso nao tenha
-                                // nenhum voluntario cadastrado
                                 return Container(
                                   margin: const EdgeInsets.all(10.0),
                                   transformAlignment: Alignment.center,
@@ -559,7 +670,7 @@ class _TelaObservacaoState extends State<TelaObservacao> {
                   color: Colors.white,
                   width: larguraTela,
                   height: 70,
-                  child: BarraNavegacao()
+                  child: BarraNavegacao(),
                 ),
               );
             }

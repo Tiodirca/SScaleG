@@ -13,7 +13,6 @@ import 'package:sscaleg/uteis/passar_pegar_dados.dart';
 import 'package:sscaleg/uteis/textos.dart';
 import 'package:sscaleg/widgets/barra_navegacao_widget.dart';
 
-
 class TelaSelecaoLocalTrabalho extends StatefulWidget {
   const TelaSelecaoLocalTrabalho({super.key});
 
@@ -74,6 +73,7 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
               width: 30,
               height: 30,
               child: FloatingActionButton(
+                tooltip: Textos.btnExcluir,
                 heroTag: "btnExcluir ${checkBoxModel.id}",
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -90,6 +90,7 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
               width: 30,
               height: 30,
               child: FloatingActionButton(
+                tooltip: Textos.btnEditar,
                 heroTag: "btnEditar ${checkBoxModel.id}",
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -447,10 +448,10 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
                   height: alturaTela,
                   child: SingleChildScrollView(
                     child: SizedBox(
-                      height:  Platform.isAndroid ||
-                          Platform.isIOS
-                          ? alturaTela * 0.75
-                          : alturaTela * 0.8,
+                      height:
+                          Platform.isAndroid || Platform.isIOS
+                              ? alturaTela * 0.75
+                              : alturaTela * 0.8,
                       width: larguraTela,
                       child: LayoutBuilder(
                         builder: (context, constraints) {
@@ -470,17 +471,16 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
                                       width: larguraTela,
                                       child: Text(
                                         textAlign: TextAlign.center,
-                                        Textos
-                                            .telaSelecaoLocalDescricao,
-                                        style:
-                                        TextTheme.of(context).bodySmall,
+                                        Textos.telaSelecaoLocalDescricao,
+                                        style: TextTheme.of(context).bodySmall,
                                       ),
                                     ),
                                   ),
                                   Expanded(
-                                    flex:   Platform.isAndroid ||
-                                        Platform.isIOS
-                                        ?  3 : 6,
+                                    flex:
+                                        Platform.isAndroid || Platform.isIOS
+                                            ? 3
+                                            : 6,
                                     child: SizedBox(
                                       width: larguraTela,
                                       height: alturaTela,
@@ -488,23 +488,22 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
                                         child: Card(
                                           child: SizedBox(
                                             height:
-                                            Platform.isAndroid ||
-                                                Platform.isIOS
-                                                ? alturaTela * 0.45
-                                                : alturaTela * 0.6,
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? alturaTela * 0.45
+                                                    : alturaTela * 0.6,
                                             width:
-                                            Platform.isAndroid ||
-                                                Platform.isIOS
-                                                ? larguraTela
-                                                : larguraTela * 0.9,
+                                                Platform.isAndroid ||
+                                                        Platform.isIOS
+                                                    ? larguraTela
+                                                    : larguraTela * 0.9,
                                             child: ListView(
                                               children: [
                                                 ...listaNomesCadastrados.map(
-                                                      (e) =>
-                                                      checkBoxPersonalizado(
-                                                        e,
-                                                        larguraTela,
-                                                      ),
+                                                  (e) => checkBoxPersonalizado(
+                                                    e,
+                                                    larguraTela,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -517,85 +516,73 @@ class _TelaSelecaoLocalTrabalhoState extends State<TelaSelecaoLocalTrabalho> {
                                     flex: 1,
                                     child: Visibility(
                                       visible:
-                                      listaNomesSelecionados.isNotEmpty
-                                          ? true
-                                          : false,
+                                          listaNomesSelecionados.isNotEmpty
+                                              ? true
+                                              : false,
                                       child: SizedBox(
                                         width:
-                                        Platform.isAndroid ||
-                                            Platform.isIOS
-                                            ? larguraTela
-                                            : larguraTela * 0.9,
+                                            Platform.isAndroid || Platform.isIOS
+                                                ? larguraTela
+                                                : larguraTela * 0.9,
                                         child: Card(
                                           child: SingleChildScrollView(
                                             child: Column(
                                               children: [
                                                 Row(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment
-                                                      .center,
+                                                      CrossAxisAlignment.center,
                                                   mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .center,
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Text(
                                                       textAlign:
-                                                      TextAlign.center,
+                                                          TextAlign.center,
                                                       Textos
                                                           .telaSelecaoLocalLocaisSelecionados,
                                                       style:
-                                                      TextTheme.of(
-                                                        context,
-                                                      ).bodySmall,
+                                                          TextTheme.of(
+                                                            context,
+                                                          ).bodySmall,
                                                     ),
                                                     Text(
                                                       textAlign:
-                                                      TextAlign.center,
+                                                          TextAlign.center,
                                                       listaNomesSelecionados
                                                           .length
                                                           .toString(),
                                                       style:
-                                                      TextTheme.of(
-                                                        context,
-                                                      ).bodySmall,
+                                                          TextTheme.of(
+                                                            context,
+                                                          ).bodySmall,
                                                     ),
                                                   ],
                                                 ),
                                                 Wrap(
                                                   alignment:
-                                                  WrapAlignment.center,
+                                                      WrapAlignment.center,
                                                   children: [
                                                     Text(
                                                       textAlign:
-                                                      TextAlign.center,
+                                                          TextAlign.center,
                                                       Textos
                                                           .telaSelecaoDescricaoVoluntarioNomesSelecionados,
                                                       style:
-                                                      TextTheme.of(
-                                                        context,
-                                                      ).bodySmall,
+                                                          TextTheme.of(
+                                                            context,
+                                                          ).bodySmall,
                                                     ),
                                                     Text(
                                                       textAlign:
-                                                      TextAlign.center,
+                                                          TextAlign.center,
                                                       listaNomesSelecionadosExibicao
                                                           .toString()
-                                                          .replaceAll(
-                                                        "_",
-                                                        " ",
-                                                      )
-                                                          .replaceAll(
-                                                        "[",
-                                                        " ",
-                                                      )
-                                                          .replaceAll(
-                                                        "]",
-                                                        " ",
-                                                      ),
+                                                          .replaceAll("_", " ")
+                                                          .replaceAll("[", " ")
+                                                          .replaceAll("]", " "),
                                                       style:
-                                                      TextTheme.of(
-                                                        context,
-                                                      ).bodySmall,
+                                                          TextTheme.of(
+                                                            context,
+                                                          ).bodySmall,
                                                     ),
                                                   ],
                                                 ),

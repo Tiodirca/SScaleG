@@ -70,6 +70,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
 
   @override
   void dispose() {
+    nomeControle.dispose();
     super.dispose();
     PassarPegarDados.passarConfirmacaoSelecaoDataComplemento(
       Constantes.confirmacaoSelecaoDataComplemento,
@@ -82,7 +83,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     });
     try {
       var db = FirebaseFirestore.instance;
-      //instanciano variavel
       db
           .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
@@ -90,35 +90,32 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
           .get()
           .then(
             (querySnapshot) async {
-              // for para percorrer todos os dados que a variavel recebeu
-              if (querySnapshot.docs.isNotEmpty) {
-                for (var documentoFirebase in querySnapshot.docs) {
-                  // chamando metodo para converter json
-                  // recebido do firebase para objeto
-                  converterJsonParaObjeto(
-                    documentoFirebase.id,
-                    querySnapshot.size,
-                  );
-                }
-              } else {
-                setState(() {
-                  Timer(const Duration(milliseconds: 500), () {
-                    setState(() {
-                      exibirWidgetTelaCarregamento = false;
-                    });
-                  });
-                });
-              }
-            },
-            onError: (e) {
-              setState(() {
-                exibirWidgetTelaCarregamento = false;
-              });
-              chamarExibirMensagemErro(
-                "Erro Buscar Departamento: ${e.toString()}",
+          if (querySnapshot.docs.isNotEmpty) {
+            for (var documentoFirebase in querySnapshot.docs) {
+              converterJsonParaObjeto(
+                documentoFirebase.id,
+                querySnapshot.size,
               );
-            },
+            }
+          } else {
+            setState(() {
+              Timer(const Duration(milliseconds: 500), () {
+                setState(() {
+                  exibirWidgetTelaCarregamento = false;
+                });
+              });
+            });
+          }
+        },
+        onError: (e) {
+          setState(() {
+            exibirWidgetTelaCarregamento = false;
+          });
+          chamarExibirMensagemErro(
+            "Erro Buscar Departamento: ${e.toString()}",
           );
+        },
+      );
     } catch (e) {
       setState(() {
         exibirWidgetTelaCarregamento = false;
@@ -135,17 +132,14 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
         .collection(nomeColecaoFireBase)
         .doc(id)
         .withConverter(
-          // chamando modelos para fazer conversao
-          fromFirestore: CheckBoxModelo.fromFirestore,
-          toFirestore: (CheckBoxModelo checkbox, _) => checkbox.toFirestore(),
-        );
+      fromFirestore: CheckBoxModelo.fromFirestore,
+      toFirestore: (CheckBoxModelo checkbox, _) => checkbox.toFirestore(),
+    );
 
     final docSnap = await ref.get();
-    final dados = docSnap.data(); // convertendo
+    final dados = docSnap.data();
     if (dados != null) {
-      // pegando o id para posteriormente excluir o item caso seja necessario
       dados.id = docSnap.id;
-      //adicionando os dados convertidos na lista
       listaNomesCadastrados.add(dados);
       setState(() {
         recuperarCheckBoxMarcado(dataSelecionadaComDepartamento, quantidade);
@@ -153,7 +147,119 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     }
   }
 
-  // Metodo para chamar deletar tabela
+  // Método para atualizar item editado no Firestore
+  atualizarNome(CheckBoxModelo checkbox, String novoNome) async {
+    final nomeLimpo = novoNome.trim();
+    if (nomeLimpo.isEmpty || nomeLimpo == checkbox.texto) {
+      return;
+    }
+
+    setState(() {
+      exibirWidgetTelaCarregamento = true;
+    });
+
+    try {
+      var db = FirebaseFirestore.instance;
+      await db
+          .collection(nomeColecaoUsuariosFireBase)
+          .doc(uidUsuario)
+          .collection(nomeColecaoFireBase)
+          .doc(checkbox.id)
+          .update({nomeDocumentoFireBase: nomeLimpo});
+
+      // Atualiza o texto na data selecionada caso estivesse aplicado
+      if (dataSelecionadaComDepartamento.contains("(${checkbox.texto})")) {
+        dataSelecionadaComDepartamento = dataSelecionadaComDepartamento.replaceAll(
+          "(${checkbox.texto})",
+          "($nomeLimpo)",
+        );
+        PassarPegarDados.passarDataComComplemento(
+          dataSelecionadaComDepartamento,
+        );
+      }
+      if (checkBoxSelecionado == checkbox.texto) {
+        checkBoxSelecionado = nomeLimpo;
+      }
+
+      limparDados();
+      realizarBuscaDadosFireBase();
+      chamarExibirMensagemSucesso();
+    } catch (e) {
+      setState(() {
+        exibirWidgetTelaCarregamento = false;
+      });
+      chamarExibirMensagemErro(
+        "Erro Atualizar Departamento: ${e.toString()}",
+      );
+    }
+  }
+
+  Future<void> alertaEdicao(
+      BuildContext context,
+      CheckBoxModelo checkbox,
+      ) async {
+    final TextEditingController edicaoControle = TextEditingController(
+      text: checkbox.texto,
+    );
+    final GlobalKey<FormState> formEdicaoKey = GlobalKey<FormState>();
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Editar item",
+            style: TextStyle(color: Colors.black),
+          ),
+          content: Form(
+            key: formEdicaoKey,
+            child: TextFormField(
+              controller: edicaoControle,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: Textos.labelTextFieldCampo,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return Textos.erroCampoVazio;
+                }
+                return null;
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Salvar',
+                style: TextStyle(
+                  color: PaletaCores.corAzulEscuro,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                if (formEdicaoKey.currentState!.validate()) {
+                  final novoTexto = edicaoControle.text;
+                  Navigator.of(context).pop();
+                  atualizarNome(checkbox, novoTexto);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   chamarDeletar(CheckBoxModelo checkbox) async {
     setState(() {
       exibirWidgetTelaCarregamento = true;
@@ -167,28 +273,27 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
         .delete()
         .then(
           (doc) {
-            setState(() {
-              limparDados();
-              realizarBuscaDadosFireBase();
-              chamarExibirMensagemSucesso();
-              removerComplemetoExcluido(checkbox);
-            });
-          },
-          onError: (e) {
-            setState(() {
-              exibirWidgetTelaCarregamento = false;
-            });
-            chamarExibirMensagemErro(
-              "Erro Deletar Departamento: ${e.toString()}",
-            );
-          },
+        setState(() {
+          limparDados();
+          realizarBuscaDadosFireBase();
+          chamarExibirMensagemSucesso();
+          removerComplemetoExcluido(checkbox);
+        });
+      },
+      onError: (e) {
+        setState(() {
+          exibirWidgetTelaCarregamento = false;
+        });
+        chamarExibirMensagemErro(
+          "Erro Deletar Departamento: ${e.toString()}",
         );
+      },
+    );
   }
 
-  // metodo para remover das string o complemento caso o usuario faca a exclusao dele
   removerComplemetoExcluido(CheckBoxModelo checkbox) {
     dataSelecionadaComDepartamento =
-        dataSelecionadaComDepartamento.split(checkbox.texto)[0];
+    dataSelecionadaComDepartamento.split(checkbox.texto)[0];
     dataSelecionadaComDepartamento = dataSelecionadaComDepartamento.replaceAll(
       "(",
       "",
@@ -196,35 +301,33 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     PassarPegarDados.passarDataComComplemento(dataSelecionadaComDepartamento);
   }
 
-  // metodo para cadastrar item
   cadastrarNome(String nome) async {
     setState(() {
       exibirWidgetTelaCarregamento = true;
     });
     try {
-      // instanciando Firebase
       var db = FirebaseFirestore.instance;
       db
           .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
-          .collection(nomeColecaoFireBase) // passando a colecao
-          .doc() //passando o documento
-          .set({nomeDocumentoFireBase: nomeControle.text})
+          .collection(nomeColecaoFireBase)
+          .doc()
+          .set({nomeDocumentoFireBase: nome.trim()})
           .then(
             (value) {
-              limparDados();
-              realizarBuscaDadosFireBase();
-              chamarExibirMensagemSucesso();
-            },
-            onError: (e) {
-              setState(() {
-                exibirWidgetTelaCarregamento = false;
-              });
-              chamarExibirMensagemErro(
-                "Erro Cadastrar Departamento: ${e.toString()}",
-              );
-            },
+          limparDados();
+          realizarBuscaDadosFireBase();
+          chamarExibirMensagemSucesso();
+        },
+        onError: (e) {
+          setState(() {
+            exibirWidgetTelaCarregamento = false;
+          });
+          chamarExibirMensagemErro(
+            "Erro Cadastrar Departamento: ${e.toString()}",
           );
+        },
+      );
     } catch (e) {
       setState(() {
         exibirWidgetTelaCarregamento = false;
@@ -241,9 +344,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     }
   }
 
-  //metodo para recuperar o nome selecionado e deixar a caixa
-  // do checkbox marcado quando o usuario volta na tela
-  // para fazer alguma alteracao apos ja ter selecionado uma opcao antes
   recuperarCheckBoxMarcado(String departamento, int quantidade) {
     indexQuantidadeItensCadastrados++;
     if (indexQuantidadeItensCadastrados == quantidade) {
@@ -264,8 +364,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     }
   }
 
-  //remover complemento caso o usuario faca alguma selecao direfente
-  // metodo necessario para que o nome anterior nao permanessa na string
   removerDepartamentoAnteriorSelecaoCheckBox(String dataComDepartamento) {
     for (var element in listaNomesCadastrados) {
       if (dataComDepartamento.contains(element.texto)) {
@@ -275,15 +373,10 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
     return dataComDepartamento.replaceAll("(", "").replaceAll(")", "");
   }
 
-  //metodo para alterar a opcao adicional da data confirme
-  // o usuario seleciona uma opcao nos checkbox
   alterarDataComDepartamento() {
     String opcoesAdicionaisSelecionada = "";
-    //percorrendo os nomes cadastrados
     for (var element in listaNomesCadastrados) {
-      // caso o elemento seja verdadeiro
       if (element.checked) {
-        //definir que a opcao adicional vai receber o valor do elemento
         opcoesAdicionaisSelecionada = "(${element.texto})";
       }
     }
@@ -291,34 +384,27 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
       dataSelecionadaComDepartamento =
           removerDepartamentoAnteriorSelecaoCheckBox(widget.dataSelecionada);
       dataSelecionadaComDepartamento =
-          "$dataSelecionadaComDepartamento$opcoesAdicionaisSelecionada";
+      "$dataSelecionadaComDepartamento$opcoesAdicionaisSelecionada";
     });
   }
 
   validarSelecoes(CheckBoxModelo checkBoxModel) {
-    //verificando se o checkbox selecionado
     if (checkBoxModel.checked == true) {
-      // caso tenha sido definir que a variavel receber o valor
       checkBoxSelecionado = checkBoxModel.texto;
     } else {
-      // caso seja desmarcado vai receber o seguinte valor
       checkBoxSelecionado = "";
     }
-    //percorrendo a lista
     for (var element in listaNomesCadastrados) {
-      //caso a variavel seja DIFERENTE do elemento passado
       if (checkBoxSelecionado != element.texto) {
-        // definir que o valor do elemento sera
-        // false para poder desmarcar na lista de checkbox
         element.checked = false;
       }
     }
   }
 
   Future<void> alertaExclusao(
-    BuildContext context,
-    CheckBoxModelo checkbox,
-  ) async {
+      BuildContext context,
+      CheckBoxModelo checkbox,
+      ) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -371,21 +457,46 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
       CheckboxListTile(
         activeColor: PaletaCores.corAzulEscuro,
         checkColor: PaletaCores.corRosaClaro,
-        secondary: SizedBox(
-          width: 30,
-          height: 30,
-          child: FloatingActionButton(
-            heroTag: "btnExcluir${checkBoxModel.id}",
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: const BorderSide(color: Colors.red, width: 1),
+        secondary: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: EdgeInsets.only(left: 10),
+              width: 30,
+              height: 30,
+              child: FloatingActionButton(
+                tooltip: Textos.btnEditar,
+                heroTag: "btnEditar${checkBoxModel.id}",
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(
+                    color: PaletaCores.corCastanho,
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(Icons.edit, size: 20),
+                onPressed: () {
+                  alertaEdicao(context, checkBoxModel);
+                },
+              ),
             ),
-            child: const Icon(Icons.close, size: 20),
-            onPressed: () {
-              // chamando alerta para confirmar exclusao do item
-              alertaExclusao(context, checkBoxModel);
-            },
-          ),
+            SizedBox(
+              width: 30,
+              height: 30,
+              child: FloatingActionButton(
+                tooltip: Textos.btnExcluir,
+                heroTag: "btnExcluir${checkBoxModel.id}",
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: const BorderSide(color: Colors.red, width: 1),
+                ),
+                child: const Icon(Icons.close, size: 20),
+                onPressed: () {
+                  alertaExclusao(context, checkBoxModel);
+                },
+              ),
+            ),
+          ],
         ),
         title: Text(checkBoxModel.texto, style: const TextStyle(fontSize: 18)),
         value: checkBoxModel.checked,
@@ -395,7 +506,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
             checkBoxModel.checked = value!;
             validarSelecoes(checkBoxModel);
           });
-          // //chamando metodo
           alterarDataComDepartamento();
         },
       );
@@ -531,7 +641,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             if (listaNomesCadastrados.isNotEmpty) {
-                              // area de exibicao de descricao e listagem de nomes
                               return SingleChildScrollView(
                                 child: Column(
                                   children: [
@@ -547,7 +656,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                                         style: const TextStyle(fontSize: 18),
                                       ),
                                     ),
-                                    // Area de Exibicao da lista com os nomes dos voluntarios
                                     Card(
                                       child: SizedBox(
                                         height: alturaTela * 0.35,
@@ -568,8 +676,6 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                                 ),
                               );
                             } else {
-                              // area caso nao tenha
-                              // nenhum voluntario cadastrado
                               return Container(
                                 margin: const EdgeInsets.all(10.0),
                                 transformAlignment: Alignment.center,
@@ -586,7 +692,7 @@ class _WidgetOpcoesDataState extends State<WidgetOpcoesData> {
                       ),
                     ],
                   ),
-                )
+                ),
               ),
               bottomNavigationBar: Container(
                 width: larguraTela,

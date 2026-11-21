@@ -80,7 +80,7 @@ class _WidgetAjustarHorarioState extends State<WidgetAjustarHorario> {
         Switch(
           inactiveThumbColor: PaletaCores.corAzulEscuro,
           value: valorBotao,
-          activeColor: PaletaCores.corAzulEscuro,
+
           onChanged: (bool valor) {
             setState(() {
               exibirTrocaTurno = !exibirTrocaTurno;
@@ -106,6 +106,7 @@ class _WidgetAjustarHorarioState extends State<WidgetAjustarHorario> {
           height: 50,
           width: 50,
           child: FloatingActionButton(
+            tooltip: label,
             elevation: 0,
             heroTag: label,
             backgroundColor: Colors.white,

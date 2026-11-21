@@ -104,7 +104,7 @@ class Constantes {
   static const iconeConfiguracao = Icons.settings;
   static const iconeFiltroAtivo = Icons.filter_alt;
   static const iconeFiltroDesativado = Icons.filter_alt_off;
-
+  static const iconeOrdenarLista= Icons.swap_horiz;
   // SHARE PREFERENCES
   static const sharePreferencesAjustarHorarioSemana = "ajustarHorarioSemana";
   static const sharePreferencesAjustarHorarioFinalSemana =

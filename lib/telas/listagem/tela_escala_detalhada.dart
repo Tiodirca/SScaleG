@@ -33,11 +33,12 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   bool exibirObservacoes = false;
   bool exibirWidgetCarregamento = true;
   bool exibirOcultarBtnAcao = true;
-  List<Map> listaEscalaBancoDados = [];
-  List<Map> listaLinhaEscalaOrdenada = [];
+  List listaEscalaBancoDados = [];
+  List listaLinhaEscalaOrdenada = [];
   List<String> listaObservacoesPDF = [];
   List<dynamic> cabecalhoEscala = [];
-  List<Map> listaIDDocumento = [];
+  List<dynamic> ordemColunasPersonalizada = [];
+  List listaIDDocumento = [];
   Map mapExibirCampos = {};
   int contadorBtnFloat = 0;
   int indexSwitch = 0;
@@ -79,9 +80,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     });
     limparVariaveis();
     var db = FirebaseFirestore.instance;
-    //instanciano variavel
     db
-        .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+        .collection(nomeColecaoUsuariosFireBase)
         .doc(uidUsuario)
         .collection(nomeColecaoFireBase)
         .doc(idDocumento)
@@ -89,15 +89,11 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         .get()
         .then(
           (querySnapshot) async {
-            //Veficando se nao e vazio
             if (querySnapshot.docs.isNotEmpty) {
-              // for para percorrer todos os dados que a variavel recebeu
               for (var documentoFirebase in querySnapshot.docs) {
-                //adicionando na lista os id dos documentos
                 listaIDDocumento.addAll([
                   recuperarIDDocumento(documentoFirebase),
                 ]);
-                //adicionando na lista
                 listaEscalaBancoDados.addAll([documentoFirebase.data()]);
               }
               if (listaEscalaBancoDados.isEmpty) {
@@ -125,12 +121,9 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         );
   }
 
-  //metodo para recuperar o id e colocar num map onde o key vai receber o id do documento
-  // e no value vai receber a concatenacao da data com o horario de trabalho
   recuperarIDDocumento(var documentoFirebase) {
     Map idDocumentoData = {};
     String dataComHorario = "";
-    //percorrendo map
     documentoFirebase.data().forEach((key, value) {
       if (key.toString().contains(Constantes.dataCulto)) {
         dataComHorario = "$value $dataComHorario";
@@ -141,6 +134,164 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     });
     idDocumentoData[documentoFirebase.id] = dataComHorario;
     return idDocumentoData;
+  }
+
+  bool _isColunaFixaInicio(dynamic chave) {
+    final nome = chave.toString();
+    return nome.contains(Constantes.dataCulto) ||
+        nome.contains(Constantes.horarioTrabalho);
+  }
+
+  bool _isColunaFixaFim(dynamic chave) {
+    return chave.toString() == Constantes.editar ||
+        chave.toString() == Constantes.excluir;
+  }
+
+  Map _aplicarOrdemColunasNoMap(Map mapaBase, List<dynamic> colunasDinamicas) {
+    final Map mapaOrdenado = {};
+
+    // 1. Mantém colunas fixas iniciais (Data e Horário de Trabalho)
+    for (final entry in mapaBase.entries) {
+      if (_isColunaFixaInicio(entry.key)) {
+        mapaOrdenado[entry.key] = entry.value;
+      }
+    }
+
+    // 2. Aplica a ordem personalizada das colunas dinâmicas
+    for (final coluna in colunasDinamicas) {
+      if (mapaBase.containsKey(coluna)) {
+        mapaOrdenado[coluna] = mapaBase[coluna];
+      }
+    }
+
+    // 3. Inclui qualquer coluna dinâmica nova caso exista
+    for (final entry in mapaBase.entries) {
+      if (!_isColunaFixaInicio(entry.key) &&
+          !_isColunaFixaFim(entry.key) &&
+          !mapaOrdenado.containsKey(entry.key)) {
+        mapaOrdenado[entry.key] = entry.value;
+      }
+    }
+
+    return mapaOrdenado;
+  }
+
+  void _sincronizarOrdemColunas(List<dynamic> chavesDisponiveis) {
+    final dinamicasAtuais =
+        chavesDisponiveis
+            .where((k) => !_isColunaFixaInicio(k) && !_isColunaFixaFim(k))
+            .toList();
+
+    if (ordemColunasPersonalizada.isEmpty) {
+      ordemColunasPersonalizada = List<dynamic>.from(dinamicasAtuais);
+    } else {
+      ordemColunasPersonalizada.removeWhere(
+        (k) => !dinamicasAtuais.contains(k),
+      );
+      for (final k in dinamicasAtuais) {
+        if (!ordemColunasPersonalizada.contains(k)) {
+          ordemColunasPersonalizada.add(k);
+        }
+      }
+    }
+  }
+
+  Future<void> abrirDialogOrdenarColunas() async {
+    final List<dynamic> listaTemporaria = List<dynamic>.from(
+      ordemColunasPersonalizada,
+    );
+
+    final bool? salvou = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title:  Text(
+                Textos.telaEscalaDetalhadaLegandaToolTipOrganizarColunas,
+                style: TextStyle(color: Colors.black),
+              ),
+              content: SizedBox(
+                width: 350,
+                height: 300,
+                child:
+                    listaTemporaria.isEmpty
+                        ? const Center(
+                          child: Text(
+                            "Não há colunas extras para reordenar.",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        )
+                        : ReorderableListView.builder(
+                          itemCount: listaTemporaria.length,
+                          onReorder: (int oldIndex, int newIndex) {
+                            setStateDialog(() {
+                              if (newIndex > oldIndex) {
+                                newIndex -= 1;
+                              }
+                              final item = listaTemporaria.removeAt(oldIndex);
+                              listaTemporaria.insert(newIndex, item);
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            final chave = listaTemporaria[index];
+                            final rotulo =
+                                chave
+                                    .toString()
+                                    .replaceAll("01_", "")
+                                    .replaceAll("02_", "")
+                                    .replaceAll("_", " ")
+                                    .toUpperCase();
+                            return ListTile(
+                              key: ValueKey(chave),
+                              leading: const Icon(
+                                Icons.drag_handle,
+                                color: PaletaCores.corAzulEscuro,
+                              ),
+                              title: Text(
+                                rotulo,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            );
+                          },
+                        ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    "Cancelar",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    "Aplicar",
+                    style: TextStyle(
+                      color: PaletaCores.corAzulEscuro,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (salvou == true) {
+      setState(() {
+        ordemColunasPersonalizada = listaTemporaria;
+        linhasDataRow.clear();
+        listaLinhaEscalaOrdenada.clear();
+        cabecalhoEscala.clear();
+        cabecalhoDataColumn.clear();
+        quantidadeRepeticaoNomePesquisa = 0;
+        percorrerListaRetornadaBancoDados();
+      });
+    }
   }
 
   percorrerListaRetornadaBancoDados() {
@@ -156,25 +307,27 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     chamarCarregarLinhas(listaLinhaEscalaOrdenada, itemOrdenado);
   }
 
-  //metodo para fazer a ordenacao de cada item que for puxado do banco de dados
-  // para que a data e o horario de trabalho fiquem no comeco
   fazerOrdenacaoItemAItemMap(var item) {
     Map escalaOrdenadaMap = {};
     List<MapEntry> escalaOrdenadaItemMap = [];
-    // adicinando na lista todos os itens transformados em entries item  a item
     escalaOrdenadaItemMap.addAll(item.entries);
-    //fazendo ordenacao da lista para os itens menores ficarem em primeiro
-    // ou seja os item que contem numeracao no comeco
     escalaOrdenadaItemMap.sort((a, b) {
       return a.key.toString().compareTo(b.key.toString());
     });
     for (var element in escalaOrdenadaItemMap) {
-      escalaOrdenadaMap[element.key] = element.value.toString().replaceAll("_", " ");
+      escalaOrdenadaMap[element.key] = element.value.toString().replaceAll(
+        "_",
+        " ",
+      );
     }
-    return escalaOrdenadaMap;
+    _sincronizarOrdemColunas(escalaOrdenadaMap.keys.toList());
+    return _aplicarOrdemColunasNoMap(
+      escalaOrdenadaMap,
+      ordemColunasPersonalizada,
+    );
   }
 
-  chamarCarregarLinhas(List<Map> listaLinhaEscalaOrdenada, Map itemOrdenado) {
+  chamarCarregarLinhas(List listaLinhaEscalaOrdenada, Map itemOrdenado) {
     for (var element in listaLinhaEscalaOrdenada) {
       List<dynamic> elementos = [];
       chamarCarregarCabecalho(itemOrdenado);
@@ -184,7 +337,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     }
   }
 
-  ordenarListaPelaDataEHorario(List<Map> listaOrdernar) {
+  ordenarListaPelaDataEHorario(List listaOrdernar) {
     listaOrdernar.sort((a, b) {
       int data = DateFormat("dd/MM/yyyy EEEE", "pt_BR")
           .parse(a.values.elementAt(0))
@@ -194,18 +347,14 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
       if (data != 0) {
         return data;
       }
-      // caso a condicao acima retorne 0 quer dizer que as datas sao iguais
-      // logo sera colocado em ordem baseado na ordem a baixo
       return a.values.elementAt(1).compareTo(b.values.elementAt(1));
     });
     return listaOrdernar;
   }
 
-  // metodo para pegar os valores que irao compor o cabecalho
   chamarCarregarCabecalho(Map escalaOrdenadaMap) {
     if (cabecalhoEscala.isEmpty) {
       cabecalhoEscala = escalaOrdenadaMap.keys.toList();
-      //adicionando no cabecalho colunas de editar e excluir
       cabecalhoEscala.addAll([Constantes.editar, Constantes.excluir]);
       carregarCabecalho();
     }
@@ -222,6 +371,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   width: 35,
                   height: 35,
                   child: FloatingActionButton(
+                    tooltip: Textos.btnEditar,
                     heroTag: "${Constantes.editar}$contadorBtnFloat",
                     onPressed: () {
                       String dataComHoraItem =
@@ -251,6 +401,7 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                   width: 35,
                   height: 35,
                   child: FloatingActionButton(
+                    tooltip: Textos.btnExcluir,
                     heroTag: "${Constantes.excluir}$contadorBtnFloat",
                     onPressed: () {
                       String dataComHoraItem =
@@ -283,12 +434,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                 Container(
                   decoration: validarNomeFoco(e.replaceAll("_", " ")),
                   width: 90,
-                  //SET width
                   child: SingleChildScrollView(
-                    child: Text(
-                      e.toString(),
-                      textAlign: TextAlign.center,
-                    ),
+                    child: Text(e.toString(), textAlign: TextAlign.center),
                   ),
                 ),
               );
@@ -301,7 +448,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
 
   carregarCabecalho() {
     for (var element in cabecalhoEscala) {
-      print(element);
       cabecalhoDataColumn.add(
         DataColumn(
           label: Text(
@@ -318,7 +464,6 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
   }
 
   validarNomeFoco(String nome) {
-    //colocando tudo em minuscolo pois se tiver maiusculo nao localiza
     if (nome.toLowerCase().contains(nomeReacar.toLowerCase()) &&
         nomeReacar.isNotEmpty) {
       quantidadeRepeticaoNomePesquisa++;
@@ -336,12 +481,11 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     }
   }
 
-  // // Metodo para chamar deletar tabela
   chamarDeletar(String idDocumento) async {
     try {
       var db = FirebaseFirestore.instance;
       await db
-          .collection(nomeColecaoUsuariosFireBase) // passando a colecao
+          .collection(nomeColecaoUsuariosFireBase)
           .doc(uidUsuario)
           .collection(nomeColecaoFireBase)
           .doc(widget.idTabelaSelecionada)
@@ -551,9 +695,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
         children: [
           Text(
             nomeBotao,
-            textAlign: TextAlign.center,  style: TextStyle(
-            color: Colors.black,
-          ),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black),
           ),
         ],
       ),
@@ -565,11 +708,13 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
     Color corBotao,
     double largura,
     double altura,
+    String legandaToolTip,
   ) => Container(
     margin: EdgeInsets.symmetric(horizontal: 5.0),
     width: largura,
     height: altura,
     child: FloatingActionButton(
+      tooltip: legandaToolTip,
       heroTag: icone.toString(),
       onPressed: () {
         if (icone == Constantes.iconeAbrirBarraPesquisa) {
@@ -578,6 +723,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
           });
         } else if (icone == Constantes.iconeBarraPesquisar) {
           chamarPesquisarNome();
+        } else if (icone == Constantes.iconeOrdenarLista) {
+          abrirDialogOrdenarColunas();
         } else {
           setState(() {
             exibirBarraPesquisa = false;
@@ -618,6 +765,15 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
               return Scaffold(
                 appBar: AppBar(
                   actions: [
+                    if (listaLinhaEscalaOrdenada.isNotEmpty)
+                      botoesIcone(
+                        Constantes.iconeOrdenarLista,
+                        PaletaCores.corAzulEscuro,
+                        40,
+                        40,
+                        Textos
+                            .telaEscalaDetalhadaLegandaToolTipOrganizarColunas,
+                      ),
                     LayoutBuilder(
                       builder: (context, constraints) {
                         if (listaLinhaEscalaOrdenada.isEmpty) {
@@ -628,6 +784,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                             PaletaCores.corAzulEscuro,
                             40,
                             40,
+                            Textos
+                                .telaEscalaDetalhadaLegandaToolTipPesquisaNome,
                           );
                         }
                       },
@@ -655,7 +813,10 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                         child: Column(
                           children: [
                             Container(
-                              margin: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 20,
+                                horizontal: 10,
+                              ),
                               width: larguraTela,
                               height: 200,
                               child: Text(
@@ -767,6 +928,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                                     PaletaCores.corVerdeCiano,
                                                     40,
                                                     40,
+                                                    Textos
+                                                        .telaEscalaDetalhadaLegandaToolTipPesquisar,
                                                   ),
                                                   botoesIcone(
                                                     Constantes.iconeExclusao,
@@ -774,6 +937,8 @@ class _TelaEscalaDetalhadaState extends State<TelaEscalaDetalhada> {
                                                         .corRosaAvermelhado,
                                                     35,
                                                     35,
+                                                    Textos
+                                                        .telaEscalaDetalhadaLegandaToolTipFechar,
                                                   ),
                                                 ],
                                               ),

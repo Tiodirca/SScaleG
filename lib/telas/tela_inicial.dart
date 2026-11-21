@@ -163,11 +163,12 @@ class _TelaInicialState extends State<TelaInicial> {
     ),
   );
 
-  Widget botoesIcones(IconData icone) => Container(
+  Widget botoesIcones(IconData icone,String legenda) => Container(
     margin: EdgeInsets.symmetric(horizontal: 10),
     height: 40,
     width: 40,
     child: FloatingActionButton(
+      tooltip: legenda,
       heroTag: icone.toString(),
       onPressed: () async {
         if (icone == Constantes.iconeConfiguracao) {
@@ -213,7 +214,9 @@ class _TelaInicialState extends State<TelaInicial> {
                   botoesIcones(
                     exibirWidgetAjustarHorario == true
                         ? Constantes.iconeExclusao
-                        : Constantes.iconeConfiguracao,
+                        : Constantes.iconeConfiguracao, exibirWidgetAjustarHorario == true
+                      ? Textos.btnFechar
+                      : Textos.btnConfiguracao,
                   ),
                 ],
               ),
